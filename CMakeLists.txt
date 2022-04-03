@@ -30,6 +30,7 @@ FetchContent_MakeAvailable(Catch2)
 add_executable(test-filter
   test/moving-average-test.cpp
   test/iir-filter-test.cpp
+  test/fir-exponential-test.cpp
   test/iir-exponential-test.cpp
 )
 target_link_libraries(test-filter PRIVATE Catch2::Catch2WithMain dh::filter)

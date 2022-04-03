@@ -36,13 +36,15 @@ typedef struct {
 
 
 typedef enum {
-    DH_MOVING_AVERAGE,
-    DH_MOVING_AVERAGE_HIGHPASS,
+    DH_FIR_MOVING_AVERAGE,
+    DH_FIR_MOVING_AVERAGE_HIGHPASS,
+    DH_FIR_EXPONENTIAL_LOWPASS,
     DH_IIR_EXPONENTIAL_LOWPASS
 } DH_FILTER_TYPE;
 
 typedef struct {
     DH_FILTER_VALUE_TYPE alpha;
+    size_t filter_order;
 } dh_exponential_filter_parameters;
 
 

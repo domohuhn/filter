@@ -12,7 +12,7 @@
 static DH_FILTER_RETURN_VALUE dh_create_moving_average(dh_filter_data* filter, dh_filter_options* options);
 static DH_FILTER_RETURN_VALUE dh_create_moving_average_highpass(dh_filter_data* filter, dh_filter_options* options);
 static DH_FILTER_RETURN_VALUE dh_iir_exponential_lowpass(dh_filter_data* filter, dh_filter_options* options);
-static DH_FILTER_RETURN_VALUE dh_iir_exponential_highpass(dh_filter_data* filter, dh_filter_options* options);
+static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter, dh_filter_options* options);
 
 DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_options* options)
 {
@@ -23,11 +23,14 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_option
     }
     DH_FILTER_RETURN_VALUE rv = DH_FILTER_UNKNOWN_FILTER_TYPE;
     switch(options->filter_type){
-        case DH_MOVING_AVERAGE:
+        case DH_FIR_MOVING_AVERAGE:
             rv = dh_create_moving_average(filter, options);
             break;
-        case DH_MOVING_AVERAGE_HIGHPASS:
+        case DH_FIR_MOVING_AVERAGE_HIGHPASS:
             rv = dh_create_moving_average_highpass(filter, options);
+            break;
+        case DH_FIR_EXPONENTIAL_LOWPASS:
+            rv = dh_fir_exponential_lowpass(filter, options);
             break;
         case DH_IIR_EXPONENTIAL_LOWPASS:
             rv = dh_iir_exponential_lowpass(filter, options);
@@ -121,6 +124,25 @@ static DH_FILTER_RETURN_VALUE dh_iir_exponential_lowpass(dh_filter_data* filter,
     filter->coefficients_in[0] = val;
     filter->coefficients_out[0] = 1.0;
     filter->coefficients_out[1] = -(1.0-val);
+    return DH_FILTER_OK;
+}
+
+static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter, dh_filter_options* options)
+{
+    if (dh_filter_allocate_buffers(filter, options->parameters.exponential.filter_order, 0) != DH_FILTER_OK) {
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    DH_FILTER_VALUE_TYPE current = 1.0;
+    DH_FILTER_VALUE_TYPE integrated = 0.0;
+    DH_FILTER_VALUE_TYPE val = options->parameters.exponential.alpha;
+    for (size_t i=0; i<filter->number_coefficients_in; ++i) {
+        filter->coefficients_in[i] = current;
+        integrated += current;
+        current *= val;
+    }
+    for (size_t i=0; i<filter->number_coefficients_in; ++i) {
+        filter->coefficients_in[i] = filter->coefficients_in[i]/integrated;
+    }
     return DH_FILTER_OK;
 }
 
