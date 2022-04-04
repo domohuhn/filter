@@ -26,13 +26,11 @@ DH_FILTER_RETURN_VALUE dh_filter(dh_filter_data* filter, double input, double* o
         return DH_FILTER_DATA_STRUCTURE_INPUTS_NOT_INITIALIZED;
     }
     if(!filter->initialized) {
-        // printf("==> init\n");
         dh_initialize_filter(filter,input);
     }
 
     dh_filter_add_input(filter, input);
     dh_filter_run_input_loop(filter);
-    // printf("/// inputs %f current %f\n", input,filter->current_value);
 
     if (filter->number_coefficients_out > 0) {
         if (filter->outputs == NULL || filter->coefficients_out == NULL) {
@@ -41,7 +39,6 @@ DH_FILTER_RETURN_VALUE dh_filter(dh_filter_data* filter, double input, double* o
         dh_filter_shift_output(filter);
         dh_filter_run_output_loop(filter);
         dh_filter_add_output(filter);
-        // printf("//// outsetp %f current %f\n", input,filter->current_value);
     }
 
     if (output) {
@@ -87,12 +84,10 @@ static double dh_filter_run_filter_loop(double* coefficients, size_t num_coeffs,
     for(size_t i=start; i< split_loops; ++i) {
         size_t idx = current_idx + i;
         out += coefficients[i] * data[idx];
-        // printf("l1 %f %f\n", coefficients[i],data[idx]);
     }
     for(size_t i=split_loops; i <  num_coeffs; ++i) {
         size_t idx = i-split_loops;
         out += coefficients[i] * data[idx];
-        // printf("l2 %f %f\n", coefficients[i],data[idx]);
     }
     return out;
 }

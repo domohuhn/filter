@@ -44,7 +44,6 @@ typedef struct {
     double cutoff_frequency_2_hz;
     double sampling_frequency_hz;
     size_t filter_order;
-    DH_FILTER_CHARACTERISTIC filter_characteristic;
 } dh_butterworth_parameters;
 
 
@@ -53,7 +52,6 @@ typedef struct {
     double cutoff_frequency_2_hz;
     double sampling_frequency_hz;
     size_t filter_order;
-    DH_FILTER_CHARACTERISTIC filter_characteristic;
     double ripple;
 } dh_chebyshev_parameters;
 

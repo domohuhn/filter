@@ -37,6 +37,8 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_option
 /**
  * @brief Forces the filter to the steady state with output value.
  * 
+ * Note: This function only makes sense for low-pass or band-stop filters!
+ * 
  * @param filter the filter structure
  * @param value the desired steady state
  * @return DH_FILTER_RETURN_VALUE 

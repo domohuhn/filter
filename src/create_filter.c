@@ -1,5 +1,6 @@
 #include "dh/filter.h"
 #include "dh/butterworth.h"
+#include "dh/chebyshev.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -14,8 +15,10 @@ static DH_FILTER_RETURN_VALUE dh_create_moving_average(dh_filter_data* filter, d
 static DH_FILTER_RETURN_VALUE dh_create_moving_average_highpass(dh_filter_data* filter, dh_filter_options* options);
 static DH_FILTER_RETURN_VALUE dh_iir_exponential_lowpass(dh_filter_data* filter, dh_filter_options* options);
 static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter, dh_filter_options* options);
-static DH_FILTER_RETURN_VALUE dh_iir_butterworth_lowpass(dh_filter_data* filter, dh_filter_options* options);
-static DH_FILTER_RETURN_VALUE dh_iir_butterworth_highpass(dh_filter_data* filter, dh_filter_options* options);
+static DH_FILTER_RETURN_VALUE dh_iir_butterworth_high_lowpass(dh_filter_data* filter, dh_filter_options* options, bool lowpass);
+static DH_FILTER_RETURN_VALUE dh_iir_butterworth_bandfilter(dh_filter_data* filter, dh_filter_options* options, bool bandpass);
+static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_high_lowpass(dh_filter_data* filter, dh_filter_options* options, bool lowpass);
+static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_bandfilter(dh_filter_data* filter, dh_filter_options* options, bool bandfilter);
 
 DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_options* options)
 {
@@ -38,11 +41,21 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_option
         case DH_IIR_EXPONENTIAL_LOWPASS:
             rv = dh_iir_exponential_lowpass(filter, options);
             break;
-        case DH_IIR_BUTTERWORTH_LOWPASS:
-            rv = dh_iir_butterworth_lowpass(filter, options);
-            break;
+        case DH_IIR_BUTTERWORTH_LOWPASS: // fallthrough
         case DH_IIR_BUTTERWORTH_HIGHPASS:
-            rv = dh_iir_butterworth_highpass(filter, options);
+            rv = dh_iir_butterworth_high_lowpass(filter, options, options->filter_type == DH_IIR_BUTTERWORTH_LOWPASS);
+            break;
+        case DH_IIR_BUTTERWORTH_BANDPASS: // fallthrough
+        case DH_IIR_BUTTERWORTH_BANDSTOP:
+            rv = dh_iir_butterworth_bandfilter(filter, options, options->filter_type == DH_IIR_BUTTERWORTH_BANDPASS);
+            break;
+        case DH_IIR_CHEBYSHEV_LOWPASS: // fallthrough
+        case DH_IIR_CHEBYSHEV_HIGHPASS:
+            rv = dh_iir_chebyshev_high_lowpass(filter, options, options->filter_type == DH_IIR_CHEBYSHEV_LOWPASS);
+            break;
+        case DH_IIR_CHEBYSHEV_BANDPASS: // fallthrough
+        case DH_IIR_CHEBYSHEV_BANDSTOP:
+            rv = dh_iir_chebyshev_bandfilter(filter, options, options->filter_type == DH_IIR_CHEBYSHEV_BANDPASS);
             break;
     }
     return rv;
@@ -155,23 +168,63 @@ static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter,
     return DH_FILTER_OK;
 }
 
-static DH_FILTER_RETURN_VALUE dh_iir_butterworth_lowpass(dh_filter_data* filter, dh_filter_options* options)
+static DH_FILTER_RETURN_VALUE dh_iir_butterworth_high_lowpass(dh_filter_data* filter, dh_filter_options* options, bool lowpass)
 {
     size_t coefficients = options->parameters.butterworth.filter_order + 1;
     if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    compute_butterworth_lowpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.butterworth.filter_order,
-        options->parameters.butterworth.cutoff_frequency_hz, options->parameters.butterworth.sampling_frequency_hz);
+    if (lowpass) {
+        return compute_butterworth_lowpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.butterworth.filter_order,
+            options->parameters.butterworth.cutoff_frequency_hz, options->parameters.butterworth.sampling_frequency_hz);
+    } else {
+        filter->initialized = true;
+        return compute_butterworth_highpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.butterworth.filter_order,
+            options->parameters.butterworth.cutoff_frequency_hz, options->parameters.butterworth.sampling_frequency_hz);
+    }
 }
 
-static DH_FILTER_RETURN_VALUE dh_iir_butterworth_highpass(dh_filter_data* filter, dh_filter_options* options)
+static DH_FILTER_RETURN_VALUE dh_iir_butterworth_bandfilter(dh_filter_data* filter, dh_filter_options* options, bool bandpass)
 {
-    size_t coefficients = options->parameters.butterworth.filter_order + 1;
+    size_t coefficients = 2*options->parameters.butterworth.filter_order + 1;
     if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    compute_butterworth_highpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.butterworth.filter_order,
-        options->parameters.butterworth.cutoff_frequency_hz, options->parameters.butterworth.sampling_frequency_hz);
+    filter->initialized = true;
+    return compute_butterworth_bandfilter_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.butterworth.filter_order,
+        options->parameters.butterworth.cutoff_frequency_hz, options->parameters.butterworth.cutoff_frequency_2_hz,
+        options->parameters.butterworth.sampling_frequency_hz,bandpass);
+}
+
+
+static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_high_lowpass(dh_filter_data* filter, dh_filter_options* options, bool lowpass)
+{
+    size_t coefficients = options->parameters.chebyshev.filter_order + 1;
+    if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    if (lowpass) {
+        return compute_chebyshev_lowpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.chebyshev.filter_order,
+            options->parameters.chebyshev.cutoff_frequency_hz, options->parameters.chebyshev.sampling_frequency_hz,
+            options->parameters.chebyshev.ripple);
+    } else {
+        filter->initialized = true;
+        return compute_chebyshev_highpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.chebyshev.filter_order,
+            options->parameters.chebyshev.cutoff_frequency_hz, options->parameters.chebyshev.sampling_frequency_hz,
+            options->parameters.chebyshev.ripple);
+    }
+}
+
+static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_bandfilter(dh_filter_data* filter, dh_filter_options* options, bool bandpass)
+{
+    size_t coefficients = 2*options->parameters.chebyshev.filter_order + 1;
+    if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    filter->initialized = true;
+    return compute_chebyshev_bandfilter_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.chebyshev.filter_order,
+        options->parameters.chebyshev.cutoff_frequency_hz, options->parameters.chebyshev.cutoff_frequency_2_hz,
+        options->parameters.chebyshev.sampling_frequency_hz,bandpass,
+        options->parameters.chebyshev.ripple);
 }
 
