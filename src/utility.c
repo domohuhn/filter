@@ -1,0 +1,244 @@
+#include "dh/utility.h"
+#include "dh/chebyshev.h"
+#define _USE_MATH_DEFINES
+#include "math.h"
+#include "stdlib.h"
+
+COMPLEX bilinear_z_transform(COMPLEX p) {
+    return (2.0 + p)/(2.0 -p);
+}
+
+
+static COMPLEX complex_unit_circle(double phi) {
+    return cos(phi) + sin(phi) *I;
+}
+
+void fill_array_with_binomial_coefficients(double* ptr, size_t number)
+{
+    if ( ptr==NULL || number==0 ) {
+        return;
+    }
+    size_t binom_base = number - 1;
+    ptr[0] = 1.0;
+    if(number > 1) {
+        ptr[1] = binom_base;
+        size_t mid = binom_base/2;
+        for (size_t i=2; i<=mid; ++i) {
+            ptr[i] = ptr[i-1] * (double)(number-i)/(double)i;
+        }
+        for (size_t i = mid+1; i<number; ++i) {
+            ptr[i] = ptr[binom_base-i];
+        }
+    }
+}
+
+
+void dh_alternate_signs(double* array, size_t len){
+    if (array == NULL) {
+        return;
+    }
+    for(size_t i=0; i<len; ++i) {
+        array[i] = i%2==0 ? array[i] : -array[i];
+    }
+}
+
+double transform_frequency(double frequency)
+{
+    return 2*tan(frequency * M_PI);
+}
+
+void compute_poles_on_s_plane(COMPLEX* ptr, size_t len, double transformed_frequency) {
+    for(size_t i=0; i<len; ++i) {
+        double phi = (2*i+1)*M_PI/(2*len) + M_PI/2.0;
+        ptr[i] = transformed_frequency * complex_unit_circle(phi);
+    }
+}
+
+void compute_polynomial_coefficients_from_roots(COMPLEX* roots, size_t len, COMPLEX* outputs)
+{
+    if ( roots==(void*)NULL|| len==0 || outputs==(void*)NULL ) {
+        return;
+    }
+    outputs[0] = -roots[0];
+    outputs[1] = 1.0;
+    for(size_t i=2; i<len; ++i) {
+        outputs[i] = outputs[i-1];
+        for(size_t k=i-1; k>=1; --k) {
+            outputs[k] = outputs[k-1] - outputs[k]*roots[i-1];
+        }
+        outputs[0] = -outputs[0]*roots[i-1];
+    }
+}
+
+static double accumulate_array(double* ptr, size_t len)
+{
+    double sum = 0.0;
+    for(size_t i=0; i<len; ++i){
+        sum += ptr[i];
+    }
+    return sum;
+}
+
+
+void dh_normalize_coefficients(double* numerator, double* denominator, size_t len)
+{
+    if (numerator == NULL || denominator == NULL) {
+        return;
+    }
+    double scale = accumulate_array(denominator,len)/accumulate_array(numerator,len);
+    for(size_t i=0; i<len; ++i){
+        numerator[i] *= scale;
+    }
+}
+
+DH_FILTER_RETURN_VALUE dh_create_bandpass_numerator_polynomial(double* numerator, size_t order)
+{
+    COMPLEX* roots = (COMPLEX*)malloc(sizeof(COMPLEX) * 2*order);
+    if(roots == NULL) {
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    COMPLEX* polynomial = (COMPLEX*)malloc(sizeof(COMPLEX) * (2*order+1));
+    if(polynomial == NULL) {
+        free(roots);
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    for (size_t i=0;i<order;++i) {
+        roots[i] = 1.0;
+        roots[order+i] = -1.0;
+    }
+    compute_polynomial_coefficients_from_roots(roots , 2*order+1 ,polynomial);
+    for (size_t i=0; i<(2*order+1);++i) {
+        numerator[i] = creal(polynomial[2*order-i]);
+        printf("numerator %zu: %f\n",i,numerator[i]);
+    }
+    free(polynomial);
+    free(roots);
+    return DH_FILTER_OK;
+}
+
+
+DH_FILTER_RETURN_VALUE dh_create_bandstop_numerator_polynomial(double* numerator, size_t order, double gm)
+{
+    COMPLEX* roots = (COMPLEX*)malloc(sizeof(COMPLEX) * 2*order);
+    if(roots == NULL) {
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    COMPLEX* polynomial = (COMPLEX*)malloc(sizeof(COMPLEX) * (2*order+1));
+    if(polynomial == NULL) {
+        free(roots);
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    COMPLEX positive = bilinear_z_transform(gm * I);
+    COMPLEX negative = bilinear_z_transform(-gm * I);
+    printf("z-plane zeros: %f + %fi %zu times\n",creal(positive),cimag(positive),order);
+    printf("z-plane zeros: %f + %fi %zu times\n",creal(negative),cimag(negative),order);
+    for (size_t i=0;i<order;++i) {
+        roots[i] = positive;
+        roots[order+i] = negative;
+    }
+    compute_polynomial_coefficients_from_roots(roots , 2*order+1 ,polynomial);
+    for (size_t i=0; i<(2*order+1);++i) {
+        numerator[i] = creal(polynomial[i]);
+        printf("numerator %zu: %f\n",i,numerator[i]);
+    }
+    free(polynomial);
+    free(roots);
+    return DH_FILTER_OK;
+}
+
+void dh_transform_poles_bandfilter(COMPLEX* poles, size_t len, double transformed_frequency_low,  double transformed_frequency_high, bool bandpass)
+{
+    if (poles == (void*)NULL) {
+        return;
+    }
+    double geo_mean = sqrt(transformed_frequency_low * transformed_frequency_high);
+    double geo_mean_sqr = geo_mean*geo_mean;
+    double half_difference = 0.5*(transformed_frequency_high - transformed_frequency_low);
+
+    for(size_t i =0; i<len; ++i) {
+        
+        printf("pole %zu before: %f+%fi\n",i,creal(poles[i]), cimag(poles[i]));
+        COMPLEX v1;
+        if (bandpass) {
+            v1 = half_difference * poles[i];
+        } else {
+            v1 = half_difference / poles[i];
+        }
+        COMPLEX v2 = csqrt( 1.0 - geo_mean_sqr/(v1*v1));
+        
+        printf("v1 %zu : %f+%fi\n",i,creal(v1), cimag(v1));
+        printf("v2 %zu : %f+%fi\n",i,creal(v2), cimag(v2));
+        poles[i] = v1 * ( 1.0 + v2 );
+        poles[i+len] = v1 * ( 1.0 - v2 );
+        printf("pole %zu after: %f+%fi\n",i,creal(poles[i]), cimag(poles[i]));
+        printf("pole %zu after: %f+%fi\n\n",i+len,creal(poles[i+len]), cimag(poles[i+len]));
+    }
+}
+
+
+DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_denominator(double* ptr, size_t filter_order, double transformed_frequency_low, double transformed_frequency_high, bool bandpass, double* ripple_db)
+{
+    if(ptr == NULL || filter_order == 0) {
+        return DH_FILTER_NO_DATA_STRUCTURE;
+    }
+    COMPLEX* poles = (COMPLEX*)malloc(sizeof(COMPLEX) * (2*filter_order));
+    if(poles == NULL) {
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    COMPLEX* polycoeff = (COMPLEX*)malloc(sizeof(COMPLEX) * (2*filter_order+1));
+    if(polycoeff == NULL) {
+        free(poles);
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    compute_poles_on_s_plane(poles,filter_order,1.0);
+    for(size_t i=0; i<filter_order; ++i) {
+        printf("poles s-plane %zu : %f + %fi\n", i,  creal(poles[i]), cimag(poles[i]));
+    }
+    if(ripple_db != (void*)NULL) {
+        dh_transform_s_poles_to_chebyshev(poles,filter_order,*ripple_db);
+    }
+    dh_transform_poles_bandfilter(poles,filter_order,transformed_frequency_low,transformed_frequency_high,bandpass);
+    for(size_t i=0; i<2*filter_order; ++i) {
+        printf("trafod poles s-plane %zu : %f + %fi\n", i,  creal(poles[i]), cimag(poles[i]));
+    }
+    for(size_t i=0; i<2*filter_order; ++i) {
+        poles[i] = bilinear_z_transform(poles[i]);
+        printf("poles z-plane %zu : %f + %fi\n", i,  creal(poles[i]), cimag(poles[i]));
+    }
+
+    size_t len = 2*filter_order+1;
+    compute_polynomial_coefficients_from_roots(poles, len, polycoeff);
+
+    for(size_t i=0; i<len;++i){
+        ptr[i] = creal(polycoeff[len-1-i]);
+        printf("denom %zu : %f\n", i, ptr[i]);
+    }
+    
+    free(polycoeff);
+    free(poles);
+    
+    return DH_FILTER_OK;
+}
+
+static COMPLEX evaluate_polynomial(double* coeffs, size_t len, COMPLEX x) 
+{
+    COMPLEX rv = 0.0;
+    for(size_t i=0; i<len; ++i) {
+        rv = rv*x + coeffs[i];
+    }
+    return rv;
+}
+
+void dh_normalize_bandpass_coefficients(double* numerator,double* denominator,size_t len, double x_evaluate)
+{
+    if(numerator == NULL || denominator == NULL) {
+        return;
+    }
+    COMPLEX arg = complex_unit_circle(2*M_PI*x_evaluate);
+    COMPLEX num = evaluate_polynomial(numerator,len,arg);
+    COMPLEX denom = evaluate_polynomial(denominator,len,arg);
+    double scale = cabs(denom/num);
+    for(size_t i=0; i<len; ++i) {
+        numerator[i] *= scale;
+    }
+}

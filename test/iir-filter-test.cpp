@@ -14,13 +14,13 @@ SCENARIO( "The coefficients are used in correct order", "[filter]" ) {
         filter_data.number_coefficients_in = 4;
         filter_data.number_coefficients_out = 0;
         filter_data.current_output_index = 0;
-        DH_FILTER_VALUE_TYPE indata[4] = {0.0};
-        DH_FILTER_VALUE_TYPE incoeffs[4] = {-0.5, 0.25, -0.75, -1.5};
+        double indata[4] = {0.0};
+        double incoeffs[4] = {-0.5, 0.25, -0.75, -1.5};
         filter_data.inputs = indata;
         filter_data.coefficients_in = incoeffs;
 
         WHEN( "an impulse input is filtered" ) {  
-            DH_FILTER_VALUE_TYPE output=0.0;
+            double output=0.0;
             int status = dh_filter(&filter_data, 20.0F, &output);
 
             THEN( "the filter first returns coefficient 0 times inmpulse" ) {
@@ -70,17 +70,17 @@ SCENARIO( "The coefficients are used in correct order", "[filter]" ) {
         filter_data.number_coefficients_in = 1;
         filter_data.number_coefficients_out = 4;
         filter_data.current_output_index = 0;
-        DH_FILTER_VALUE_TYPE indata[1] = {0.0};
-        DH_FILTER_VALUE_TYPE incoeffs[1] = {0.0};
-        DH_FILTER_VALUE_TYPE outdata[4] = {1.0, 0.0, 0.0, 0.0};
-        DH_FILTER_VALUE_TYPE outcoeffs[4] = {1.0, -2.0, -3.0, -4.0};
+        double indata[1] = {0.0};
+        double incoeffs[1] = {0.0};
+        double outdata[4] = {1.0, 0.0, 0.0, 0.0};
+        double outcoeffs[4] = {1.0, -2.0, -3.0, -4.0};
         filter_data.inputs = indata;
         filter_data.coefficients_in = incoeffs;
         filter_data.outputs = outdata;
         filter_data.coefficients_out = outcoeffs;
 
         WHEN( "filter is called" ) {  
-            DH_FILTER_VALUE_TYPE output=0.0;
+            double output=0.0;
             int status = dh_filter(&filter_data, 0.0F, &output);
 
             THEN( "the filter returns -(output coefficient 1) times last output" ) {

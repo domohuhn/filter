@@ -24,15 +24,15 @@ SCENARIO( "An FIR exponential lowpass filter can be used", "[filter]" ) {
                 REQUIRE(filter_data.number_coefficients_in == 16);
                 REQUIRE(filter_data.number_coefficients_out == 0);
                 REQUIRE((void*)filter_data.coefficients_in == (void*)filter_data.buffer);
-                REQUIRE((void*)filter_data.inputs == (filter_data.buffer + 16 * sizeof(DH_FILTER_VALUE_TYPE)));
+                REQUIRE((void*)filter_data.inputs == (filter_data.buffer + 16 * sizeof(double)));
                 REQUIRE((void*)filter_data.coefficients_out == (void*)NULL);
                 REQUIRE((void*)filter_data.outputs == (void*)NULL);
                 REQUIRE(filter_data.current_input_index == 0);
                 REQUIRE(filter_data.current_output_index == 0);
-                REQUIRE(filter_data.buffer_length == 32*sizeof(DH_FILTER_VALUE_TYPE));
+                REQUIRE(filter_data.buffer_length == 32*sizeof(double));
                 REQUIRE(filter_data.initialized == false);
             }
-            DH_FILTER_VALUE_TYPE output=0.0;
+            double output=0.0;
             int status = dh_filter(&filter_data, 10.0, &output);
 
             THEN("The filter can be initialized") {

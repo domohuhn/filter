@@ -1,4 +1,5 @@
 #include "dh/filter.h"
+#include "dh/butterworth.h"
 #include <assert.h>
 #include <stdlib.h>
 
@@ -13,6 +14,8 @@ static DH_FILTER_RETURN_VALUE dh_create_moving_average(dh_filter_data* filter, d
 static DH_FILTER_RETURN_VALUE dh_create_moving_average_highpass(dh_filter_data* filter, dh_filter_options* options);
 static DH_FILTER_RETURN_VALUE dh_iir_exponential_lowpass(dh_filter_data* filter, dh_filter_options* options);
 static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter, dh_filter_options* options);
+static DH_FILTER_RETURN_VALUE dh_iir_butterworth_lowpass(dh_filter_data* filter, dh_filter_options* options);
+static DH_FILTER_RETURN_VALUE dh_iir_butterworth_highpass(dh_filter_data* filter, dh_filter_options* options);
 
 DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_options* options)
 {
@@ -35,6 +38,12 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_option
         case DH_IIR_EXPONENTIAL_LOWPASS:
             rv = dh_iir_exponential_lowpass(filter, options);
             break;
+        case DH_IIR_BUTTERWORTH_LOWPASS:
+            rv = dh_iir_butterworth_lowpass(filter, options);
+            break;
+        case DH_IIR_BUTTERWORTH_HIGHPASS:
+            rv = dh_iir_butterworth_highpass(filter, options);
+            break;
     }
     return rv;
 }
@@ -42,7 +51,7 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_option
 static DH_FILTER_RETURN_VALUE dh_filter_allocate_buffers(dh_filter_data* filter, size_t num_inputs, size_t num_outputs)
 {
     size_t total_num = 2 * (num_inputs + num_outputs);
-    filter->buffer_length = total_num * sizeof(DH_FILTER_VALUE_TYPE);
+    filter->buffer_length = total_num * sizeof(double);
     filter->buffer = malloc(filter->buffer_length);
     if(filter->buffer == NULL) {
         return DH_FILTER_ALLOCATION_FAILED;
@@ -50,7 +59,7 @@ static DH_FILTER_RETURN_VALUE dh_filter_allocate_buffers(dh_filter_data* filter,
     filter->buffer_needs_cleanup = true;
 
     size_t offset = 0;
-    DH_FILTER_VALUE_TYPE* ptr = (DH_FILTER_VALUE_TYPE*)filter->buffer;
+    double* ptr = (double*)filter->buffer;
     if (num_inputs>0) {
         filter->coefficients_in = ptr;
         offset += num_inputs;
@@ -94,7 +103,7 @@ static DH_FILTER_RETURN_VALUE dh_create_moving_average(dh_filter_data* filter, d
     if (dh_filter_allocate_buffers(filter, options->parameters.moving_average.filter_order, 0) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    DH_FILTER_VALUE_TYPE val = 1.0/(DH_FILTER_VALUE_TYPE)filter->number_coefficients_in;
+    double val = 1.0/(double)filter->number_coefficients_in;
     for (size_t i=0; i<filter->number_coefficients_in; ++i) {
         filter->coefficients_in[i] = val;
     }
@@ -120,7 +129,7 @@ static DH_FILTER_RETURN_VALUE dh_iir_exponential_lowpass(dh_filter_data* filter,
     if (dh_filter_allocate_buffers(filter, 1, 2) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    DH_FILTER_VALUE_TYPE val = options->parameters.exponential.alpha;
+    double val = options->parameters.exponential.alpha;
     filter->coefficients_in[0] = val;
     filter->coefficients_out[0] = 1.0;
     filter->coefficients_out[1] = -(1.0-val);
@@ -132,9 +141,9 @@ static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter,
     if (dh_filter_allocate_buffers(filter, options->parameters.exponential.filter_order, 0) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    DH_FILTER_VALUE_TYPE current = 1.0;
-    DH_FILTER_VALUE_TYPE integrated = 0.0;
-    DH_FILTER_VALUE_TYPE val = options->parameters.exponential.alpha;
+    double current = 1.0;
+    double integrated = 0.0;
+    double val = options->parameters.exponential.alpha;
     for (size_t i=0; i<filter->number_coefficients_in; ++i) {
         filter->coefficients_in[i] = current;
         integrated += current;
@@ -146,6 +155,23 @@ static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter,
     return DH_FILTER_OK;
 }
 
+static DH_FILTER_RETURN_VALUE dh_iir_butterworth_lowpass(dh_filter_data* filter, dh_filter_options* options)
+{
+    size_t coefficients = options->parameters.butterworth.filter_order + 1;
+    if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    compute_butterworth_lowpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.butterworth.filter_order,
+        options->parameters.butterworth.cutoff_frequency_hz, options->parameters.butterworth.sampling_frequency_hz);
+}
 
-
+static DH_FILTER_RETURN_VALUE dh_iir_butterworth_highpass(dh_filter_data* filter, dh_filter_options* options)
+{
+    size_t coefficients = options->parameters.butterworth.filter_order + 1;
+    if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    compute_butterworth_highpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.butterworth.filter_order,
+        options->parameters.butterworth.cutoff_frequency_hz, options->parameters.butterworth.sampling_frequency_hz);
+}
 

@@ -22,18 +22,18 @@ SCENARIO( "A moving average filter can be created", "[filter]" ) {
                 REQUIRE(moving_avg.number_coefficients_in == 16);
                 REQUIRE(moving_avg.number_coefficients_out == 0);
                 REQUIRE((void*)moving_avg.coefficients_in == (void*)moving_avg.buffer);
-                REQUIRE((void*)moving_avg.inputs == (moving_avg.buffer + 16 * sizeof(DH_FILTER_VALUE_TYPE)));
+                REQUIRE((void*)moving_avg.inputs == (moving_avg.buffer + 16 * sizeof(double)));
                 REQUIRE((void*)moving_avg.coefficients_out == (void*)NULL);
                 REQUIRE((void*)moving_avg.outputs == (void*)NULL);
                 REQUIRE(moving_avg.current_input_index == 0);
                 REQUIRE(moving_avg.current_output_index == 0);
-                REQUIRE(moving_avg.buffer_length == 32*sizeof(DH_FILTER_VALUE_TYPE));
+                REQUIRE(moving_avg.buffer_length == 32*sizeof(double));
                 REQUIRE(moving_avg.initialized == false);
                 for(size_t i=0;i<16;++i) {
                     REQUIRE(moving_avg.coefficients_in[i] == 1.0/16.0);
                 }
             }
-            DH_FILTER_VALUE_TYPE output=0.0;
+            double output=0.0;
             int status = dh_filter(&moving_avg, 10.0, &output);
 
             THEN("The filter can be initialized") {
@@ -64,13 +64,13 @@ SCENARIO( "A moving average filter can be used", "[filter]" ) {
         moving_avg.number_coefficients_in = 4;
         moving_avg.number_coefficients_out = 0;
         moving_avg.current_output_index = 0;
-        DH_FILTER_VALUE_TYPE indata[4] = {0.0};
-        DH_FILTER_VALUE_TYPE incoeffs[4] = {0.25, 0.25, 0.25, 0.25};
+        double indata[4] = {0.0};
+        double incoeffs[4] = {0.25, 0.25, 0.25, 0.25};
         moving_avg.inputs = indata;
         moving_avg.coefficients_in = incoeffs;
 
         WHEN( "a step function is filtered" ) {  
-            DH_FILTER_VALUE_TYPE output=0.0;
+            double output=0.0;
             int status = dh_filter(&moving_avg, 0.0F, &output);
 
             THEN( "the filter first returns zero" ) {
@@ -135,19 +135,19 @@ SCENARIO( "A moving average highpass filter can be used", "[filter]" ) {
                 REQUIRE(moving_avg.number_coefficients_in == 16);
                 REQUIRE(moving_avg.number_coefficients_out == 0);
                 REQUIRE((void*)moving_avg.coefficients_in == (void*)moving_avg.buffer);
-                REQUIRE((void*)moving_avg.inputs == (moving_avg.buffer + 16 * sizeof(DH_FILTER_VALUE_TYPE)));
+                REQUIRE((void*)moving_avg.inputs == (moving_avg.buffer + 16 * sizeof(double)));
                 REQUIRE((void*)moving_avg.coefficients_out == (void*)NULL);
                 REQUIRE((void*)moving_avg.outputs == (void*)NULL);
                 REQUIRE(moving_avg.current_input_index == 0);
                 REQUIRE(moving_avg.current_output_index == 0);
-                REQUIRE(moving_avg.buffer_length == 32*sizeof(DH_FILTER_VALUE_TYPE));
+                REQUIRE(moving_avg.buffer_length == 32*sizeof(double));
                 REQUIRE(moving_avg.initialized == true);
                 REQUIRE(moving_avg.coefficients_in[0] == 1.0-1.0/16.0);
                 for(size_t i=1;i<16;++i) {
                     REQUIRE(moving_avg.coefficients_in[i] == -1.0/16.0);
                 }
             }
-            DH_FILTER_VALUE_TYPE output=0.0;
+            double output=0.0;
             int status = dh_filter(&moving_avg, 10.0, &output);
 
             THEN("The filter can be initialized") {
@@ -157,7 +157,7 @@ SCENARIO( "A moving average highpass filter can be used", "[filter]" ) {
             }
 
             for(size_t i=0; i<30; ++i) {
-                DH_FILTER_VALUE_TYPE last = output;
+                double last = output;
                 status = dh_filter(&moving_avg, 10.0, &output);
                 THEN("the output slowly drops to zero") {
                     REQUIRE(status == DH_FILTER_OK);

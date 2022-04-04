@@ -8,8 +8,11 @@ project(CFilter VERSION 1.0.0)
 
 add_library(filter 
   src/filter.c
+  src/utility.c
   src/create_filter.c
   src/free_filter.c
+  src/butterworth.c
+  src/chebyshev.c
 )
 target_include_directories(filter PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
@@ -28,11 +31,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Catch2)
 
 add_executable(test-filter
+  test/butterworth-test.cpp
+  test/chebyshev-test.cpp
   test/moving-average-test.cpp
   test/iir-filter-test.cpp
   test/fir-exponential-test.cpp
   test/iir-exponential-test.cpp
+  test/utility-test.cpp
 )
 target_link_libraries(test-filter PRIVATE Catch2::Catch2WithMain dh::filter)
-
-

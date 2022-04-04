@@ -9,14 +9,14 @@
  * This source code is licensed under the MIT license. See file "LICENSE" at the root of the repository.
  */
 
-static void dh_filter_add_input(dh_filter_data* filter, DH_FILTER_VALUE_TYPE input);
-static double dh_filter_run_filter_loop(DH_FILTER_VALUE_TYPE* coefficients, size_t num_coeffs, DH_FILTER_VALUE_TYPE* data, size_t current_idx , size_t start);
+static void dh_filter_add_input(dh_filter_data* filter, double input);
+static double dh_filter_run_filter_loop(double* coefficients, size_t num_coeffs, double* data, size_t current_idx , size_t start);
 static void dh_filter_run_input_loop(dh_filter_data* filter);
 static void dh_filter_run_output_loop(dh_filter_data* filter);
 static void dh_filter_shift_output(dh_filter_data* filter);
 static void dh_filter_add_output(dh_filter_data* filter);
 
-DH_FILTER_RETURN_VALUE dh_filter(dh_filter_data* filter, DH_FILTER_VALUE_TYPE input, DH_FILTER_VALUE_TYPE* output)
+DH_FILTER_RETURN_VALUE dh_filter(dh_filter_data* filter, double input, double* output)
 {
     assert(filter);
     if (!filter) {
@@ -52,7 +52,7 @@ DH_FILTER_RETURN_VALUE dh_filter(dh_filter_data* filter, DH_FILTER_VALUE_TYPE in
 }
 
 
-DH_FILTER_RETURN_VALUE dh_initialize_filter(dh_filter_data* filter, DH_FILTER_VALUE_TYPE value)
+DH_FILTER_RETURN_VALUE dh_initialize_filter(dh_filter_data* filter, double value)
 {
     assert(filter);
     if (!filter) {
@@ -69,7 +69,7 @@ DH_FILTER_RETURN_VALUE dh_initialize_filter(dh_filter_data* filter, DH_FILTER_VA
     return DH_FILTER_OK;
 }
 
-static void dh_filter_add_input(dh_filter_data* filter, DH_FILTER_VALUE_TYPE input)
+static void dh_filter_add_input(dh_filter_data* filter, double input)
 {
     if (filter->current_input_index>0) {
         filter->current_input_index -= 1;
@@ -80,9 +80,9 @@ static void dh_filter_add_input(dh_filter_data* filter, DH_FILTER_VALUE_TYPE inp
     filter->inputs[filter->current_input_index] = input;
 }
 
-static double dh_filter_run_filter_loop(DH_FILTER_VALUE_TYPE* coefficients, size_t num_coeffs, DH_FILTER_VALUE_TYPE* data, size_t current_idx , size_t start)
+static double dh_filter_run_filter_loop(double* coefficients, size_t num_coeffs, double* data, size_t current_idx , size_t start)
 {
-    DH_FILTER_VALUE_TYPE out = 0.0;
+    double out = 0.0;
     size_t split_loops = num_coeffs - current_idx;
     for(size_t i=start; i< split_loops; ++i) {
         size_t idx = current_idx + i;
