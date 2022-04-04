@@ -109,7 +109,6 @@ DH_FILTER_RETURN_VALUE dh_create_bandpass_numerator_polynomial(double* numerator
     compute_polynomial_coefficients_from_roots(roots , 2*order+1 ,polynomial);
     for (size_t i=0; i<(2*order+1);++i) {
         numerator[i] = creal(polynomial[2*order-i]);
-        printf("numerator %zu: %f\n",i,numerator[i]);
     }
     free(polynomial);
     free(roots);
@@ -130,8 +129,6 @@ DH_FILTER_RETURN_VALUE dh_create_bandstop_numerator_polynomial(double* numerator
     }
     COMPLEX positive = bilinear_z_transform(gm * I);
     COMPLEX negative = bilinear_z_transform(-gm * I);
-    printf("z-plane zeros: %f + %fi %zu times\n",creal(positive),cimag(positive),order);
-    printf("z-plane zeros: %f + %fi %zu times\n",creal(negative),cimag(negative),order);
     for (size_t i=0;i<order;++i) {
         roots[i] = positive;
         roots[order+i] = negative;
@@ -139,7 +136,6 @@ DH_FILTER_RETURN_VALUE dh_create_bandstop_numerator_polynomial(double* numerator
     compute_polynomial_coefficients_from_roots(roots , 2*order+1 ,polynomial);
     for (size_t i=0; i<(2*order+1);++i) {
         numerator[i] = creal(polynomial[i]);
-        printf("numerator %zu: %f\n",i,numerator[i]);
     }
     free(polynomial);
     free(roots);
@@ -156,8 +152,6 @@ void dh_transform_poles_bandfilter(COMPLEX* poles, size_t len, double transforme
     double half_difference = 0.5*(transformed_frequency_high - transformed_frequency_low);
 
     for(size_t i =0; i<len; ++i) {
-        
-        printf("pole %zu before: %f+%fi\n",i,creal(poles[i]), cimag(poles[i]));
         COMPLEX v1;
         if (bandpass) {
             v1 = half_difference * poles[i];
@@ -165,16 +159,10 @@ void dh_transform_poles_bandfilter(COMPLEX* poles, size_t len, double transforme
             v1 = half_difference / poles[i];
         }
         COMPLEX v2 = csqrt( 1.0 - geo_mean_sqr/(v1*v1));
-        
-        printf("v1 %zu : %f+%fi\n",i,creal(v1), cimag(v1));
-        printf("v2 %zu : %f+%fi\n",i,creal(v2), cimag(v2));
         poles[i] = v1 * ( 1.0 + v2 );
         poles[i+len] = v1 * ( 1.0 - v2 );
-        printf("pole %zu after: %f+%fi\n",i,creal(poles[i]), cimag(poles[i]));
-        printf("pole %zu after: %f+%fi\n\n",i+len,creal(poles[i+len]), cimag(poles[i+len]));
     }
 }
-
 
 DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_denominator(double* ptr, size_t filter_order, double transformed_frequency_low, double transformed_frequency_high, bool bandpass, double* ripple_db)
 {
@@ -191,19 +179,12 @@ DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_denominator(double* ptr, siz
         return DH_FILTER_ALLOCATION_FAILED;
     }
     compute_poles_on_s_plane(poles,filter_order,1.0);
-    for(size_t i=0; i<filter_order; ++i) {
-        printf("poles s-plane %zu : %f + %fi\n", i,  creal(poles[i]), cimag(poles[i]));
-    }
     if(ripple_db != (void*)NULL) {
         dh_transform_s_poles_to_chebyshev(poles,filter_order,*ripple_db);
     }
     dh_transform_poles_bandfilter(poles,filter_order,transformed_frequency_low,transformed_frequency_high,bandpass);
     for(size_t i=0; i<2*filter_order; ++i) {
-        printf("trafod poles s-plane %zu : %f + %fi\n", i,  creal(poles[i]), cimag(poles[i]));
-    }
-    for(size_t i=0; i<2*filter_order; ++i) {
         poles[i] = bilinear_z_transform(poles[i]);
-        printf("poles z-plane %zu : %f + %fi\n", i,  creal(poles[i]), cimag(poles[i]));
     }
 
     size_t len = 2*filter_order+1;
@@ -211,7 +192,6 @@ DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_denominator(double* ptr, siz
 
     for(size_t i=0; i<len;++i){
         ptr[i] = creal(polycoeff[len-1-i]);
-        printf("denom %zu : %f\n", i, ptr[i]);
     }
     
     free(polycoeff);
@@ -241,4 +221,38 @@ void dh_normalize_bandpass_coefficients(double* numerator,double* denominator,si
     for(size_t i=0; i<len; ++i) {
         numerator[i] *= scale;
     }
+}
+
+
+DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_coefficients(double* numerator, double* denominator, size_t filter_order, 
+    double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz, bool bandpass, double* ripple_db)
+{
+    if(numerator == NULL || denominator == NULL) {
+        return DH_FILTER_NO_DATA_STRUCTURE;
+    }
+    double transformed_low = transform_frequency(cutoff_low_hz/sampling_frequency_hz);
+    double transformed_high = transform_frequency(cutoff_high_hz/sampling_frequency_hz);
+
+    DH_FILTER_RETURN_VALUE rv;
+    if(bandpass) {
+        rv = dh_create_bandpass_numerator_polynomial(numerator,filter_order);
+    } else {
+        rv = dh_create_bandstop_numerator_polynomial(numerator,filter_order, sqrt(transformed_high*transformed_low));
+    }
+    if (rv != DH_FILTER_OK) {
+        return rv;
+    }
+
+    rv = compute_butt_cheb_bandfilter_denominator(denominator,filter_order,transformed_low, transformed_high, bandpass, ripple_db);
+    if(rv != DH_FILTER_OK) {
+        return rv;
+    }
+    if (!bandpass) {
+        dh_normalize_coefficients(numerator,denominator,2*filter_order+1);
+    }
+    else {
+        double center = (0.5*cutoff_low_hz + 0.5*cutoff_high_hz)/sampling_frequency_hz;
+        dh_normalize_bandpass_coefficients(numerator,denominator,2*filter_order+1, center);
+    }
+    return DH_FILTER_OK;
 }

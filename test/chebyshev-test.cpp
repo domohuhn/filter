@@ -8,7 +8,7 @@
  */
 
 SCENARIO("Chebyshev output coefficients can be computed", "[filter]") {
-     GIVEN("parameters: fourth order chebyshev, 100 Hz sampling rate, 25Hz cutoff, 3 db ripple") {
+     GIVEN("parameters: fourth order chebyshev, 100 Hz sampling rate, 25Hz cutoff, 3 db ripple, lowpass") {
           WHEN("denominator is computed") {
                double coeffs[5];
                double transformed = transform_frequency(0.25);
@@ -40,65 +40,58 @@ SCENARIO("Chebyshev output coefficients can be computed", "[filter]") {
                }
           }
      }
+     
+     GIVEN("parameters: third order chebyshev, 100 Hz sampling rate, 15, 30Hz cutoff, 3 db ripple, band pass") {
+          WHEN("coefficients are computed") {
+               double num[7];
+               double denom[7];
+               int status = compute_chebyshev_bandfilter_coefficients(num,denom,3,15,30,100, true, -3.0);
+               THEN("results are correct") {
+                    REQUIRE(status == DH_FILTER_OK);
+                    REQUIRE(denom[6] == Catch::Approx( 0.5724244477));
+                    REQUIRE(denom[5] == Catch::Approx(-0.5855928827));
+                    REQUIRE(denom[4] == Catch::Approx( 1.8286681732));
+                    REQUIRE(denom[3] == Catch::Approx(-1.2549361046));
+                    REQUIRE(denom[2] == Catch::Approx( 2.1357801602));
+                    REQUIRE(denom[1] == Catch::Approx(-0.8563748024));
+                    REQUIRE(denom[0] == Catch::Approx(1.0));
+
+                    double gain = 4.731343700e+001;
+                    REQUIRE(num[6] == Catch::Approx(-1.0/gain));
+                    REQUIRE(num[5] == Catch::Approx(0.0));
+                    REQUIRE(num[4] == Catch::Approx(3.0/gain));
+                    REQUIRE(num[3] == Catch::Approx(0.0));
+                    REQUIRE(num[2] == Catch::Approx(-3.0/gain));
+                    REQUIRE(num[1] == Catch::Approx(0.0));
+                    REQUIRE(num[0] == Catch::Approx(1.0/gain));
+               }
+          }
+     }
+
+     GIVEN("parameters: third order chebyshev, 100 Hz sampling rate, 15, 30Hz cutoff, 3 db ripple, band stop") {
+          WHEN("coefficients are computed") {
+               double num[7];
+               double denom[7];
+               int status = compute_chebyshev_bandfilter_coefficients(num,denom,3,15,30,100, false, -3.0);
+               THEN("results are correct") {
+                    REQUIRE(status == DH_FILTER_OK);
+                    REQUIRE(denom[6] == Catch::Approx(-0.1974887770));
+                    REQUIRE(denom[5] == Catch::Approx( 0.0136148879));
+                    REQUIRE(denom[4] == Catch::Approx( 0.5489194787));
+                    REQUIRE(denom[3] == Catch::Approx(-0.4252673736));
+                    REQUIRE(denom[2] == Catch::Approx( 0.8150006537));
+                    REQUIRE(denom[1] == Catch::Approx(-0.6435743840));
+                    REQUIRE(denom[0] == Catch::Approx(1.0));
+
+                    double gain = 4.034192003e+000;
+                    REQUIRE(num[6] == Catch::Approx(1.0/gain));
+                    REQUIRE(num[5] == Catch::Approx(-1.0534230275/gain));
+                    REQUIRE(num[4] == Catch::Approx(3.3699000250/gain));
+                    REQUIRE(num[3] == Catch::Approx(-2.1501417444/gain));
+                    REQUIRE(num[2] == Catch::Approx(3.3699000250/gain));
+                    REQUIRE(num[1] == Catch::Approx(-1.0534230275/gain));
+                    REQUIRE(num[0] == Catch::Approx(1.0/gain));
+               }
+          }
+     }
 }
-
-
-
-/* high pass
-20 / 100 order 5 ripple -2.0
-gain 0.0
-
-5: 0.2657574384
-4: 0.4386539929
-3: 0.6053373580
-2: 1.1506939843
-1: 0.2289297075
-0: 1.0
-*/
-
-
-/* band pass
-15, 30 / 100 order 3 ripple -3.0
-gain ???
-
-Recurrence relation:
-y[n] = ( -1 * x[n- 6])
-     + (  0 * x[n- 5])
-     + (  3 * x[n- 4])
-     + (  0 * x[n- 3])
-     + ( -3 * x[n- 2])
-     + (  0 * x[n- 1])
-     + (  1 * x[n- 0])
-
-     + ( -0.5724244477 * y[n- 6])
-     + (  0.5855928827 * y[n- 5])
-     + ( -1.8286681732 * y[n- 4])
-     + (  1.2549361046 * y[n- 3])
-     + ( -2.1357801602 * y[n- 2])
-     + (  0.8563748024 * y[n- 1])
-
-*/
-
-
-/* band stop
-15, 30/ 100 order 3 ripple -3.0
-gain 4.034192003e+000
-
-Recurrence relation:
-y[n] = (  1 * x[n- 6])
-     + ( -1.0534230275 * x[n- 5])
-     + (  3.3699000250 * x[n- 4])
-     + ( -2.1501417444 * x[n- 3])
-     + (  3.3699000250 * x[n- 2])
-     + ( -1.0534230275 * x[n- 1])
-     + (  1 * x[n- 0])
-
-     + (  0.1974887770 * y[n- 6])
-     + ( -0.0136148879 * y[n- 5])
-     + ( -0.5489194787 * y[n- 4])
-     + (  0.4252673736 * y[n- 3])
-     + ( -0.8150006537 * y[n- 2])
-     + (  0.6435743840 * y[n- 1])
-
-
-*/

@@ -72,36 +72,8 @@ DH_FILTER_RETURN_VALUE compute_butterworth_bandfilter_denominator(double* ptr, s
     return compute_butt_cheb_bandfilter_denominator(ptr,filter_order,transformed_frequency_low,transformed_frequency_high,bandpass,NULL);
 }
 
-
 DH_FILTER_RETURN_VALUE compute_butterworth_bandfilter_coefficients(double* numerator, double* denominator, size_t filter_order, 
     double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz, bool bandpass)
 {
-    if(numerator == NULL || denominator == NULL) {
-        return DH_FILTER_NO_DATA_STRUCTURE;
-    }
-    double transformed_low = transform_frequency(cutoff_low_hz/sampling_frequency_hz);
-    double transformed_high = transform_frequency(cutoff_high_hz/sampling_frequency_hz);
-
-    DH_FILTER_RETURN_VALUE rv;
-    if(bandpass) {
-        rv = dh_create_bandpass_numerator_polynomial(numerator,filter_order);
-    } else {
-        rv = dh_create_bandstop_numerator_polynomial(numerator,filter_order, sqrt(transformed_high*transformed_low));
-    }
-    if (rv != DH_FILTER_OK) {
-        return rv;
-    }
-
-    rv = compute_butterworth_bandfilter_denominator(denominator,filter_order,transformed_low, transformed_high, bandpass);
-    if(rv != DH_FILTER_OK) {
-        return rv;
-    }
-    if (!bandpass) {
-        dh_normalize_coefficients(numerator,denominator,2*filter_order+1);
-    }
-    else {
-        double center = (0.5*cutoff_low_hz + 0.5*cutoff_high_hz)/sampling_frequency_hz;
-        dh_normalize_bandpass_coefficients(numerator,denominator,2*filter_order+1, center);
-    }
-    return DH_FILTER_OK;
+    return compute_butt_cheb_bandfilter_coefficients(numerator,denominator,filter_order,cutoff_low_hz,cutoff_high_hz,sampling_frequency_hz,bandpass,NULL);
 }

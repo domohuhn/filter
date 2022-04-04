@@ -85,3 +85,9 @@ DH_FILTER_RETURN_VALUE compute_chebyshev_highpass_coefficients(double* numerator
     return rv;
 }
 
+DH_FILTER_RETURN_VALUE compute_chebyshev_bandfilter_coefficients(double* numerator, double* denominator, size_t filter_order, 
+    double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz, bool bandpass, double ripple_db)
+{
+    return compute_butt_cheb_bandfilter_coefficients(numerator,denominator,filter_order,cutoff_low_hz,cutoff_high_hz,sampling_frequency_hz,bandpass,&ripple_db);
+}
+
