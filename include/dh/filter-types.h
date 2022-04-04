@@ -57,6 +57,7 @@ typedef struct {
 
 
 typedef enum {
+    DH_NO_FILTER,
     DH_FIR_MOVING_AVERAGE,
     DH_FIR_MOVING_AVERAGE_HIGHPASS,
     DH_FIR_EXPONENTIAL_LOWPASS,

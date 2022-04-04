@@ -68,7 +68,7 @@ DH_FILTER_RETURN_VALUE compute_chebyshev_lowpass_coefficients(double* numerator,
     if(rv != DH_FILTER_OK) {
         return rv;
     }
-    dh_normalize_coefficients(numerator,denominator,filter_order+1);
+    dh_normalize_gain_at(numerator,denominator,filter_order+1, 0.0);
     return DH_FILTER_OK;
 }
 

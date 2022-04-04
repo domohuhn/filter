@@ -5,9 +5,8 @@
 #include "stdlib.h"
 
 COMPLEX bilinear_z_transform(COMPLEX p) {
-    return (2.0 + p)/(2.0 -p);
+    return (1.0 + p)/(1.0 -p);
 }
-
 
 static COMPLEX complex_unit_circle(double phi) {
     return cos(phi) + sin(phi) *I;
@@ -32,7 +31,6 @@ void fill_array_with_binomial_coefficients(double* ptr, size_t number)
     }
 }
 
-
 void dh_alternate_signs(double* array, size_t len){
     if (array == NULL) {
         return;
@@ -44,7 +42,7 @@ void dh_alternate_signs(double* array, size_t len){
 
 double transform_frequency(double frequency)
 {
-    return 2*tan(frequency * M_PI);
+    return tan(frequency * M_PI);
 }
 
 void compute_poles_on_s_plane(COMPLEX* ptr, size_t len, double transformed_frequency) {
@@ -79,18 +77,6 @@ static double accumulate_array(double* ptr, size_t len)
     return sum;
 }
 
-
-void dh_normalize_coefficients(double* numerator, double* denominator, size_t len)
-{
-    if (numerator == NULL || denominator == NULL) {
-        return;
-    }
-    double scale = accumulate_array(denominator,len)/accumulate_array(numerator,len);
-    for(size_t i=0; i<len; ++i){
-        numerator[i] *= scale;
-    }
-}
-
 DH_FILTER_RETURN_VALUE dh_create_bandpass_numerator_polynomial(double* numerator, size_t order)
 {
     COMPLEX* roots = (COMPLEX*)malloc(sizeof(COMPLEX) * 2*order);
@@ -114,7 +100,6 @@ DH_FILTER_RETURN_VALUE dh_create_bandpass_numerator_polynomial(double* numerator
     free(roots);
     return DH_FILTER_OK;
 }
-
 
 DH_FILTER_RETURN_VALUE dh_create_bandstop_numerator_polynomial(double* numerator, size_t order, double gm)
 {
@@ -209,20 +194,28 @@ static COMPLEX evaluate_polynomial(double* coeffs, size_t len, COMPLEX x)
     return rv;
 }
 
-void dh_normalize_bandpass_coefficients(double* numerator,double* denominator,size_t len, double x_evaluate)
+
+COMPLEX dh_gain_at(double* numerator,double* denominator,size_t len, double x_evaluate)
 {
     if(numerator == NULL || denominator == NULL) {
-        return;
+        return 1.0;
     }
     COMPLEX arg = complex_unit_circle(2*M_PI*x_evaluate);
     COMPLEX num = evaluate_polynomial(numerator,len,arg);
     COMPLEX denom = evaluate_polynomial(denominator,len,arg);
-    double scale = cabs(denom/num);
+    return num/denom;
+}
+
+void dh_normalize_gain_at(double* numerator,double* denominator,size_t len, double x_evaluate)
+{
+    if(numerator == NULL || denominator == NULL) {
+        return;
+    }
+    double scale = cabs(1.0/dh_gain_at(numerator,denominator,len,x_evaluate));
     for(size_t i=0; i<len; ++i) {
         numerator[i] *= scale;
     }
 }
-
 
 DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_coefficients(double* numerator, double* denominator, size_t filter_order, 
     double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz, bool bandpass, double* ripple_db)
@@ -247,12 +240,7 @@ DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_coefficients(double* numerat
     if(rv != DH_FILTER_OK) {
         return rv;
     }
-    if (!bandpass) {
-        dh_normalize_coefficients(numerator,denominator,2*filter_order+1);
-    }
-    else {
-        double center = (0.5*cutoff_low_hz + 0.5*cutoff_high_hz)/sampling_frequency_hz;
-        dh_normalize_bandpass_coefficients(numerator,denominator,2*filter_order+1, center);
-    }
+    double center = bandpass ? (0.5*cutoff_low_hz + 0.5*cutoff_high_hz)/sampling_frequency_hz : 0.0;
+    dh_normalize_gain_at(numerator,denominator,2*filter_order+1, center);
     return DH_FILTER_OK;
 }

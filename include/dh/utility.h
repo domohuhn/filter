@@ -58,15 +58,6 @@ void compute_poles_on_s_plane(COMPLEX* ptr, size_t len, double transformed_frequ
 void compute_polynomial_coefficients_from_roots(COMPLEX* roots, size_t len, COMPLEX* outputs);
 
 /**
- * @brief Normalizes the numerator Polynomial for gain 1
- * 
- * @param numerator Pointer to array 1. Must have length len.
- * @param denominator Pointer to array 2. Must have length len.
- * @param len Number of values in arrays
- */
-void dh_normalize_coefficients(double* numerator, double* denominator, size_t len);
-
-/**
  * @brief Alternates the sign of the entries in the array.
  * 
  * The signs for every second element are inverted.
@@ -128,14 +119,25 @@ DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_denominator(double* ptr, siz
     double transformed_frequency_high, bool bandpass, double* ripple_db);
 
 /**
- * @brief Evaluates the polynomials at the given positions and normalizes the numerator for gain 1.0.
+ * @brief Evaluates the polynomials at the given positions and normalizes the numerator for gain 1.0 at [x_evaluate].
  * 
  * @param numerator Array of polynomial coefficients. Will be modified in place.
  * @param denominator Array of polynomial coefficients.
  * @param len Number of entries.
  * @param x_evaluate Position where the polynominals are evaluated on the complex unit circle.
  */
-void dh_normalize_bandpass_coefficients(double* numerator,double* denominator,size_t len, double x_evaluate);
+void dh_normalize_gain_at(double* numerator,double* denominator,size_t len, double x_evaluate);
+
+
+/**
+ * @brief Evaluates the polynomials at the given position and returns the gain.
+ * 
+ * @param numerator Array of polynomial coefficients. Will be modified in place.
+ * @param denominator Array of polynomial coefficients.
+ * @param len Number of entries.
+ * @param x_evaluate Position where the polynominals are evaluated on the complex unit circle.
+ */
+COMPLEX dh_gain_at(double* numerator,double* denominator,size_t len, double x_evaluate);
 
 
 /**

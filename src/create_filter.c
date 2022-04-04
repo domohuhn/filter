@@ -29,6 +29,10 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_option
     }
     DH_FILTER_RETURN_VALUE rv = DH_FILTER_UNKNOWN_FILTER_TYPE;
     switch(options->filter_type){
+        case DH_NO_FILTER:
+            options->parameters.moving_average.filter_order = 1;
+            rv = dh_create_moving_average(filter, options);
+            break;
         case DH_FIR_MOVING_AVERAGE:
             rv = dh_create_moving_average(filter, options);
             break;

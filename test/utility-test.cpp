@@ -13,8 +13,8 @@ SCENARIO( "Transforms can be used", "[filter]" ) {
         WHEN( "bilinear z transform is computed" ) {
             COMPLEX out = bilinear_z_transform(number);
             THEN( "the result is correct" ) {
-                REQUIRE(creal(out) == -1.0);
-                REQUIRE(cimag(out) == 4.0);
+                REQUIRE(creal(out) == -2.0);
+                REQUIRE(cimag(out) == 1.0);
             }
         }
     }

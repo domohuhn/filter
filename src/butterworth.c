@@ -53,17 +53,23 @@ DH_FILTER_RETURN_VALUE compute_butterworth_lowpass_coefficients(double* numerato
     if(rv != DH_FILTER_OK) {
         return rv;
     }
-    dh_normalize_coefficients(numerator,denominator,filter_order+1);
+    dh_normalize_gain_at(numerator,denominator,filter_order+1, 0.0);
     return DH_FILTER_OK;
 }
 
 DH_FILTER_RETURN_VALUE compute_butterworth_highpass_coefficients(double* numerator, double* denominator, size_t filter_order, double cutoff_hz, double sampling_frequency_hz)
 {
-    int rv = compute_butterworth_lowpass_coefficients(numerator,denominator,filter_order,cutoff_hz,sampling_frequency_hz);
+    if(numerator == NULL || denominator == NULL) {
+        return DH_FILTER_NO_DATA_STRUCTURE;
+    }
+    double transformed = transform_frequency(cutoff_hz/sampling_frequency_hz);
+    fill_array_with_binomial_coefficients(numerator,filter_order+1);
+    DH_FILTER_RETURN_VALUE rv = compute_butterworth_lowpass_denominator(denominator,filter_order,transformed);
     if(rv != DH_FILTER_OK) {
         return rv;
     }
     dh_alternate_signs(numerator,filter_order+1);
+    dh_normalize_gain_at(numerator,denominator,filter_order+1, 0.5);
     return rv;
 }
 
