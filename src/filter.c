@@ -40,6 +40,8 @@ DH_FILTER_RETURN_VALUE dh_filter(dh_filter_data* filter, double input, double* o
         dh_filter_shift_output(filter);
         dh_filter_run_output_loop(filter);
         dh_filter_add_output(filter);
+    }
+    if (filter->number_coefficients_out >= 1) {
         dh_filter_apply_gain(filter);
     }
 
@@ -131,7 +133,7 @@ DH_FILTER_RETURN_VALUE dh_filter_set_gain(dh_filter_data* filter, double gain)
     if (!filter) {
         return DH_FILTER_NO_DATA_STRUCTURE;
     }
-    if (filter->number_coefficients_out == 0 || filter->outputs == NULL || filter->coefficients_out == NULL) {
+    if (filter->number_coefficients_out == 0 || filter->coefficients_out == NULL) {
         return DH_FILTER_DATA_STRUCTURE_INPUTS_NOT_INITIALIZED;
     }
     filter->current_value *= gain/filter->coefficients_out[0];

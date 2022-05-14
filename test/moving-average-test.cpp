@@ -62,16 +62,18 @@ SCENARIO( "A moving average filter can be used", "[filter]" ) {
         moving_avg.initialized = true;
         moving_avg.current_input_index = 0;
         moving_avg.number_coefficients_in = 4;
-        moving_avg.number_coefficients_out = 0;
+        moving_avg.number_coefficients_out = 1;
         moving_avg.current_output_index = 0;
         double indata[4] = {0.0};
         double incoeffs[4] = {0.25, 0.25, 0.25, 0.25};
+        double outcoeffs[1] = {1.0};
         moving_avg.inputs = indata;
         moving_avg.coefficients_in = incoeffs;
+        moving_avg.coefficients_out = outcoeffs;
 
         WHEN( "a step function is filtered" ) {  
             double output=0.0;
-            int status = dh_filter(&moving_avg, 0.0F, &output);
+            int status = dh_filter(&moving_avg, 0.0, &output);
 
             THEN( "the filter first returns zero" ) {
                 REQUIRE( status == DH_FILTER_OK);
@@ -79,41 +81,56 @@ SCENARIO( "A moving average filter can be used", "[filter]" ) {
             }
 
             output=0.0;
-            status = dh_filter(&moving_avg, 20.0F, &output);
+            status = dh_filter(&moving_avg, 20.0, &output);
             THEN( "the filter function is called with a step function the output has a linear response" ) {
                 REQUIRE( status == DH_FILTER_OK);
                 REQUIRE( output == 5.0);
             }
 
             output=0.0;
-            status = dh_filter(&moving_avg, 20.0F, &output);
+            status = dh_filter(&moving_avg, 20.0, &output);
             THEN( "the filter function is called with a step function the output has a linear response" ) {
                 REQUIRE( status == DH_FILTER_OK);
                 REQUIRE( output == 10.0);
             }
 
             output=0.0;
-            status = dh_filter(&moving_avg, 20.0F, &output);
+            status = dh_filter(&moving_avg, 20.0, &output);
             THEN( "the filter function is called with a step function the output has a linear response" ) {
                 REQUIRE( status == DH_FILTER_OK);
                 REQUIRE( output == 15.0);
             }
 
             output=0.0;
-            status = dh_filter(&moving_avg, 20.0F, &output);
+            status = dh_filter(&moving_avg, 20.0, &output);
             THEN( "the filter function is called with a step function the output has a linear response" ) {
                 REQUIRE( status == DH_FILTER_OK);
                 REQUIRE( output == 20.0);
             }
 
             output=0.0;
-            status = dh_filter(&moving_avg, 20.0F, &output);
+            status = dh_filter(&moving_avg, 20.0, &output);
             THEN( "the filter function reaches a constant state after 4 calls" ) {
                 REQUIRE( status == DH_FILTER_OK);
                 REQUIRE( output == 20.0);
             }
-        }
 
+            WHEN("The gain is set to 4.0") {
+                status = dh_filter_set_gain(&moving_avg, 4.0);
+                THEN( "the first value in the output coefficients is set to 4.0" ) {
+                    REQUIRE( status == DH_FILTER_OK);
+                    REQUIRE( outcoeffs[0] == 4.0);
+                }
+                
+                WHEN("a filter cycle is run in the steady state") {
+                    status = dh_filter(&moving_avg, 20.0, &output);
+                    THEN( "the filter outputs 4 times the input" ) {
+                        REQUIRE( status == DH_FILTER_OK);
+                        REQUIRE( output == 80.0);
+                    }
+                }
+            }
+        }
     }
 }
 
