@@ -20,7 +20,7 @@ design-filter [OPTION...]
   -h, --help                    Print usage
 ```
 
-Example calls producing the outputs in doc:
+Example calls producing the outputs in the doc directory:
 ```
 .\design-filter.exe -p moving-average -o 15 -t lowpass -g > movingaverage_lowpass.txt
 .\design-filter.exe -p moving-average -o 15 -t highpass -g > movingaverage_highpass.txt
@@ -39,5 +39,5 @@ Example calls producing the outputs in doc:
 .\design-filter.exe -p brickwall -o 40 -t highpass -c 25 -g > brickwall_highpass.txt
 ```
 
-See 
+See the [examples for the supported filter types](../README.md#examples).
 

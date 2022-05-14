@@ -7,13 +7,13 @@ This repostitory contains a C-library that can be used to both design digital fi
 | *Example filter responses for a butterworth filter designed using this library.* |
 
 
-The following filter types are supported:
+<a name="examples"></a>The following filter types are supported:
 
 | Name     |      Type     | Characteristics | Examples |
 |----------|:-------------:|:-------------:|------------|
 | Moving average | FIR     | lowpass, highpass | [Examples](doc/moving-average.md) |
 | exponential    | FIR     | lowpass |
-| exponential    | IIR     | lowpass |
+| exponential    | IIR     | lowpass | [Examples](doc/exponential.md)
 | butterworth    | IIR     | lowpass, highpass, bandpass, bandstop | [Examples](doc/butterworth.md) |
 | chebyshev    | IIR     | lowpass, highpass, bandpass, bandstop | [Examples](doc/chebyshev.md) |
 | brickwall    | FIR     | lowpass, highpass, bandpass, bandstop | [Examples](doc/brickwall.md) |
