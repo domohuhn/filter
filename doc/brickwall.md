@@ -1,29 +1,29 @@
-# Butterworth filters
+# Brickwall filters
 
-Here are some examples of butterworth filters. See [Wikipedia](https://en.wikipedia.org/wiki/Butterworth_filter).
+Here are some examples of brickwall filters. These filters are finite impulse response filters. The frequency response will converge to a step function for increasing filter orders. However, these filters have a large delay.
 
 # Lowpass
 
 | Name             | Value          |
 |------------------|----------------|
-| Order            | 4              |
+| Order            | 40              |
 | Filter type        | 'lowpass'    |
 | Sampling frequency | 100 Hz       |
 | Cutoff 1           | 25 Hz        |
 
-![Lowpass](butterworth_lowpass.png)
+![Lowpass](brickwall_lowpass.png)
 
-How to create this filter in code:
+How to create this filter C:
 ```c
 #include "dh/filter.h"
 
-// create butterworth filter
+// create brickwall filter
 dh_filter_data filter_data;
 dh_filter_options opts;
-opts.filter_type = DH_IIR_BUTTERWORTH_LOWPASS;
-opts.parameters.butterworth.cutoff_frequency_hz = 25.0;
-opts.parameters.butterworth.sampling_frequency_hz = 100.0;
-opts.parameters.butterworth.filter_order = 4;
+opts.filter_type = DH_FIR_BRICKWALL_LOWPASS;
+opts.parameters.brickwall.cutoff_frequency_hz = 25.0;
+opts.parameters.brickwall.sampling_frequency_hz = 100.0;
+opts.parameters.brickwall.filter_order = 40;
 if ( dh_create_filter(&filter_data,&opts) != DH_FILTER_OK) {
     // handle error
 }
@@ -33,24 +33,24 @@ if ( dh_create_filter(&filter_data,&opts) != DH_FILTER_OK) {
 
 | Name             | Value          |
 |------------------|----------------|
-| Order            | 4              |
+| Order            | 40              |
 | Filter type        | 'highpass'    |
 | Sampling frequency | 100 Hz       |
 | Cutoff 1           | 25 Hz        |
 
-![Highpass](butterworth_highpass.png)
+![Highpass](brickwall_highpass.png)
 
 How to create this filter in code:
 ```c
 #include "dh/filter.h"
 
-// create butterworth filter
+// create brickwall filter
 dh_filter_data filter_data;
 dh_filter_options opts;
-opts.filter_type = DH_IIR_BUTTERWORTH_HIGHPASS;
-opts.parameters.butterworth.cutoff_frequency_hz = 25.0;
-opts.parameters.butterworth.sampling_frequency_hz = 100.0;
-opts.parameters.butterworth.filter_order = 4;
+opts.filter_type = DH_FIR_BRICKWALL_HIGHPASS;
+opts.parameters.brickwall.cutoff_frequency_hz = 25.0;
+opts.parameters.brickwall.sampling_frequency_hz = 100.0;
+opts.parameters.brickwall.filter_order = 40;
 if ( dh_create_filter(&filter_data,&opts) != DH_FILTER_OK) {
     // handle error
 }
@@ -66,20 +66,20 @@ if ( dh_create_filter(&filter_data,&opts) != DH_FILTER_OK) {
 | Cutoff 1           | 15 Hz        |
 | Cutoff 2           | 35 Hz        |
 
-![Bandpass](butterworth_bandpass.png)
+![Bandpass](brickwall_bandpass.png)
 
 How to create this filter in code:
 ```c
 #include "dh/filter.h"
 
-// create butterworth filter
+// create brickwall filter
 dh_filter_data filter_data;
 dh_filter_options opts;
-opts.filter_type = DH_IIR_BUTTERWORTH_BANDPASS;
-opts.parameters.butterworth.cutoff_frequency_hz = 15.0;
-opts.parameters.butterworth.cutoff_frequency_2_hz = 35.0;
-opts.parameters.butterworth.sampling_frequency_hz = 100.0;
-opts.parameters.butterworth.filter_order = 4;
+opts.filter_type = DH_FIR_BRICKWALL_BANDPASS;
+opts.parameters.brickwall.cutoff_frequency_hz = 15.0;
+opts.parameters.brickwall.cutoff_frequency_2_hz = 35.0;
+opts.parameters.brickwall.sampling_frequency_hz = 100.0;
+opts.parameters.brickwall.filter_order = 40;
 if ( dh_create_filter(&filter_data,&opts) != DH_FILTER_OK) {
     // handle error
 }
@@ -95,20 +95,20 @@ if ( dh_create_filter(&filter_data,&opts) != DH_FILTER_OK) {
 | Cutoff 1           | 15 Hz        |
 | Cutoff 2           | 35 Hz        |
 
-![Bandstop](butterworth_bandstop.png)
+![Bandstop](brickwall_bandstop.png)
 
 How to create this filter in code:
 ```c
 #include "dh/filter.h"
 
-// create butterworth filter
+// create brickwall filter
 dh_filter_data filter_data;
 dh_filter_options opts;
-opts.filter_type = DH_IIR_BUTTERWORTH_BANDSTOP;
-opts.parameters.butterworth.cutoff_frequency_hz = 15.0;
-opts.parameters.butterworth.cutoff_frequency_2_hz = 35.0;
-opts.parameters.butterworth.sampling_frequency_hz = 100.0;
-opts.parameters.butterworth.filter_order = 4;
+opts.filter_type = DH_FIR_BRICKWALL_BANDSTOP;
+opts.parameters.brickwall.cutoff_frequency_hz = 15.0;
+opts.parameters.brickwall.cutoff_frequency_2_hz = 35.0;
+opts.parameters.brickwall.sampling_frequency_hz = 100.0;
+opts.parameters.brickwall.filter_order = 40;
 if ( dh_create_filter(&filter_data,&opts) != DH_FILTER_OK) {
     // handle error
 }

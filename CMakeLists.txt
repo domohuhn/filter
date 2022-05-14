@@ -35,7 +35,7 @@ if(DH_CFILTER_BUILD_EXAMPLES)
   FetchContent_MakeAvailable(Cxxopts)
 
   add_executable(design-filter
-    examples/main.cpp
+    examples/design-filter.cpp
   )
   target_link_libraries(design-filter PRIVATE cxxopts::cxxopts dh::filter)
 

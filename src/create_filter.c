@@ -20,8 +20,9 @@ static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter,
 static DH_FILTER_RETURN_VALUE dh_iir_butterworth_high_lowpass(dh_filter_data* filter, dh_filter_options* options, bool lowpass);
 static DH_FILTER_RETURN_VALUE dh_iir_butterworth_bandfilter(dh_filter_data* filter, dh_filter_options* options, bool bandpass);
 static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_high_lowpass(dh_filter_data* filter, dh_filter_options* options, bool lowpass);
-static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_bandfilter(dh_filter_data* filter, dh_filter_options* options, bool bandfilter);
+static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_bandfilter(dh_filter_data* filter, dh_filter_options* options, bool bandpass);
 static DH_FILTER_RETURN_VALUE dh_fir_create_sinc(dh_filter_data* filter, dh_filter_options* options);
+static DH_FILTER_RETURN_VALUE dh_fir_create_sinc_bandfilter(dh_filter_data* filter, dh_filter_options* options, bool bandpass);
 
 DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_options* options)
 {
@@ -46,10 +47,12 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_option
             rv = dh_fir_exponential_lowpass(filter, options);
             break;
         case DH_FIR_BRICKWALL_LOWPASS: // falltrough
-        case DH_FIR_BRICKWALL_HIGHPASS: // falltrough
+        case DH_FIR_BRICKWALL_HIGHPASS:
+            rv = dh_fir_create_sinc(filter, options);
+            break;
         case DH_FIR_BRICKWALL_BANDPASS: // falltrough
         case DH_FIR_BRICKWALL_BANDSTOP:
-            rv = dh_fir_create_sinc(filter, options);
+            rv = dh_fir_create_sinc_bandfilter(filter, options, options->filter_type == DH_FIR_BRICKWALL_BANDPASS);
             break;
         case DH_IIR_EXPONENTIAL_LOWPASS:
             rv = dh_iir_exponential_lowpass(filter, options);
@@ -72,6 +75,15 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_option
             break;
     }
     return rv;
+}
+
+static DH_FILTER_RETURN_VALUE zero_inout_buffers(dh_filter_data* filter) {
+    for(size_t i=0; i<filter->number_coefficients_in; ++i) {
+        filter->inputs[i] = 0.0;
+    }
+    for(size_t i=0; i<filter->number_coefficients_out; ++i) {
+        filter->outputs[i] = 0.0;
+    }
 }
 
 static DH_FILTER_RETURN_VALUE dh_filter_allocate_buffers(dh_filter_data* filter, size_t num_inputs, size_t num_outputs)
@@ -113,14 +125,8 @@ static DH_FILTER_RETURN_VALUE dh_filter_allocate_buffers(dh_filter_data* filter,
     filter->number_coefficients_in = num_inputs;
     filter->number_coefficients_out = num_outputs;
     filter->initialized = false;
-
     
-    for(size_t i=0; i<filter->number_coefficients_in; ++i) {
-        filter->inputs[i] = 0.0;
-    }
-    for(size_t i=0; i<filter->number_coefficients_out; ++i) {
-        filter->outputs[i] = 0.0;
-    }
+    zero_inout_buffers(filter);
     return DH_FILTER_OK;
 }
 
@@ -137,14 +143,15 @@ static DH_FILTER_RETURN_VALUE dh_create_moving_average(dh_filter_data* filter, d
     return DH_FILTER_OK;
 }
 
-static void fill_array_fir_sinc(double* data,double* gain, size_t count,double cutoff, bool highpass) {
+static void fill_array_fir_sinc(double* data, size_t count,double cutoff, bool highpass) {
+    assert(data != NULL);
     int xshift = count/2;
     for (size_t i=0; i<count; ++i) {
         int idx = i;
         double x = 2*M_PI*cutoff*(idx-xshift);
         data[i] = x!=0.0 ? sin(x)/x : 1.0;
     }
-    gain[0] = 1.0;
+    double gain[1] = {1.0};
     
     double scale = cabs(1.0/dh_gain_at(data,count,gain,1,0.0));
     for(size_t i=0; i<count; ++i) {
@@ -169,29 +176,43 @@ static DH_FILTER_RETURN_VALUE dh_fir_create_sinc(dh_filter_data* filter, dh_filt
         return DH_FILTER_ALLOCATION_FAILED;
     }
     double cutoff = pars->cutoff_frequency_hz/pars->sampling_frequency_hz;
-    int xshift = filter->number_coefficients_in/2;
-    for (size_t i=0; i<filter->number_coefficients_in; ++i) {
-        int idx = i;
-        double x = 2*M_PI*cutoff*(idx-xshift);
-        filter->coefficients_in[i] = x!=0.0 ? sin(x)/x : 1.0;
+    bool is_highpass = options->filter_type == DH_FIR_BRICKWALL_HIGHPASS;
+    fill_array_fir_sinc(filter->coefficients_in,filter->number_coefficients_in,cutoff , is_highpass);
+    filter->coefficients_out[0] = 1.0;
+    filter->initialized = options->filter_type != DH_FIR_BRICKWALL_LOWPASS;
+    return DH_FILTER_OK;
+}
+
+
+static DH_FILTER_RETURN_VALUE dh_fir_create_sinc_bandfilter(dh_filter_data* filter, dh_filter_options* options, bool bandpass)
+{
+    dh_brickwall_parameters* pars = &(options->parameters.brickwall);
+    size_t count_single_filter = pars->filter_order+1;
+    if (dh_filter_allocate_buffers(filter, 2*count_single_filter-1, 1) != DH_FILTER_OK) {
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    double cutoff_low = pars->cutoff_frequency_hz/pars->sampling_frequency_hz;
+    double cutoff_high = pars->cutoff_frequency_2_hz/pars->sampling_frequency_hz;
+    // in order to save allocations, we will use the input and output buffers for the temporary values
+    // inputs has size 2*count_single_filter-1 followed by 2 doubles
+    // we need 2*count_single_filter -> ok, there are 8 bytes of buffer left
+    double* coeff_in_temp_low = filter->inputs;
+    double* coeff_in_temp_high = filter->inputs + count_single_filter;
+    assert(8 == (void*)(filter->buffer+ filter->buffer_length)-(void*)(coeff_in_temp_high + count_single_filter));
+
+    fill_array_fir_sinc(coeff_in_temp_low,count_single_filter,cutoff_low, bandpass);
+    fill_array_fir_sinc(coeff_in_temp_high,count_single_filter,cutoff_high, !bandpass);
+    if(bandpass) {
+        convolve_parameters(coeff_in_temp_low,coeff_in_temp_high,count_single_filter,filter->coefficients_in);
+    } else {
+        for(size_t i=0; i<count_single_filter;++i) {
+            filter->coefficients_in[i]= coeff_in_temp_low[i] + coeff_in_temp_high[i];
+        }
+        filter->number_coefficients_in = count_single_filter;
     }
     filter->coefficients_out[0] = 1.0;
-    
-    double scale = cabs(1.0/dh_gain_at(filter->coefficients_in,filter->number_coefficients_in,filter->coefficients_out,1,0.0));
-    for(size_t i=0; i<filter->number_coefficients_in; ++i) {
-        filter->coefficients_in[i] *= scale;
-    }
-
-    if (options->filter_type == DH_FIR_BRICKWALL_HIGHPASS) {
-        for (size_t i=0; i<filter->number_coefficients_in; ++i) {
-            if(i!=xshift) {
-                filter->coefficients_in[i] = -filter->coefficients_in[i];
-            } else {
-                filter->coefficients_in[i] = 1.0 - filter->coefficients_in[i];
-            }
-        }
-    }
-    filter->initialized = options->filter_type != DH_FIR_BRICKWALL_LOWPASS;
+    filter->initialized = true;
+    zero_inout_buffers(filter);
     return DH_FILTER_OK;
 }
 

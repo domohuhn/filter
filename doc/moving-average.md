@@ -10,7 +10,7 @@ How to create this filter in code:
 ```c
 #include "dh/filter.h"
 
-// create chebyshev filter
+// create moving average lowpass filter
 dh_filter_data filter_data;
 dh_filter_options opts;
 opts.filter_type = DH_FIR_MOVING_AVERAGE;
@@ -28,7 +28,7 @@ How to create this filter in code:
 ```c
 #include "dh/filter.h"
 
-// create chebyshev filter
+// create moving average highpass filter
 dh_filter_data filter_data;
 dh_filter_options opts;
 opts.filter_type = DH_FIR_MOVING_AVERAGE_HIGHPASS;

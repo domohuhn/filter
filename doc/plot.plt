@@ -1,5 +1,6 @@
 if (!exists("filename")) filename='butterworth_lowpass.txt'
-outfile=sprintf("%s.png",filename)
+moo2=substr(filename,0,strlen(filename)-4)
+outfile=sprintf("%s.png",moo2)
 set output outfile
 set term 'png' size 1280,960
 set multiplot layout 2,2 rowsfirst

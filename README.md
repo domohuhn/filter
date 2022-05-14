@@ -1,6 +1,12 @@
-# Filter library for C Code
+# Filter library for C
 
 This repostitory contains a C-library that can be used to both design digital filters, as well as use them.
+
+| ![Lowpass](doc/butterworth_lowpass.png) | 
+|:--:| 
+| *Example filter responses for a butterworth filter designed using this library.* |
+
+
 The following filter types are supported:
 
 | Name     |      Type     | Characteristics | Examples |
@@ -10,6 +16,7 @@ The following filter types are supported:
 | exponential    | IIR     | lowpass |
 | butterworth    | IIR     | lowpass, highpass, bandpass, bandstop | [Examples](doc/butterworth.md) |
 | chebyshev    | IIR     | lowpass, highpass, bandpass, bandstop | [Examples](doc/chebyshev.md) |
+| brickwall    | FIR     | lowpass, highpass, bandpass, bandstop | [Examples](doc/brickwall.md) |
 
 The filters are designed using the bilinear z-transform.
 In broad terms, you start with the frequency response of the analog filter and compute its poles and zeros. These values are transformed via a bilinear z-transform and expanded into a polynomial. The polynomial is normalized for gain 1 at 0 or the middle of the pass band.
@@ -40,7 +47,7 @@ if(dh_filter(&filter_data, input,&output) != DH_FILTER_OK){
     // handle error
 }
 
-// free filter
+// free filter after you are done
 dh_free_filter(&filter_data);
 
 ```
