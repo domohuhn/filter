@@ -117,13 +117,14 @@ static DH_FILTER_RETURN_VALUE dh_filter_allocate_buffers(dh_filter_data* filter,
 
 static DH_FILTER_RETURN_VALUE dh_create_moving_average(dh_filter_data* filter, dh_filter_options* options)
 {
-    if (dh_filter_allocate_buffers(filter, options->parameters.moving_average.filter_order, 0) != DH_FILTER_OK) {
+    if (dh_filter_allocate_buffers(filter, options->parameters.moving_average.filter_order, 1) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
     double val = 1.0/(double)filter->number_coefficients_in;
     for (size_t i=0; i<filter->number_coefficients_in; ++i) {
         filter->coefficients_in[i] = val;
     }
+    filter->coefficients_out[0] = 1.0;
     return DH_FILTER_OK;
 }
 

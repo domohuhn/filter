@@ -132,12 +132,13 @@ void dh_normalize_gain_at(double* numerator,double* denominator,size_t len, doub
 /**
  * @brief Evaluates the polynomials at the given position and returns the gain.
  * 
- * @param numerator Array of polynomial coefficients. Will be modified in place.
+ * @param numerator Array of polynomial coefficients.
+ * @param len_numerator Number of entries in numerator array.
  * @param denominator Array of polynomial coefficients.
- * @param len Number of entries.
+ * @param len_denominator Number of entries in denominator array.
  * @param x_evaluate Position where the polynominals are evaluated on the complex unit circle.
  */
-COMPLEX dh_gain_at(double* numerator,double* denominator,size_t len, double x_evaluate);
+COMPLEX dh_gain_at(double* numerator, size_t len_numerator,double* denominator, size_t len_denominator, double x_evaluate);
 
 
 /**

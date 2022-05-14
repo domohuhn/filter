@@ -195,14 +195,14 @@ static COMPLEX evaluate_polynomial(double* coeffs, size_t len, COMPLEX x)
 }
 
 
-COMPLEX dh_gain_at(double* numerator,double* denominator,size_t len, double x_evaluate)
+COMPLEX dh_gain_at(double* numerator, size_t len_numerator,double* denominator, size_t len_denominator, double x_evaluate)
 {
     if(numerator == NULL || denominator == NULL) {
         return 1.0;
     }
     COMPLEX arg = complex_unit_circle(2*M_PI*x_evaluate);
-    COMPLEX num = evaluate_polynomial(numerator,len,arg);
-    COMPLEX denom = evaluate_polynomial(denominator,len,arg);
+    COMPLEX num = evaluate_polynomial(numerator,len_numerator,arg);
+    COMPLEX denom = evaluate_polynomial(denominator,len_denominator,arg);
     return num/denom;
 }
 
@@ -211,7 +211,7 @@ void dh_normalize_gain_at(double* numerator,double* denominator,size_t len, doub
     if(numerator == NULL || denominator == NULL) {
         return;
     }
-    double scale = cabs(1.0/dh_gain_at(numerator,denominator,len,x_evaluate));
+    double scale = cabs(1.0/dh_gain_at(numerator,len,denominator,len,x_evaluate));
     for(size_t i=0; i<len; ++i) {
         numerator[i] *= scale;
     }

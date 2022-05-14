@@ -20,14 +20,14 @@ SCENARIO( "A moving average filter can be created", "[filter]" ) {
             THEN( "the buffers are initialized" ) {
                 REQUIRE(moving_avg.buffer_needs_cleanup);
                 REQUIRE(moving_avg.number_coefficients_in == 16);
-                REQUIRE(moving_avg.number_coefficients_out == 0);
+                REQUIRE(moving_avg.number_coefficients_out == 1);
                 REQUIRE((void*)moving_avg.coefficients_in == (void*)moving_avg.buffer);
-                REQUIRE((void*)moving_avg.inputs == (moving_avg.buffer + 16 * sizeof(double)));
-                REQUIRE((void*)moving_avg.coefficients_out == (void*)NULL);
-                REQUIRE((void*)moving_avg.outputs == (void*)NULL);
+                REQUIRE((void*)moving_avg.inputs == (void*)(moving_avg.buffer + 16 * sizeof(double)));
+                REQUIRE((void*)moving_avg.coefficients_out == (void*)(moving_avg.buffer + 32 * sizeof(double)));
+                REQUIRE((void*)moving_avg.outputs == (void*)(moving_avg.buffer + 33 * sizeof(double)));
                 REQUIRE(moving_avg.current_input_index == 0);
                 REQUIRE(moving_avg.current_output_index == 0);
-                REQUIRE(moving_avg.buffer_length == 32*sizeof(double));
+                REQUIRE(moving_avg.buffer_length == 34*sizeof(double));
                 REQUIRE(moving_avg.initialized == false);
                 for(size_t i=0;i<16;++i) {
                     REQUIRE(moving_avg.coefficients_in[i] == 1.0/16.0);
@@ -133,14 +133,14 @@ SCENARIO( "A moving average highpass filter can be used", "[filter]" ) {
             THEN( "the buffers are initialized" ) {
                 REQUIRE(moving_avg.buffer_needs_cleanup);
                 REQUIRE(moving_avg.number_coefficients_in == 16);
-                REQUIRE(moving_avg.number_coefficients_out == 0);
+                REQUIRE(moving_avg.number_coefficients_out == 1);
                 REQUIRE((void*)moving_avg.coefficients_in == (void*)moving_avg.buffer);
-                REQUIRE((void*)moving_avg.inputs == (moving_avg.buffer + 16 * sizeof(double)));
-                REQUIRE((void*)moving_avg.coefficients_out == (void*)NULL);
-                REQUIRE((void*)moving_avg.outputs == (void*)NULL);
+                REQUIRE((void*)moving_avg.inputs == (void*)(moving_avg.buffer + 16 * sizeof(double)));
+                REQUIRE((void*)moving_avg.coefficients_out == (void*)(moving_avg.buffer + 32 * sizeof(double)));
+                REQUIRE((void*)moving_avg.outputs == (void*)(moving_avg.buffer + 33 * sizeof(double)));
                 REQUIRE(moving_avg.current_input_index == 0);
                 REQUIRE(moving_avg.current_output_index == 0);
-                REQUIRE(moving_avg.buffer_length == 32*sizeof(double));
+                REQUIRE(moving_avg.buffer_length == 34*sizeof(double));
                 REQUIRE(moving_avg.initialized == true);
                 REQUIRE(moving_avg.coefficients_in[0] == 1.0-1.0/16.0);
                 for(size_t i=1;i<16;++i) {

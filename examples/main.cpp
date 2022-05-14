@@ -205,7 +205,6 @@ std::pair<double,double> gain(dh_filter_options opts, double fraction) {
     }
 }
 
-
 std::vector<std::pair<double,double>> frequency_response(dh_filter_options opts)
 {
     std::vector<std::pair<double,double>> rv;
@@ -224,13 +223,9 @@ std::vector<std::pair<double,double>> phase_shift(dh_filter_options opts)
     }
     std::vector<std::pair<double,double>> rv;
     for(size_t i=0;i<=100;i++) {
-        if(filter_data.number_coefficients_in == filter_data.number_coefficients_out) {
-            auto comp_gain = dh_gain_at(filter_data.coefficients_in,filter_data.coefficients_out,filter_data.number_coefficients_in, i/200.0);
-            auto shift = atan2(cimag(comp_gain),creal(comp_gain)) / M_PI * 180.0;
-            rv.emplace_back(std::make_pair(i/200.0,shift));
-        } else {
-            rv.emplace_back(std::make_pair(i/200.0,std::numeric_limits<double>::quiet_NaN()));
-        }
+        auto comp_gain = dh_gain_at(filter_data.coefficients_in,filter_data.number_coefficients_in,filter_data.coefficients_out,filter_data.number_coefficients_out, i/200.0);
+        auto shift = atan2(cimag(comp_gain),creal(comp_gain)) / M_PI * 180.0;
+        rv.emplace_back(std::make_pair(i/200.0,shift));
     }
     dh_free_filter(&filter_data);
     return rv;

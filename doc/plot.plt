@@ -13,7 +13,7 @@ plot filename u 6:7 w lp ti "Gain" lt rgb 'red'
 set xlabel 'Frequency f/fsample'
 set ylabel 'Phase shift (degree)'
 set title 'Phase shift'
-plot filename u 6:(0) w lp ti "Phase shift" lt rgb 'red'
+plot filename u 6:8 w lp ti "Phase shift" lt rgb 'red'
 
 set title 'Impulse response'
 set xlabel 'Filter cycle'
