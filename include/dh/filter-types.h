@@ -56,11 +56,22 @@ typedef struct {
 } dh_chebyshev_parameters;
 
 
+typedef struct {
+    double cutoff_frequency_hz;
+    double cutoff_frequency_2_hz;
+    double sampling_frequency_hz;
+    size_t filter_order;
+} dh_brickwall_parameters;
+
 typedef enum {
     DH_NO_FILTER,
     DH_FIR_MOVING_AVERAGE,
     DH_FIR_MOVING_AVERAGE_HIGHPASS,
     DH_FIR_EXPONENTIAL_LOWPASS,
+    DH_FIR_BRICKWALL_LOWPASS,
+    DH_FIR_BRICKWALL_HIGHPASS,
+    DH_FIR_BRICKWALL_BANDPASS,
+    DH_FIR_BRICKWALL_BANDSTOP,
     DH_IIR_EXPONENTIAL_LOWPASS,
     DH_IIR_BUTTERWORTH_LOWPASS,
     DH_IIR_BUTTERWORTH_HIGHPASS,
@@ -87,6 +98,7 @@ typedef union {
     dh_moving_average_parameters moving_average;
     dh_butterworth_parameters butterworth;
     dh_chebyshev_parameters chebyshev;
+    dh_brickwall_parameters brickwall;
 } dh_filter_parameters;
 
 typedef struct {

@@ -159,6 +159,17 @@ COMPLEX dh_gain_at(double* numerator, size_t len_numerator,double* denominator, 
 DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_coefficients(double* numerator, double* denominator, size_t filter_order, 
     double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz, bool bandpass, double* ripple_db);
 
+/**
+ * @brief Convolves two sets of FIR filter parameters to combine them into one filter.
+ * 
+ * @param param1 Pointer to array with feedforward coefficients of the filter that is applied first.
+ * @param param2 Pointer to array with feedforward coefficients of the filter that is applied second.
+ * @param len Number of entries in array param1 and param2.
+ * @param out The output is stored in that array. Must have 2*len-1 entries.
+ * @return DH_FILTER_RETURN_VALUE 
+ */
+void convolve_parameters(double * param1,double * param2, size_t len,double * out );
+
 #ifdef __cplusplus
 }
 #endif

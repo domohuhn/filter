@@ -14,7 +14,7 @@ How to create this filter in code:
 dh_filter_data filter_data;
 dh_filter_options opts;
 opts.filter_type = DH_FIR_MOVING_AVERAGE;
-opts.parameters.moving_average.filter_order = 16;
+opts.parameters.moving_average.filter_order = 15;
 if ( dh_create_filter(&filter_data,&opts) != DH_FILTER_OK) {
     // handle error
 }
@@ -32,7 +32,7 @@ How to create this filter in code:
 dh_filter_data filter_data;
 dh_filter_options opts;
 opts.filter_type = DH_FIR_MOVING_AVERAGE_HIGHPASS;
-opts.parameters.moving_average.filter_order = 16;
+opts.parameters.moving_average.filter_order = 15;
 if ( dh_create_filter(&filter_data,&opts) != DH_FILTER_OK) {
     // handle error
 }

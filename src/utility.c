@@ -217,6 +217,20 @@ void dh_normalize_gain_at(double* numerator,double* denominator,size_t len, doub
     }
 }
 
+void convolve_parameters(double * param1,double * param2, size_t len,double * out ) {
+    if(param1 == NULL || param2 == NULL || out==NULL) {
+        return;
+    }
+    for(size_t i=0;i<2*len-1; ++i) {
+        out[i] = 0.0;
+    }
+    for(size_t i=0;i<len; ++i) {
+        for(size_t k=0;k<len; ++k) {
+            out[i+k] += param1[i] * param2[k];
+        }
+    }
+}
+
 DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_coefficients(double* numerator, double* denominator, size_t filter_order, 
     double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz, bool bandpass, double* ripple_db)
 {

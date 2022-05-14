@@ -19,16 +19,36 @@ DH_FILTER_TYPE select_type(cxxopts::ParseResult& result, DH_FILTER_TYPE type){
             throw std::runtime_error("Unknown filter type! Only high- and lowpass is supported for moving average filters!");
     }
     else if(param=="lowpass"){
-        return type == DH_IIR_CHEBYSHEV_LOWPASS ? DH_IIR_CHEBYSHEV_LOWPASS : DH_IIR_BUTTERWORTH_LOWPASS;
+        if( type == DH_IIR_CHEBYSHEV_LOWPASS ) {
+            return DH_IIR_CHEBYSHEV_LOWPASS;
+        } else if (type == DH_FIR_BRICKWALL_LOWPASS) {
+            return DH_FIR_BRICKWALL_LOWPASS;
+        }
+        return DH_IIR_BUTTERWORTH_LOWPASS;
     }
     else if(param=="highpass"){
-        return type == DH_IIR_CHEBYSHEV_LOWPASS ? DH_IIR_CHEBYSHEV_HIGHPASS : DH_IIR_BUTTERWORTH_HIGHPASS;
+        if( type == DH_IIR_CHEBYSHEV_LOWPASS ) {
+            return DH_IIR_CHEBYSHEV_HIGHPASS;
+        } else if (type == DH_FIR_BRICKWALL_LOWPASS) {
+            return DH_FIR_BRICKWALL_HIGHPASS;
+        }
+        return DH_IIR_BUTTERWORTH_HIGHPASS;
     }
     else if(param=="bandpass"){
-        return type == DH_IIR_CHEBYSHEV_LOWPASS ? DH_IIR_CHEBYSHEV_BANDPASS : DH_IIR_BUTTERWORTH_BANDPASS;
+        if( type == DH_IIR_CHEBYSHEV_LOWPASS ) {
+            return DH_IIR_CHEBYSHEV_BANDPASS;
+        } else if (type == DH_FIR_BRICKWALL_LOWPASS) {
+            return DH_FIR_BRICKWALL_BANDPASS;
+        }
+        return DH_IIR_BUTTERWORTH_BANDPASS;
     }
     else if(param=="bandstop"){
-        return type == DH_IIR_CHEBYSHEV_LOWPASS ? DH_IIR_CHEBYSHEV_BANDSTOP : DH_IIR_BUTTERWORTH_BANDSTOP;
+        if( type == DH_IIR_CHEBYSHEV_LOWPASS ) {
+            return DH_IIR_CHEBYSHEV_BANDSTOP;
+        } else if (type == DH_FIR_BRICKWALL_LOWPASS) {
+            return DH_FIR_BRICKWALL_BANDSTOP;
+        }
+        return DH_IIR_BUTTERWORTH_BANDSTOP;
     }
     else {
         throw std::runtime_error("Unknown filter type! Only butterworth, chebyshev or moving-average are supported for option -p.\nParsed: '"+param +"'");
@@ -58,11 +78,29 @@ dh_filter_options convert_options(cxxopts::ParseResult& result)
             options.parameters.butterworth.cutoff_frequency_hz = cutoffs_hz[0];
             std::cout<< "# Cutoff 1           : "<<options.parameters.butterworth.cutoff_frequency_hz<<" Hz\n";
         }
-        if(cutoffs_hz.size()>1){
+        if(cutoffs_hz.size()>1 && (options.filter_type==DH_IIR_BUTTERWORTH_BANDPASS || options.filter_type==DH_IIR_BUTTERWORTH_BANDSTOP)){
             options.parameters.butterworth.cutoff_frequency_2_hz = cutoffs_hz[1];
             std::cout<< "# Cutoff 2           : "<<options.parameters.butterworth.cutoff_frequency_2_hz<<" Hz\n";
         }
         if(cutoffs_hz.size()==0 || (cutoffs_hz.size()<2 && (options.filter_type==DH_IIR_BUTTERWORTH_BANDPASS || options.filter_type==DH_IIR_BUTTERWORTH_BANDSTOP))) {
+            throw std::runtime_error("You must provide cutoff frequencies in Hz via -c\nExample '-c 10' for lowpass, or '-c 10,20' a bandpass or bandstop");
+        }
+    }
+    else if (param == "brickwall") {
+        options.filter_type = select_type(result ,DH_FIR_BRICKWALL_LOWPASS);
+        options.parameters.brickwall.filter_order = order;
+        options.parameters.brickwall.sampling_frequency_hz = sampling_frequency_hz;
+        
+        std::cout<< "# Sampling frequency : "<<options.parameters.brickwall.sampling_frequency_hz<<" Hz\n";
+        if(cutoffs_hz.size()>0) {
+            options.parameters.brickwall.cutoff_frequency_hz = cutoffs_hz[0];
+            std::cout<< "# Cutoff 1           : "<<options.parameters.brickwall.cutoff_frequency_hz<<" Hz\n";
+        }
+        if(cutoffs_hz.size()>1 && (options.filter_type==DH_FIR_BRICKWALL_BANDPASS || options.filter_type==DH_FIR_BRICKWALL_BANDSTOP)){
+            options.parameters.brickwall.cutoff_frequency_2_hz = cutoffs_hz[1];
+            std::cout<< "# Cutoff 2           : "<<options.parameters.brickwall.cutoff_frequency_2_hz<<" Hz\n";
+        }
+        if(cutoffs_hz.size()==0 || (cutoffs_hz.size()<2 && (options.filter_type==DH_FIR_BRICKWALL_BANDPASS || options.filter_type==DH_FIR_BRICKWALL_BANDSTOP))) {
             throw std::runtime_error("You must provide cutoff frequencies in Hz via -c\nExample '-c 10' for lowpass, or '-c 10,20' a bandpass or bandstop");
         }
     }
@@ -76,7 +114,7 @@ dh_filter_options convert_options(cxxopts::ParseResult& result)
             options.parameters.chebyshev.cutoff_frequency_hz = cutoffs_hz[0];
             std::cout<< "# Cutoff 1           : "<<options.parameters.chebyshev.cutoff_frequency_hz<<" Hz\n";
         }
-        if(cutoffs_hz.size()>1){
+        if(cutoffs_hz.size()>1 && (options.filter_type==DH_IIR_CHEBYSHEV_BANDPASS || options.filter_type==DH_IIR_CHEBYSHEV_BANDSTOP)){
             options.parameters.chebyshev.cutoff_frequency_2_hz = cutoffs_hz[1];
             std::cout<< "# Cutoff 2           : "<<options.parameters.chebyshev.cutoff_frequency_2_hz<<" Hz\n";
         }
@@ -109,6 +147,8 @@ void print_parameters(dh_filter_options opts)
     }
     std::cout<<"# Feedforward parameters : "<<filter_data.number_coefficients_in<<" (multiplied with inputs x)\n";
     std::cout<<"# Feedback parameters : "<<filter_data.number_coefficients_out<<" (multiplied with outputs y)\n";
+    std::cout<<"# Gain: 1\n";
+    std::cout<<"# Recurrence relation:\n";
     std::cout<<"# y[n] = "<<"\n";
     for(size_t i=0; i<filter_data.number_coefficients_in; ++i) {
         std::cout<<"#     + (x[n-"<<std::setw(3)<< i << "] * "<<std::setprecision(15)<< filter_data.coefficients_in[i] << ")\n";
@@ -181,13 +221,17 @@ std::pair<double,double> gain(dh_filter_options opts, double fraction) {
     double input = 0.0;
     double output = 0.0;
     double factor = 2*M_PI*fraction;
-    for(size_t i=0; i<=1000; ++i) {
+    for(size_t i=0; i<=10000; ++i) {
         input = amp * std::sin(factor * i);
         if(factor==0.0){
             input=amp;
         }
         if(dh_filter(&filter_data, input,&output) != DH_FILTER_OK){
             throw std::runtime_error("Error while filtering step response!");
+        }
+        // only measure amplitude in steady state
+        if(i<1000) {
+            continue;
         }
         if(output<min){
             min = output;
@@ -248,7 +292,7 @@ int main(int argc, const char * argv[]) {
     cxxopts::Options options("design-filter", "A program that can be used to design FIR and IIR filters.");
 
     options.add_options()
-        ("p,parameter-type", "Filter type (one of no-filter, butterworth, chebyshev, moving-average)", cxxopts::value<std::string>()->default_value("butterworth"))
+        ("p,parameter-type", "Filter type (one of no-filter, butterworth, chebyshev, moving-average, brickwall)", cxxopts::value<std::string>()->default_value("butterworth"))
         ("t,type", "Filter type (one of lowpass, highpass, bandpass, bandstop)", cxxopts::value<std::string>()->default_value("lowpass"))
         ("o,order", "Order of the filter", cxxopts::value<int>()->default_value("4"))
         ("g,graphs", "Create data for graphs", cxxopts::value<bool>()->default_value("false"))

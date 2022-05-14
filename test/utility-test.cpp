@@ -172,3 +172,22 @@ SCENARIO( "Binomial coefficients can be computed", "[filter]" ) {
     }
 }
 
+
+SCENARIO( "Convolution of parameters", "[filter]" ) {
+    GIVEN( "Two Arrays of size 3" ) {
+        double filt1[] = {1.0,2.0,3.0};
+        double filt2[] = {-4.0,-5.0,1.0};
+        WHEN( "the convulution is computed" ) {
+            double out[5] = {};
+            convolve_parameters(filt1,filt2,3,out);
+            THEN( "the result is correct" ) {
+                REQUIRE(out[0] == filt1[0]*filt2[0]);
+                REQUIRE(out[1] == filt1[0]*filt2[1] + filt1[1]*filt2[0]);
+                REQUIRE(out[2] == filt1[0]*filt2[2] + filt1[1]*filt2[1] + filt1[2]*filt2[0]);
+                REQUIRE(out[3] == filt1[2]*filt2[1] + filt1[1]*filt2[2]);
+                REQUIRE(out[4] == filt1[2]*filt2[2]);
+            }
+        }
+    }
+}
+

@@ -54,6 +54,7 @@ if(DH_CFILTER_BUILD_TESTS)
   FetchContent_MakeAvailable(Catch2)
 
   add_executable(test-filter
+    test/brickwall-test.cpp
     test/butterworth-test.cpp
     test/chebyshev-test.cpp
     test/moving-average-test.cpp
