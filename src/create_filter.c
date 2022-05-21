@@ -77,7 +77,7 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_option
     return rv;
 }
 
-static DH_FILTER_RETURN_VALUE zero_inout_buffers(dh_filter_data* filter) {
+static void zero_inout_buffers(dh_filter_data* filter) {
     for(size_t i=0; i<filter->number_coefficients_in; ++i) {
         filter->inputs[i] = 0.0;
     }

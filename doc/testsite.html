@@ -1,0 +1,240 @@
+
+
+<!doctype html>
+<html>
+<style>
+body {
+  color: #222;
+  background: #fff;
+  font: 100% system-ui;
+}
+a {
+  color: #0033cc;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #c9d1d9;
+    background: #21262d;
+  }
+
+  body a {
+    color: #809fff;
+  }
+}
+</style>
+  <script>
+    var Module = {
+      onRuntimeInitialized: function() {
+        console.log('lerp result: ' + Module.lerp(1, 2, 0.5));
+      }
+    };
+  </script>
+  <script src="js/filter.js"></script>
+  <head>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+  <input type="number" id="num1" step="0.01"/>
+  <input type="number" id="num2" step="0.01"/>
+  <input type="number" id="pos" step="0.01"/><br>
+  <button class="run-cmd">Create Filter</button>
+  
+  <pre class="box" id="result">click run filter to create a filter</pre>
+  
+<table width ="100%" cellspacing="0" border="0">
+     <tr>
+     <td class="ItemLabel" width="50%">Date:</td>
+     <td class="ItemText" width="50%">2022-05-15 13:58:19.253411</td>
+     </tr>
+<tr><td class="title"  width="50%">
+<div>
+  <canvas id="myChart"></canvas>
+</div>
+</td>
+<td class="ItemLabel" width="50%">a</td>
+</tr>
+</table>
+
+<center>
+<table width ="25%" cellspacing="0" border="0">
+<tr>
+<td class="InputLabel" width="50%">Filter type:</td>
+<td class="InputBox" width="50%">
+<select id="filterType">
+  <option value="BwLP">Butterworth low pass (IIR)</option>
+  <option value="BwHP">Butterworth high pass (IIR)</option>
+  <option value="BwBP">Butterworth band pass (IIR)</option>
+  <option value="BwBS">Butterworth band stop (IIR)</option>
+  <option value="ChLP">Chebyshev low pass (IIR)</option>
+  <option value="ChHP">Chebyshev high pass (IIR)</option>
+  <option value="ChBP">Chebyshev band pass (IIR)</option>
+  <option value="ChBS">Chebyshev band stop (IIR)</option>
+  <option value="WsLP">Brickwall low pass (FIR)</option>
+  <option value="WsHP">Brickwall high pass (FIR)</option>
+  <option value="WsBP">Brickwall band pass (FIR)</option>
+  <option value="WsBS">Brickwall band stop (FIR)</option>
+  <option value="MaLP">Moving average low pass (FIR)</option>
+  <option value="MaHP">Moving average high pass (FIR)</option>
+  <option value="ExLP">Exponential low pass (IIR)</option>
+</select></td>
+</tr>
+
+<tr><td class="InputLabel" width="50%">Order:</td><td class="InputBox" width="50%"><input name="order" type="number" id="order" step="1" min="0" value="5"/></td></tr>
+<tr><td class="InputLabel" width="50%">Sampling Frequency (Hz):</td><td class="InputBox" width="50%"><input name="frequencies" type="number" id="frequency" step="0.001"  min="0" value="100"/></td></tr>
+<tr><td class="InputLabel" width="50%">Cutoff 1 (Hz):</td><td class="InputBox" width="50%"><input name="frequencies" type="number" id="cutoff1" step="0.001"  min="0" value="15"/></td></tr>
+<tr><td class="InputLabel" width="50%">Cutoff 2 (Hz):</td><td class="InputBox" width="50%"><input name="frequencies2" type="number" id="cutoff2" step="0.001"  min="0" value="35"/></td></tr>
+<tr><td class="InputLabel" width="50%">Ripple (dB):</td><td class="InputBox" width="50%"><input name="chebyshev" type="number" id="ripple" step="0.001" max="0" value="-3"/></td></tr>
+
+</table>
+</center>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const labels = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+  ];
+
+  const data = {
+    datasets: [{
+      label: 'My First dataset',
+      backgroundColor: 'rgb(255, 99, 132)',
+      borderColor: 'rgb(255, 99, 132)',
+      data: [{x: 10, y: 20}, {x: 15, y: 35}, {x: 20, y: 50}, {x: 25, y: 80}],
+    },
+	{
+      label: 'My First dataset2',
+      backgroundColor: 'rgb(0, 255, 0)',
+      borderColor: 'rgb(0, 255, 0)',
+      data: [{x: 10, y: 35}, {x: 15, y: 55}, {x: 20, y: 67}, {x: 25, y: 70}],
+    }]
+  };
+
+  const config = {
+type: 'scatter',
+data: {
+    datasets: [{
+      label: 'My First dataset',
+      backgroundColor: 'rgb(85, 170, 255)',
+      borderColor: 'rgb(85, 170, 255)',
+        data: [{fs: 10, g: 1500}, {fs: 15, g: 500}, {fs: 20, g: 450}],
+         showLine: true
+    }]
+},
+options: {
+    parsing: {
+        xAxisKey: 'fs',
+        yAxisKey: 'g'
+    },
+	
+        scales: {
+            y: {
+                min: 0,
+                max: 2000
+            }
+        }
+}
+
+  };
+  
+  const myChart = new Chart(
+    document.getElementById('myChart'),
+    config
+  );
+</script>
+
+<script>
+function disableInputs(name,inactive) {
+  var elems = document.getElementsByName(name);
+  for(i = 0; i < elems.length; i++) {
+	elems[i].disabled = inactive;
+  }
+}
+disableInputs("chebyshev",true);
+
+var filterSel = document.getElementById("filterType");
+filterSel.addEventListener("change", function() {
+	var type = filterSel.options[filterSel.selectedIndex].value;
+	disableInputs("frequencies2",type.substring(2)!="BP" && type.substring(2)!="BS");
+	switch(type) {
+		case "BwLP": 
+		case "BwHP": 
+		case "BwBP": 
+		case "BwBS":
+		case "WsLP":
+		case "WsHP":
+		case "WsBP":
+		case "WsBS":
+			disableInputs("order",false);
+			disableInputs("frequencies",false);
+			disableInputs("chebyshev",true);
+			console.log('switching to butterworth input mask');
+			break;
+		case "MaLP": 
+		case "MaHP":
+			console.log('switching to moving average input mask');
+			disableInputs("order",false);
+			disableInputs("frequencies",true);
+			disableInputs("chebyshev",true);
+			break;
+		case "ExLP":
+			console.log('switching to exp input mask');
+			disableInputs("order",true);
+			disableInputs("frequencies",false);
+			disableInputs("chebyshev",true);
+			break;
+		default:
+			console.log('switching to everything');
+			disableInputs("order",false);
+			disableInputs("frequencies",false);
+			disableInputs("chebyshev",false);
+	}
+});
+
+</script>
+
+<script>
+var coll = document.getElementsByClassName("run-cmd");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+	var num1 = document.getElementById("num1").value;
+	var num2 = document.getElementById("num2").value;
+	var pos = document.getElementById("pos").value;
+    alert(`Inputs: ${num1} - ${num2} - ${pos}\n` + 'lerp result: ' + Module.lerp(parseFloat(num1), parseFloat(num2), parseFloat(pos)));
+var x = new Module.MyStruct();
+x.a = 10;
+x.b = 20;
+x.c = 30;
+var y = Module.Foo(x, 21);
+console.log(y, y.a, y.b, y.c);
+
+x.delete();
+y.delete();	
+var wrap = new Module.FilterWrapper();
+var filterText = 'Created filter: \n'
+for(i=0;i<wrap.size; i++){
+console.log(wrap.getValue(i));
+filterText += wrap.getValue(i) + '\n'
+}
+wrap.delete();
+document.getElementById("result").textContent = filterText
+
+
+  });
+}
+</script>
+</html>
+
+
+

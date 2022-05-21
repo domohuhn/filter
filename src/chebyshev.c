@@ -20,6 +20,7 @@ void compute_chebyshev_poles_on_z_plane(COMPLEX* ptr, size_t len, double transfo
 {
     compute_poles_on_s_plane(ptr,len,transformed_frequency);
     dh_transform_s_poles_to_chebyshev(ptr,len,ripple);
+    // invert poles for type 2
     for(size_t i=0; i<len; ++i) {
         ptr[i] = bilinear_z_transform(ptr[i]);
     }

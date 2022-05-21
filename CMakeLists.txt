@@ -5,6 +5,8 @@ cmake_minimum_required(VERSION 3.14)
 
 project(CFilter VERSION 1.0.0)
 
+option(DH_CFILTER_BUILD_CPP_BINDINGS "If the bindings for cpp should be built." ON)
+option(DH_CFILTER_BUILD_JS_BINDINGS "If the bindings for javascript should be built. This includes the C++ Bindings." OFF)
 option(DH_CFILTER_BUILD_TESTS "If the tests should be built." OFF)
 option(DH_CFILTER_BUILD_EXAMPLES "If the example application should be built." OFF)
 
@@ -39,6 +41,17 @@ if(DH_CFILTER_BUILD_EXAMPLES)
   )
   target_link_libraries(design-filter PRIVATE cxxopts::cxxopts dh::filter)
 
+endif()
+
+if(DH_CFILTER_BUILD_CPP_BINDINGS OR DH_CFILTER_BUILD_JS_BINDINGS)
+
+endif()
+
+if(DH_CFILTER_BUILD_JS_BINDINGS)
+  add_executable(filter.js
+    src/bindings/js/emscripten.cpp
+  )
+  target_link_libraries(filter.js PRIVATE -lembind -Wl,--whole-archive dh::filter -Wl,--no-whole-archive)
 endif()
 
 
