@@ -102,10 +102,10 @@ SCENARIO("Chebyshev low pass filters are correctly initialized", "[filter]") {
           dh_filter_data filter_data;
           dh_filter_options opts;
           opts.filter_type = DH_IIR_CHEBYSHEV_LOWPASS;
-          opts.parameters.chebyshev.cutoff_frequency_hz = 25.0;
-          opts.parameters.chebyshev.sampling_frequency_hz = 100.0;
-          opts.parameters.chebyshev.ripple = -3.0;
-          opts.parameters.chebyshev.filter_order = 4;
+          opts.cutoff_frequency_low = 25.0;
+          opts.sampling_frequency = 100.0;
+          opts.ripple = -3.0;
+          opts.filter_order = 4;
           WHEN("filter is created") {
                int status = dh_create_filter(&filter_data,&opts);
                THEN("results are correct") {
@@ -133,10 +133,10 @@ SCENARIO("Chebyshev high pass filters are correctly initialized", "[filter]") {
           dh_filter_data filter_data;
           dh_filter_options opts;
           opts.filter_type = DH_IIR_CHEBYSHEV_HIGHPASS;
-          opts.parameters.chebyshev.cutoff_frequency_hz = 20.0;
-          opts.parameters.chebyshev.sampling_frequency_hz = 100.0;
-          opts.parameters.chebyshev.ripple = -2.0;
-          opts.parameters.chebyshev.filter_order = 5;
+          opts.cutoff_frequency_low = 20.0;
+          opts.sampling_frequency = 100.0;
+          opts.ripple = -2.0;
+          opts.filter_order = 5;
           WHEN("coefficients are computed") {
                int status = dh_create_filter(&filter_data,&opts);
                THEN("results are correct") {
@@ -165,11 +165,11 @@ SCENARIO("Chebyshev band pass filters are correctly initialized", "[filter]") {
           dh_filter_data filter_data;
           dh_filter_options opts;
           opts.filter_type = DH_IIR_CHEBYSHEV_BANDPASS;
-          opts.parameters.chebyshev.cutoff_frequency_hz = 15.0;
-          opts.parameters.chebyshev.cutoff_frequency_2_hz = 30.0;
-          opts.parameters.chebyshev.sampling_frequency_hz = 100.0;
-          opts.parameters.chebyshev.ripple = -3.0;
-          opts.parameters.chebyshev.filter_order = 3;
+          opts.cutoff_frequency_low = 15.0;
+          opts.cutoff_frequency_high = 30.0;
+          opts.sampling_frequency = 100.0;
+          opts.ripple = -3.0;
+          opts.filter_order = 3;
           WHEN("coefficients are computed") {
                int status = dh_create_filter(&filter_data,&opts);
                THEN("results are correct") {
@@ -207,11 +207,11 @@ SCENARIO("Chebyshev band stop filters are correctly initialized", "[filter]") {
           dh_filter_data filter_data;
           dh_filter_options opts;
           opts.filter_type = DH_IIR_CHEBYSHEV_BANDSTOP;
-          opts.parameters.chebyshev.cutoff_frequency_hz = 15.0;
-          opts.parameters.chebyshev.cutoff_frequency_2_hz = 30.0;
-          opts.parameters.chebyshev.sampling_frequency_hz = 100.0;
-          opts.parameters.chebyshev.ripple = -3.0;
-          opts.parameters.chebyshev.filter_order = 3;
+          opts.cutoff_frequency_low = 15.0;
+          opts.cutoff_frequency_high = 30.0;
+          opts.sampling_frequency = 100.0;
+          opts.ripple = -3.0;
+          opts.filter_order = 3;
           WHEN("coefficients are computed") {
                int status = dh_create_filter(&filter_data,&opts);
                THEN("results are correct") {

@@ -12,7 +12,8 @@ SCENARIO( "An IIR exponential lowpass filter can be used", "[filter]" ) {
         dh_filter_data iir_exp;
         dh_filter_options opts;
         opts.filter_type = DH_IIR_EXPONENTIAL_LOWPASS;
-        opts.parameters.exponential.alpha = 0.25;
+        opts.cutoff_frequency_low = 10;
+        opts.sampling_frequency = 40;
 
         WHEN( "the create function is called" ) {
             dh_create_filter(&iir_exp, &opts);

@@ -11,9 +11,9 @@ SCENARIO( "Brickwall lowpass filters can be initialized", "[filter]" ) {
         dh_filter_data filter_data;
         dh_filter_options opts;
         opts.filter_type = DH_FIR_BRICKWALL_LOWPASS;
-        opts.parameters.brickwall.cutoff_frequency_hz = 25.0;
-        opts.parameters.brickwall.sampling_frequency_hz = 100.0;
-        opts.parameters.brickwall.filter_order = 10;
+        opts.cutoff_frequency_low = 25.0;
+        opts.sampling_frequency = 100.0;
+        opts.filter_order = 10;
         WHEN( "The filter is created" ) {
             int status = dh_create_filter(&filter_data,&opts);
             THEN( "The status is ok" ) {
@@ -50,9 +50,9 @@ SCENARIO( "Brickwall highpass filters can be initialized", "[filter]" ) {
         dh_filter_data filter_data;
         dh_filter_options opts;
         opts.filter_type = DH_FIR_BRICKWALL_HIGHPASS;
-        opts.parameters.brickwall.cutoff_frequency_hz = 25.0;
-        opts.parameters.brickwall.sampling_frequency_hz = 100.0;
-        opts.parameters.brickwall.filter_order = 10;
+        opts.cutoff_frequency_low = 25.0;
+        opts.sampling_frequency = 100.0;
+        opts.filter_order = 10;
         WHEN( "The filter is created" ) {
             int status = dh_create_filter(&filter_data,&opts);
             THEN( "The status is ok" ) {
@@ -90,10 +90,10 @@ SCENARIO( "Brickwall bandstop filters can be initialized", "[filter]" ) {
         dh_filter_data filter_data;
         dh_filter_options opts;
         opts.filter_type = DH_FIR_BRICKWALL_BANDSTOP;
-        opts.parameters.brickwall.cutoff_frequency_hz = 20.0;
-        opts.parameters.brickwall.cutoff_frequency_2_hz = 40.0;
-        opts.parameters.brickwall.sampling_frequency_hz = 100.0;
-        opts.parameters.brickwall.filter_order = 10;
+        opts.cutoff_frequency_low = 20.0;
+        opts.cutoff_frequency_high = 40.0;
+        opts.sampling_frequency = 100.0;
+        opts.filter_order = 10;
         WHEN( "The filter is created" ) {
             int status = dh_create_filter(&filter_data,&opts);
             THEN( "The status is ok" ) {
@@ -147,10 +147,10 @@ SCENARIO( "Brickwall bandpass filters can be initialized", "[filter]" ) {
         dh_filter_data filter_data;
         dh_filter_options opts;
         opts.filter_type = DH_FIR_BRICKWALL_BANDPASS;
-        opts.parameters.brickwall.cutoff_frequency_hz = 20.0;
-        opts.parameters.brickwall.cutoff_frequency_2_hz = 40.0;
-        opts.parameters.brickwall.sampling_frequency_hz = 100.0;
-        opts.parameters.brickwall.filter_order = 10;
+        opts.cutoff_frequency_low = 20.0;
+        opts.cutoff_frequency_high = 40.0;
+        opts.sampling_frequency = 100.0;
+        opts.filter_order = 10;
         WHEN( "The filter is created" ) {
             int status = dh_create_filter(&filter_data,&opts);
             THEN( "The status is ok" ) {

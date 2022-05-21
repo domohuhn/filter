@@ -11,8 +11,8 @@ SCENARIO( "A moving average filter can be created", "[filter]" ) {
     GIVEN( "An options structure filled with values for moving average filters" ) {
         dh_filter_data moving_avg;
         dh_filter_options opts;
-        opts.filter_type = DH_FIR_MOVING_AVERAGE;
-        opts.parameters.moving_average.filter_order = 15;
+        opts.filter_type = DH_FIR_MOVING_AVERAGE_LOWPASS;
+        opts.filter_order = 15;
 
         WHEN( "the create function is called" ) {
             dh_create_filter(&moving_avg, &opts);
@@ -142,7 +142,7 @@ SCENARIO( "A moving average highpass filter can be used", "[filter]" ) {
         dh_filter_data moving_avg;
         dh_filter_options opts;
         opts.filter_type = DH_FIR_MOVING_AVERAGE_HIGHPASS;
-        opts.parameters.moving_average.filter_order = 15;
+        opts.filter_order = 15;
 
         WHEN( "the create function is called" ) {
             dh_create_filter(&moving_avg, &opts);

@@ -12,9 +12,10 @@ SCENARIO( "An FIR exponential lowpass filter can be used", "[filter]" ) {
     GIVEN( "An options structure filled with values for FIR exponential lowpass filters" ) {
         dh_filter_data filter_data;
         dh_filter_options opts;
-        opts.filter_type = DH_FIR_EXPONENTIAL_LOWPASS;
-        opts.parameters.exponential.alpha = 0.5;
-        opts.parameters.exponential.filter_order = 16;
+        opts.filter_type = DH_FIR_EXPONENTIAL_MOVING_AVERAGE_LOWPASS;
+        opts.cutoff_frequency_low = 20;
+        opts.sampling_frequency = 40;
+        opts.filter_order = 16;
 
         WHEN( "the create function is called" ) {
             dh_create_filter(&filter_data, &opts);

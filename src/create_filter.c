@@ -34,16 +34,16 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_option
     DH_FILTER_RETURN_VALUE rv = DH_FILTER_UNKNOWN_FILTER_TYPE;
     switch(options->filter_type){
         case DH_NO_FILTER:
-            options->parameters.moving_average.filter_order = 0;
+            options->filter_order = 0;
             rv = dh_create_moving_average(filter, options);
             break;
-        case DH_FIR_MOVING_AVERAGE:
+        case DH_FIR_MOVING_AVERAGE_LOWPASS:
             rv = dh_create_moving_average(filter, options);
             break;
         case DH_FIR_MOVING_AVERAGE_HIGHPASS:
             rv = dh_create_moving_average_highpass(filter, options);
             break;
-        case DH_FIR_EXPONENTIAL_LOWPASS:
+        case DH_FIR_EXPONENTIAL_MOVING_AVERAGE_LOWPASS:
             rv = dh_fir_exponential_lowpass(filter, options);
             break;
         case DH_FIR_BRICKWALL_LOWPASS: // falltrough
@@ -132,7 +132,7 @@ static DH_FILTER_RETURN_VALUE dh_filter_allocate_buffers(dh_filter_data* filter,
 
 static DH_FILTER_RETURN_VALUE dh_create_moving_average(dh_filter_data* filter, dh_filter_options* options)
 {
-    if (dh_filter_allocate_buffers(filter, options->parameters.moving_average.filter_order+1, 1) != DH_FILTER_OK) {
+    if (dh_filter_allocate_buffers(filter, options->filter_order+1, 1) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
     double val = 1.0/(double)filter->number_coefficients_in;
@@ -171,11 +171,10 @@ static void fill_array_fir_sinc(double* data, size_t count,double cutoff, bool h
 
 static DH_FILTER_RETURN_VALUE dh_fir_create_sinc(dh_filter_data* filter, dh_filter_options* options)
 {
-    dh_brickwall_parameters* pars = &(options->parameters.brickwall);
-    if (dh_filter_allocate_buffers(filter, pars->filter_order+1, 1) != DH_FILTER_OK) {
+    if (dh_filter_allocate_buffers(filter, options->filter_order+1, 1) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    double cutoff = pars->cutoff_frequency_hz/pars->sampling_frequency_hz;
+    double cutoff = options->cutoff_frequency_low/options->sampling_frequency;
     bool is_highpass = options->filter_type == DH_FIR_BRICKWALL_HIGHPASS;
     fill_array_fir_sinc(filter->coefficients_in,filter->number_coefficients_in,cutoff , is_highpass);
     filter->coefficients_out[0] = 1.0;
@@ -186,13 +185,12 @@ static DH_FILTER_RETURN_VALUE dh_fir_create_sinc(dh_filter_data* filter, dh_filt
 
 static DH_FILTER_RETURN_VALUE dh_fir_create_sinc_bandfilter(dh_filter_data* filter, dh_filter_options* options, bool bandpass)
 {
-    dh_brickwall_parameters* pars = &(options->parameters.brickwall);
-    size_t count_single_filter = pars->filter_order+1;
+    size_t count_single_filter = options->filter_order+1;
     if (dh_filter_allocate_buffers(filter, 2*count_single_filter-1, 1) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    double cutoff_low = pars->cutoff_frequency_hz/pars->sampling_frequency_hz;
-    double cutoff_high = pars->cutoff_frequency_2_hz/pars->sampling_frequency_hz;
+    double cutoff_low = options->cutoff_frequency_low/options->sampling_frequency;
+    double cutoff_high = options->cutoff_frequency_high/options->sampling_frequency;
     // in order to save allocations, we will use the input and output buffers for the temporary values
     // inputs has size 2*count_single_filter-1 followed by 2 doubles
     // we need 2*count_single_filter -> ok, there are 8 bytes of buffer left
@@ -236,7 +234,7 @@ static DH_FILTER_RETURN_VALUE dh_iir_exponential_lowpass(dh_filter_data* filter,
     if (dh_filter_allocate_buffers(filter, 1, 2) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    double val = options->parameters.exponential.alpha;
+    double val = options->cutoff_frequency_low/options->sampling_frequency;
     filter->coefficients_in[0] = val;
     filter->coefficients_out[0] = 1.0;
     filter->coefficients_out[1] = -(1.0-val);
@@ -245,12 +243,13 @@ static DH_FILTER_RETURN_VALUE dh_iir_exponential_lowpass(dh_filter_data* filter,
 
 static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter, dh_filter_options* options)
 {
-    if (dh_filter_allocate_buffers(filter, options->parameters.exponential.filter_order, 0) != DH_FILTER_OK) {
+    if (dh_filter_allocate_buffers(filter, options->filter_order, 0) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
     double current = 1.0;
     double integrated = 0.0;
-    double val = options->parameters.exponential.alpha;
+    // TODO Check if this is correct
+    double val = options->cutoff_frequency_low/options->sampling_frequency;
     for (size_t i=0; i<filter->number_coefficients_in; ++i) {
         filter->coefficients_in[i] = current;
         integrated += current;
@@ -264,61 +263,60 @@ static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter,
 
 static DH_FILTER_RETURN_VALUE dh_iir_butterworth_high_lowpass(dh_filter_data* filter, dh_filter_options* options, bool lowpass)
 {
-    size_t coefficients = options->parameters.butterworth.filter_order + 1;
+    size_t coefficients = options->filter_order + 1;
     if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
     if (lowpass) {
-        return compute_butterworth_lowpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.butterworth.filter_order,
-            options->parameters.butterworth.cutoff_frequency_hz, options->parameters.butterworth.sampling_frequency_hz);
+        return compute_butterworth_lowpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->filter_order,
+            options->cutoff_frequency_low, options->sampling_frequency);
     } else {
         filter->initialized = true;
-        return compute_butterworth_highpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.butterworth.filter_order,
-            options->parameters.butterworth.cutoff_frequency_hz, options->parameters.butterworth.sampling_frequency_hz);
+        return compute_butterworth_highpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->filter_order,
+            options->cutoff_frequency_low, options->sampling_frequency);
     }
 }
 
 static DH_FILTER_RETURN_VALUE dh_iir_butterworth_bandfilter(dh_filter_data* filter, dh_filter_options* options, bool bandpass)
 {
-    size_t coefficients = 2*options->parameters.butterworth.filter_order + 1;
+    size_t coefficients = 2*options->filter_order + 1;
     if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
     filter->initialized = true;
-    return compute_butterworth_bandfilter_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.butterworth.filter_order,
-        options->parameters.butterworth.cutoff_frequency_hz, options->parameters.butterworth.cutoff_frequency_2_hz,
-        options->parameters.butterworth.sampling_frequency_hz,bandpass);
+    return compute_butterworth_bandfilter_coefficients(filter->coefficients_in, filter->coefficients_out, options->filter_order,
+        options->cutoff_frequency_low, options->cutoff_frequency_high,
+        options->sampling_frequency,bandpass);
 }
 
 
 static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_high_lowpass(dh_filter_data* filter, dh_filter_options* options, bool lowpass)
 {
-    size_t coefficients = options->parameters.chebyshev.filter_order + 1;
+    size_t coefficients = options->filter_order + 1;
     if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
     if (lowpass) {
-        return compute_chebyshev_lowpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.chebyshev.filter_order,
-            options->parameters.chebyshev.cutoff_frequency_hz, options->parameters.chebyshev.sampling_frequency_hz,
-            options->parameters.chebyshev.ripple);
+        return compute_chebyshev_lowpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->filter_order,
+            options->cutoff_frequency_low, options->sampling_frequency,
+            options->ripple);
     } else {
         filter->initialized = true;
-        return compute_chebyshev_highpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.chebyshev.filter_order,
-            options->parameters.chebyshev.cutoff_frequency_hz, options->parameters.chebyshev.sampling_frequency_hz,
-            options->parameters.chebyshev.ripple);
+        return compute_chebyshev_highpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->filter_order,
+            options->cutoff_frequency_low, options->sampling_frequency,
+            options->ripple);
     }
 }
 
 static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_bandfilter(dh_filter_data* filter, dh_filter_options* options, bool bandpass)
 {
-    size_t coefficients = 2*options->parameters.chebyshev.filter_order + 1;
+    size_t coefficients = 2*options->filter_order + 1;
     if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
     filter->initialized = true;
-    return compute_chebyshev_bandfilter_coefficients(filter->coefficients_in, filter->coefficients_out, options->parameters.chebyshev.filter_order,
-        options->parameters.chebyshev.cutoff_frequency_hz, options->parameters.chebyshev.cutoff_frequency_2_hz,
-        options->parameters.chebyshev.sampling_frequency_hz,bandpass,
-        options->parameters.chebyshev.ripple);
+    return compute_chebyshev_bandfilter_coefficients(filter->coefficients_in, filter->coefficients_out, options->filter_order,
+        options->cutoff_frequency_low, options->cutoff_frequency_high,
+        options->sampling_frequency,bandpass,options->ripple);
 }
 

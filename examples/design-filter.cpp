@@ -217,7 +217,7 @@ int main(int argc, const char * argv[]) {
 DH_FILTER_TYPE select_type(cxxopts::ParseResult& result, DH_FILTER_TYPE type){
     auto param = result["type"].as<std::string>();
     std::cout<< "# Filter type        : '"<<param<<"'\n";
-    if (type == DH_FIR_MOVING_AVERAGE) {
+    if (type == DH_FIR_MOVING_AVERAGE_LOWPASS) {
         if(param=="lowpass") {
             return type;
         } else if(param=="highpass") {
@@ -285,17 +285,17 @@ dh_filter_options convert_options(cxxopts::ParseResult& result)
     if (param == "butterworth") {
         std::cout<< "# Order                   : "<<order<<"\n";
         options.filter_type = select_type(result ,DH_IIR_BUTTERWORTH_LOWPASS);
-        options.parameters.butterworth.filter_order = order;
-        options.parameters.butterworth.sampling_frequency_hz = sampling_frequency_hz;
+        options.filter_order = order;
+        options.sampling_frequency = sampling_frequency_hz;
         
-        std::cout<< "# Sampling frequency : "<<options.parameters.butterworth.sampling_frequency_hz<<" Hz\n";
+        std::cout<< "# Sampling frequency : "<<options.sampling_frequency<<" Hz\n";
         if(cutoffs_hz.size()>0) {
-            options.parameters.butterworth.cutoff_frequency_hz = cutoffs_hz[0];
-            std::cout<< "# Cutoff 1           : "<<options.parameters.butterworth.cutoff_frequency_hz<<" Hz\n";
+            options.cutoff_frequency_low = cutoffs_hz[0];
+            std::cout<< "# Cutoff 1           : "<<options.cutoff_frequency_low<<" Hz\n";
         }
         if(cutoffs_hz.size()>1 && (options.filter_type==DH_IIR_BUTTERWORTH_BANDPASS || options.filter_type==DH_IIR_BUTTERWORTH_BANDSTOP)){
-            options.parameters.butterworth.cutoff_frequency_2_hz = cutoffs_hz[1];
-            std::cout<< "# Cutoff 2           : "<<options.parameters.butterworth.cutoff_frequency_2_hz<<" Hz\n";
+            options.cutoff_frequency_high = cutoffs_hz[1];
+            std::cout<< "# Cutoff 2           : "<<options.cutoff_frequency_high<<" Hz\n";
         }
         if(cutoffs_hz.size()==0 || (cutoffs_hz.size()<2 && (options.filter_type==DH_IIR_BUTTERWORTH_BANDPASS || options.filter_type==DH_IIR_BUTTERWORTH_BANDSTOP))) {
             throw std::runtime_error("You must provide cutoff frequencies in Hz via -c\nExample '-c 10' for lowpass, or '-c 10,20' a bandpass or bandstop");
@@ -304,17 +304,17 @@ dh_filter_options convert_options(cxxopts::ParseResult& result)
     else if (param == "brickwall") {
         std::cout<< "# Order                   : "<<order<<"\n";
         options.filter_type = select_type(result ,DH_FIR_BRICKWALL_LOWPASS);
-        options.parameters.brickwall.filter_order = order;
-        options.parameters.brickwall.sampling_frequency_hz = sampling_frequency_hz;
+        options.filter_order = order;
+        options.sampling_frequency = sampling_frequency_hz;
         
-        std::cout<< "# Sampling frequency : "<<options.parameters.brickwall.sampling_frequency_hz<<" Hz\n";
+        std::cout<< "# Sampling frequency : "<<options.sampling_frequency<<" Hz\n";
         if(cutoffs_hz.size()>0) {
-            options.parameters.brickwall.cutoff_frequency_hz = cutoffs_hz[0];
-            std::cout<< "# Cutoff 1           : "<<options.parameters.brickwall.cutoff_frequency_hz<<" Hz\n";
+            options.cutoff_frequency_low = cutoffs_hz[0];
+            std::cout<< "# Cutoff 1           : "<<options.cutoff_frequency_low<<" Hz\n";
         }
-        if(cutoffs_hz.size()>1 && (options.filter_type==DH_FIR_BRICKWALL_BANDPASS || options.filter_type==DH_FIR_BRICKWALL_BANDSTOP)){
-            options.parameters.brickwall.cutoff_frequency_2_hz = cutoffs_hz[1];
-            std::cout<< "# Cutoff 2           : "<<options.parameters.brickwall.cutoff_frequency_2_hz<<" Hz\n";
+        if(cutoffs_hz.size()>1 && (options.filter_type==DH_IIR_BUTTERWORTH_BANDPASS || options.filter_type==DH_IIR_BUTTERWORTH_BANDSTOP)){
+            options.cutoff_frequency_high = cutoffs_hz[1];
+            std::cout<< "# Cutoff 2           : "<<options.cutoff_frequency_high<<" Hz\n";
         }
         if(cutoffs_hz.size()==0 || (cutoffs_hz.size()<2 && (options.filter_type==DH_FIR_BRICKWALL_BANDPASS || options.filter_type==DH_FIR_BRICKWALL_BANDSTOP))) {
             throw std::runtime_error("You must provide cutoff frequencies in Hz via -c\nExample '-c 10' for lowpass, or '-c 10,20' a bandpass or bandstop");
@@ -323,44 +323,45 @@ dh_filter_options convert_options(cxxopts::ParseResult& result)
     else if (param == "chebyshev") {
         std::cout<< "# Order                   : "<<order<<"\n";
         options.filter_type = select_type(result ,DH_IIR_CHEBYSHEV_LOWPASS);
-        options.parameters.chebyshev.filter_order = order;
-        options.parameters.chebyshev.sampling_frequency_hz = sampling_frequency_hz;
-
-        std::cout<< "# Sampling frequency : "<<options.parameters.chebyshev.sampling_frequency_hz<<" Hz\n";
+        options.filter_order = order;
+        options.sampling_frequency = sampling_frequency_hz;
+        
+        std::cout<< "# Sampling frequency : "<<options.sampling_frequency<<" Hz\n";
         if(cutoffs_hz.size()>0) {
-            options.parameters.chebyshev.cutoff_frequency_hz = cutoffs_hz[0];
-            std::cout<< "# Cutoff 1           : "<<options.parameters.chebyshev.cutoff_frequency_hz<<" Hz\n";
+            options.cutoff_frequency_low = cutoffs_hz[0];
+            std::cout<< "# Cutoff 1           : "<<options.cutoff_frequency_low<<" Hz\n";
         }
-        if(cutoffs_hz.size()>1 && (options.filter_type==DH_IIR_CHEBYSHEV_BANDPASS || options.filter_type==DH_IIR_CHEBYSHEV_BANDSTOP)){
-            options.parameters.chebyshev.cutoff_frequency_2_hz = cutoffs_hz[1];
-            std::cout<< "# Cutoff 2           : "<<options.parameters.chebyshev.cutoff_frequency_2_hz<<" Hz\n";
+        if(cutoffs_hz.size()>1 && (options.filter_type==DH_IIR_BUTTERWORTH_BANDPASS || options.filter_type==DH_IIR_BUTTERWORTH_BANDSTOP)){
+            options.cutoff_frequency_high = cutoffs_hz[1];
+            std::cout<< "# Cutoff 2           : "<<options.cutoff_frequency_high<<" Hz\n";
         }
         if(cutoffs_hz.size()==0 || (cutoffs_hz.size()<2 && (options.filter_type==DH_IIR_CHEBYSHEV_BANDPASS || options.filter_type==DH_IIR_CHEBYSHEV_BANDSTOP))) {
             throw std::runtime_error("You must provide cutoff frequencies in Hz via -c\nExample '-c 10' for lowpass, or '-c 10,20' a bandpass or bandstop");
         }
-        options.parameters.chebyshev.ripple = -std::abs(result["ripple"].as<double>());
-        std::cout<< "# Ripple             : "<<options.parameters.chebyshev.ripple<<" dB\n";
+        options.ripple = -std::abs(result["ripple"].as<double>());
+        std::cout<< "# Ripple             : "<<options.ripple<<" dB\n";
     }
     else if (param == "moving-average") {
         std::cout<< "# Order                   : "<<order<<"\n";
-        options.filter_type = select_type(result ,DH_FIR_MOVING_AVERAGE);
-        options.parameters.moving_average.filter_order = order;
+        options.filter_type = select_type(result ,DH_FIR_MOVING_AVERAGE_LOWPASS);
+        options.filter_order = order;
     }
     else if (param == "exponential") {
         options.filter_type =  select_type(result ,DH_IIR_EXPONENTIAL_LOWPASS);
-        options.parameters.exponential.filter_order = 1;
-        std::cout<< "# Sampling frequency : "<<sampling_frequency_hz<<" Hz\n";
+        options.filter_order = 1;
+        options.sampling_frequency = sampling_frequency_hz;
+        std::cout<< "# Sampling frequency : "<<options.sampling_frequency<<" Hz\n";
         if(cutoffs_hz.size()>0) {
-            options.parameters.exponential.alpha =  cutoffs_hz[0]/sampling_frequency_hz ;
-            std::cout<< "# Cutoff 1           : "<<cutoffs_hz[0]<<" Hz\n";
+            options.cutoff_frequency_low = cutoffs_hz[0];
+            std::cout<< "# Cutoff 1           : "<<options.cutoff_frequency_low<<" Hz\n";
         }
         else {
             throw std::runtime_error("You must provide cutoff frequencies in Hz via -c\nExample '-c 10' for lowpass, or '-c 10,20' a bandpass or bandstop");
         }
     }
     else if (param == "no-filter") {
-        options.filter_type = DH_FIR_MOVING_AVERAGE;
-        options.parameters.moving_average.filter_order = 0;
+        options.filter_type = DH_NO_FILTER;
+        options.filter_order = 0;
     }
     else {
         throw std::runtime_error("Unknown filter parametrization! Only no-filter, butterworth, chebyshev, brickwall, exponential, or moving-average are supported for option -p.\nParsed: '"+param +"'");

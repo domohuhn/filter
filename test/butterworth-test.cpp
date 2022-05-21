@@ -149,9 +149,9 @@ SCENARIO( "Butterworth lowpass filters can be initialized", "[filter]" ) {
         dh_filter_data filter_data;
         dh_filter_options opts;
         opts.filter_type = DH_IIR_BUTTERWORTH_LOWPASS;
-        opts.parameters.butterworth.cutoff_frequency_hz = 25.0;
-        opts.parameters.butterworth.sampling_frequency_hz = 100.0;
-        opts.parameters.butterworth.filter_order = 5;
+        opts.cutoff_frequency_low = 25.0;
+        opts.sampling_frequency = 100.0;
+        opts.filter_order = 5;
         WHEN( "lowpass parameters are computed" ) {
             int status = dh_create_filter(&filter_data,&opts);
             THEN( "status is ok" ) {
@@ -190,9 +190,9 @@ SCENARIO( "Butterworth highpass filters can be initialized", "[filter]" ) {
         dh_filter_data filter_data;
         dh_filter_options opts;
         opts.filter_type = DH_IIR_BUTTERWORTH_HIGHPASS;
-        opts.parameters.butterworth.cutoff_frequency_hz = 25.0;
-        opts.parameters.butterworth.sampling_frequency_hz = 100.0;
-        opts.parameters.butterworth.filter_order = 5;
+        opts.cutoff_frequency_low = 25.0;
+        opts.sampling_frequency = 100.0;
+        opts.filter_order = 5;
         WHEN( "highpass parameters are computed" ) {
             int status = dh_create_filter(&filter_data,&opts);
             THEN( "status is ok" ) {
@@ -230,10 +230,10 @@ SCENARIO( "Butterworth bandstop filters can be initialized", "[filter]" ) {
         dh_filter_data filter_data;
         dh_filter_options opts;
         opts.filter_type = DH_IIR_BUTTERWORTH_BANDSTOP;
-        opts.parameters.butterworth.cutoff_frequency_hz = 15.0;
-        opts.parameters.butterworth.cutoff_frequency_2_hz = 30.0;
-        opts.parameters.butterworth.sampling_frequency_hz = 100.0;
-        opts.parameters.butterworth.filter_order = 3;
+        opts.cutoff_frequency_low = 15.0;
+        opts.cutoff_frequency_high = 30.0;
+        opts.sampling_frequency = 100.0;
+        opts.filter_order = 3;
         WHEN( "bandstop parameters are computed" ) {
             int status = dh_create_filter(&filter_data,&opts);
             THEN( "status is ok" ) {
@@ -274,10 +274,10 @@ SCENARIO( "Butterworth bandpass filters can be initialized", "[filter]" ) {
         dh_filter_data filter_data;
         dh_filter_options opts;
         opts.filter_type = DH_IIR_BUTTERWORTH_BANDPASS;
-        opts.parameters.butterworth.cutoff_frequency_hz = 15.0;
-        opts.parameters.butterworth.cutoff_frequency_2_hz = 30.0;
-        opts.parameters.butterworth.sampling_frequency_hz = 100.0;
-        opts.parameters.butterworth.filter_order = 3;
+        opts.cutoff_frequency_low = 15.0;
+        opts.cutoff_frequency_high = 30.0;
+        opts.sampling_frequency = 100.0;
+        opts.filter_order = 3;
         WHEN( "bandpass parameters are computed" ) {
             int status = dh_create_filter(&filter_data,&opts);
             THEN( "status is ok" ) {
