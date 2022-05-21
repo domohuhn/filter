@@ -10,7 +10,7 @@ SCENARIO( "An IIR exponential lowpass filter can be used", "[filter]" ) {
 
     GIVEN( "An options structure filled with values for IIR exponential lowpass filters" ) {
         dh_filter_data iir_exp;
-        dh_filter_options opts;
+        dh_filter_parameters opts;
         opts.filter_type = DH_IIR_EXPONENTIAL_LOWPASS;
         opts.cutoff_frequency_low = 10;
         opts.sampling_frequency = 40;

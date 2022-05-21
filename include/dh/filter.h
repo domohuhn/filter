@@ -35,7 +35,7 @@ DH_FILTER_RETURN_VALUE dh_filter(dh_filter_data* filter, double input, double* o
  * @param options the desired filter type.
  * @return DH_FILTER_RETURN_VALUE 
  */
-DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_options* options);
+DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_parameters* options);
 
 /**
  * @brief Forces the filter to the steady state with output value.
@@ -48,7 +48,10 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_option
  */
 DH_FILTER_RETURN_VALUE dh_initialize_filter(dh_filter_data* filter, double value);
 
-/** Frees the filter created with dh_create_filter(). */
+/** Frees the filter created with dh_create_filter().
+ * 
+ * If the filter is marked as owner of the buffer, free() will be called to clean up the allocated memory.
+ */
 DH_FILTER_RETURN_VALUE dh_free_filter(dh_filter_data* filter);
 
 /** Sets the gain of the filter to the given value.
@@ -57,6 +60,22 @@ DH_FILTER_RETURN_VALUE dh_free_filter(dh_filter_data* filter);
  * @param gain the desired gain
  */
 DH_FILTER_RETURN_VALUE dh_filter_set_gain(dh_filter_data* filter, double gain);
+
+/** Gets the gain of the filter.
+ * 
+ * @param filter the filter structure
+ * @param gain pointer to output
+ */
+DH_FILTER_RETURN_VALUE dh_filter_get_gain(const dh_filter_data* filter, double* gain);
+
+/** Gets the gain of the filter.
+ * 
+ * @param filter the filter structure
+ * @param frequency frequency/sampling_frequency where the gain is computed. Range: [0,0.5]
+ * @param gain pointer to output
+ */
+DH_FILTER_RETURN_VALUE dh_filter_get_gain_at(const dh_filter_data* filter, double frequency, dh_frequency_response_t* gain);
+
 
 
 //DH_FILTER_RETURN_VALUE dh_create_filter_with_external_buffer(dh_filter_data* filter, dh_filter_options* options, char* buffer, size_t length);

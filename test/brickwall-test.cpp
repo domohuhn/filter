@@ -9,7 +9,7 @@
 SCENARIO( "Brickwall lowpass filters can be initialized", "[filter]" ) {
     GIVEN("The filter parameters for a 10th order brickwall lowpass filter with 100 Hz sampling rate and 25Hz cutoff"){
         dh_filter_data filter_data;
-        dh_filter_options opts;
+        dh_filter_parameters opts;
         opts.filter_type = DH_FIR_BRICKWALL_LOWPASS;
         opts.cutoff_frequency_low = 25.0;
         opts.sampling_frequency = 100.0;
@@ -48,7 +48,7 @@ SCENARIO( "Brickwall lowpass filters can be initialized", "[filter]" ) {
 SCENARIO( "Brickwall highpass filters can be initialized", "[filter]" ) {
     GIVEN("The filter parameters for a 10th order brickwall highpass filter with 100 Hz sampling rate and 25Hz cutoff"){
         dh_filter_data filter_data;
-        dh_filter_options opts;
+        dh_filter_parameters opts;
         opts.filter_type = DH_FIR_BRICKWALL_HIGHPASS;
         opts.cutoff_frequency_low = 25.0;
         opts.sampling_frequency = 100.0;
@@ -88,7 +88,7 @@ SCENARIO( "Brickwall highpass filters can be initialized", "[filter]" ) {
 SCENARIO( "Brickwall bandstop filters can be initialized", "[filter]" ) {
     GIVEN("The filter parameters for a 10th order bandstop highpass filter with 100 Hz sampling rate and 20Hz-40Hz cutoff"){
         dh_filter_data filter_data;
-        dh_filter_options opts;
+        dh_filter_parameters opts;
         opts.filter_type = DH_FIR_BRICKWALL_BANDSTOP;
         opts.cutoff_frequency_low = 20.0;
         opts.cutoff_frequency_high = 40.0;
@@ -145,7 +145,7 @@ SCENARIO( "Brickwall bandstop filters can be initialized", "[filter]" ) {
 SCENARIO( "Brickwall bandpass filters can be initialized", "[filter]" ) {
     GIVEN("The filter parameters for a 10th order brickwall bandpass filter with 100 Hz sampling rate and 20Hz-40Hz cutoff"){
         dh_filter_data filter_data;
-        dh_filter_options opts;
+        dh_filter_parameters opts;
         opts.filter_type = DH_FIR_BRICKWALL_BANDPASS;
         opts.cutoff_frequency_low = 20.0;
         opts.cutoff_frequency_high = 40.0;

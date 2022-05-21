@@ -17,24 +17,41 @@ extern "C" {
 
 
 
-
+/** The filter types supported by this library */
 typedef enum {
+    /** No filtering. Input = output */
     DH_NO_FILTER,
+    /** A simple moving average. */
     DH_FIR_MOVING_AVERAGE_LOWPASS,
+    /** A simple moving average. */
     DH_FIR_MOVING_AVERAGE_HIGHPASS,
+    /** A moving average filter with exponentially decaying weights. */
     DH_FIR_EXPONENTIAL_MOVING_AVERAGE_LOWPASS,
+    /** A brickwall filter (windowed sinc). Delay will be half of filter order. */
     DH_FIR_BRICKWALL_LOWPASS,
+    /** A brickwall filter (windowed sinc). Delay will be half of filter order. */
     DH_FIR_BRICKWALL_HIGHPASS,
+    /** A brickwall filter (windowed sinc). Delay will be half of filter order. */
     DH_FIR_BRICKWALL_BANDPASS,
+    /** A brickwall filter (windowed sinc). Delay will be half of filter order. */
     DH_FIR_BRICKWALL_BANDSTOP,
+    /** Lowest order IIR filter. y[n] = w*x[n] + (1-w)*y[n-1] */
     DH_IIR_EXPONENTIAL_LOWPASS,
+    /** A butterworth filter. Has the smoothest possible frequency response. */
     DH_IIR_BUTTERWORTH_LOWPASS,
+    /** A butterworth filter. Has the smoothest possible frequency response. */
     DH_IIR_BUTTERWORTH_HIGHPASS,
+    /** A butterworth filter. Has the smoothest possible frequency response. */
     DH_IIR_BUTTERWORTH_BANDPASS,
+    /** A butterworth filter. Has the smoothest possible frequency response. */
     DH_IIR_BUTTERWORTH_BANDSTOP,
+    /** A chebyshev type 1 filter. Ripples in pass band. */
     DH_IIR_CHEBYSHEV_LOWPASS,
+    /** A chebyshev type 1 filter. Ripples in pass band. */
     DH_IIR_CHEBYSHEV_HIGHPASS,
+    /** A chebyshev type 1 filter. Ripples in pass band. */
     DH_IIR_CHEBYSHEV_BANDPASS,
+    /** A chebyshev type 1 filter. Ripples in pass band. */
     DH_IIR_CHEBYSHEV_BANDSTOP
 } DH_FILTER_TYPE;
 
@@ -45,7 +62,7 @@ typedef enum {
  * The structure defining the parameters for a filter that will be created with dh_create_filter().
  */
 typedef struct {
-        /** The first cutoff frequency of the filter.
+    /** The first cutoff frequency of the filter.
      * 
      * This value is used to configure the cutoff frequencies for
      * lowpass and highpass filters. For bandpass and bandstop filters, the value
@@ -131,7 +148,7 @@ typedef struct {
 
     /** What filter to generate. Valid values are defined in the enum DH_FILTER_TYPE. */
     DH_FILTER_TYPE filter_type;
-} dh_filter_options;
+} dh_filter_parameters;
 
 /** The return value for the public API of the library. */
 typedef enum {
@@ -177,9 +194,19 @@ typedef struct {
     size_t current_output_index;
     /** If the filter was initialized. Relevant for low pass filters. */
     bool initialized;
-    /** If the buffer needs to freed during free. */
+    /** If the buffer needs to be freed during free. */
     bool buffer_needs_cleanup;
 } dh_filter_data;
+
+/** Return structure for the frequrency response. */
+typedef struct{
+    /** Current position (x value) */
+    double frequency;
+    /** Gain at the frequency */
+    double gain;
+    /** Phase shift at the frequency */
+    double phase_shift;
+} dh_frequency_response_t;
 
 #ifdef __cplusplus
 }

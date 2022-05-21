@@ -100,7 +100,7 @@ SCENARIO("Chebyshev output coefficients can be computed", "[filter]") {
 SCENARIO("Chebyshev low pass filters are correctly initialized", "[filter]") {
      GIVEN("parameters: fourth order chebyshev, 100 Hz sampling rate, 25Hz cutoff, 3 db ripple, lowpass") {
           dh_filter_data filter_data;
-          dh_filter_options opts;
+          dh_filter_parameters opts;
           opts.filter_type = DH_IIR_CHEBYSHEV_LOWPASS;
           opts.cutoff_frequency_low = 25.0;
           opts.sampling_frequency = 100.0;
@@ -131,7 +131,7 @@ SCENARIO("Chebyshev low pass filters are correctly initialized", "[filter]") {
 SCENARIO("Chebyshev high pass filters are correctly initialized", "[filter]") {
      GIVEN("parameters: fifth order chebyshev, 100 Hz sampling rate, 20Hz cutoff, 2 db ripple, high pass") {
           dh_filter_data filter_data;
-          dh_filter_options opts;
+          dh_filter_parameters opts;
           opts.filter_type = DH_IIR_CHEBYSHEV_HIGHPASS;
           opts.cutoff_frequency_low = 20.0;
           opts.sampling_frequency = 100.0;
@@ -163,7 +163,7 @@ SCENARIO("Chebyshev high pass filters are correctly initialized", "[filter]") {
 SCENARIO("Chebyshev band pass filters are correctly initialized", "[filter]") {
      GIVEN("parameters: third order chebyshev, 100 Hz sampling rate, 15, 30Hz cutoff, 3 db ripple, band pass") {
           dh_filter_data filter_data;
-          dh_filter_options opts;
+          dh_filter_parameters opts;
           opts.filter_type = DH_IIR_CHEBYSHEV_BANDPASS;
           opts.cutoff_frequency_low = 15.0;
           opts.cutoff_frequency_high = 30.0;
@@ -205,7 +205,7 @@ SCENARIO("Chebyshev band pass filters are correctly initialized", "[filter]") {
 SCENARIO("Chebyshev band stop filters are correctly initialized", "[filter]") {
      GIVEN("parameters: third order chebyshev, 100 Hz sampling rate, 15, 30Hz cutoff, 3 db ripple, band stop") {
           dh_filter_data filter_data;
-          dh_filter_options opts;
+          dh_filter_parameters opts;
           opts.filter_type = DH_IIR_CHEBYSHEV_BANDSTOP;
           opts.cutoff_frequency_low = 15.0;
           opts.cutoff_frequency_high = 30.0;

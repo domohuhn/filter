@@ -147,7 +147,7 @@ SCENARIO( "Butterworth output coefficients can be computed", "[filter]" ) {
 SCENARIO( "Butterworth lowpass filters can be initialized", "[filter]" ) {
     GIVEN("parameters: fifth order butterworth, 100 Hz sampling rate, 25Hz cutoff"){
         dh_filter_data filter_data;
-        dh_filter_options opts;
+        dh_filter_parameters opts;
         opts.filter_type = DH_IIR_BUTTERWORTH_LOWPASS;
         opts.cutoff_frequency_low = 25.0;
         opts.sampling_frequency = 100.0;
@@ -188,7 +188,7 @@ SCENARIO( "Butterworth lowpass filters can be initialized", "[filter]" ) {
 SCENARIO( "Butterworth highpass filters can be initialized", "[filter]" ) {   
     GIVEN("parameters: fifth order butterworth, 100 Hz sampling rate, 25Hz cutoff"){
         dh_filter_data filter_data;
-        dh_filter_options opts;
+        dh_filter_parameters opts;
         opts.filter_type = DH_IIR_BUTTERWORTH_HIGHPASS;
         opts.cutoff_frequency_low = 25.0;
         opts.sampling_frequency = 100.0;
@@ -228,7 +228,7 @@ SCENARIO( "Butterworth highpass filters can be initialized", "[filter]" ) {
 SCENARIO( "Butterworth bandstop filters can be initialized", "[filter]" ) {
     GIVEN("parameters: third order butterworth, 100 Hz sampling rate, 15-30Hz bandstop"){
         dh_filter_data filter_data;
-        dh_filter_options opts;
+        dh_filter_parameters opts;
         opts.filter_type = DH_IIR_BUTTERWORTH_BANDSTOP;
         opts.cutoff_frequency_low = 15.0;
         opts.cutoff_frequency_high = 30.0;
@@ -272,7 +272,7 @@ SCENARIO( "Butterworth bandstop filters can be initialized", "[filter]" ) {
 SCENARIO( "Butterworth bandpass filters can be initialized", "[filter]" ) {
     GIVEN("parameters: third order butterworth, 100 Hz sampling rate, 15-30Hz bandpass"){
         dh_filter_data filter_data;
-        dh_filter_options opts;
+        dh_filter_parameters opts;
         opts.filter_type = DH_IIR_BUTTERWORTH_BANDPASS;
         opts.cutoff_frequency_low = 15.0;
         opts.cutoff_frequency_high = 30.0;

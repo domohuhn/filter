@@ -6,13 +6,14 @@
 #include "dh/utility.h"
 #include <stdexcept>
 #include <iomanip>
+#include "complex.h"
 
 
 /** Converts the command line options. May throw on error. */
-dh_filter_options convert_options(cxxopts::ParseResult& result);
+dh_filter_parameters convert_options(cxxopts::ParseResult& result);
 
 
-void print_parameters(dh_filter_options opts)
+void print_parameters(dh_filter_parameters opts)
 {
     dh_filter_data filter_data{};
     int status = dh_create_filter(&filter_data,&opts);
@@ -35,7 +36,7 @@ void print_parameters(dh_filter_options opts)
 }
 
 /** This function creates a filter, then filters an impulse input and returns the response of the filter. */
-std::vector<std::pair<double,double>> impulse_response(dh_filter_options opts) {
+std::vector<std::pair<double,double>> impulse_response(dh_filter_parameters opts) {
     dh_filter_data filter_data{};
     int status = dh_create_filter(&filter_data,&opts);
     if(status != DH_FILTER_OK) {
@@ -60,7 +61,7 @@ std::vector<std::pair<double,double>> impulse_response(dh_filter_options opts) {
 }
 
 /** This function creates a filter, then filters a step function input and returns the response of the filter. */
-std::vector<std::pair<double,double>> step_response(dh_filter_options opts) {
+std::vector<std::pair<double,double>> step_response(dh_filter_parameters opts) {
     dh_filter_data filter_data{};
     int status = dh_create_filter(&filter_data,&opts);
     if(status != DH_FILTER_OK) {
@@ -87,7 +88,7 @@ std::vector<std::pair<double,double>> step_response(dh_filter_options opts) {
 
 /** This function creates a filter, then filters a sine wave with a given frequency and returns
  * the filtered amplitude in the steady state (after 1000 filter cycles). */
-std::pair<double,double> gain(dh_filter_options opts, double fraction) {
+std::pair<double,double> gain(dh_filter_parameters opts, double fraction) {
     dh_filter_data filter_data{};
     int status = dh_create_filter(&filter_data,&opts);
     if(status != DH_FILTER_OK) {
@@ -128,7 +129,7 @@ std::pair<double,double> gain(dh_filter_options opts, double fraction) {
 }
 
 /** This function creates the freuency response by filtering sine waves with different frequencies. */
-std::vector<std::pair<double,double>> frequency_response(dh_filter_options opts)
+std::vector<std::pair<double,double>> frequency_response(dh_filter_parameters opts)
 {
     std::vector<std::pair<double,double>> rv;
     for(size_t i=0;i<=100;i++) {
@@ -138,7 +139,7 @@ std::vector<std::pair<double,double>> frequency_response(dh_filter_options opts)
 }
 
 /** This function computes the phase shift from the coefficients of the filters. */
-std::vector<std::pair<double,double>> phase_shift(dh_filter_options opts)
+std::vector<std::pair<double,double>> phase_shift(dh_filter_parameters opts)
 {
     dh_filter_data filter_data{};
     int status = dh_create_filter(&filter_data,&opts);
@@ -155,7 +156,7 @@ std::vector<std::pair<double,double>> phase_shift(dh_filter_options opts)
     return rv;
 }
 
-void create_graphs(dh_filter_options opts) {
+void create_graphs(dh_filter_parameters opts) {
     auto impulse = impulse_response(opts);
     auto step = step_response(opts);
     auto freq = frequency_response(opts);
@@ -271,9 +272,9 @@ DH_FILTER_TYPE select_type(cxxopts::ParseResult& result, DH_FILTER_TYPE type){
     return type;
 }
 
-dh_filter_options convert_options(cxxopts::ParseResult& result) 
+dh_filter_parameters convert_options(cxxopts::ParseResult& result) 
 {
-    dh_filter_options options{};
+    dh_filter_parameters options{};
     auto param = result["parameter-type"].as<std::string>();
     int order = result["order"].as<int>();
     double sampling_frequency_hz = result["sampling-frequency"].as<double>();

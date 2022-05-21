@@ -1,6 +1,7 @@
 #include "catch2/catch_test_macros.hpp"
 #include "dh/utility.h"
 #include "catch2/catch_approx.hpp"
+#include "complex.h"
 
 /**
  * This source code is licensed under the MIT license. See file "LICENSE" at the root of the repository.

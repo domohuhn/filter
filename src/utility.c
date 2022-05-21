@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 #include "math.h"
 #include "stdlib.h"
+#include "complex.h"
 
 COMPLEX bilinear_z_transform(COMPLEX p) {
     return (1.0 + p)/(1.0 -p);

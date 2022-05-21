@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 #include "math.h"
 #include "stdlib.h"
+#include "complex.h"
 
 void dh_transform_s_poles_to_chebyshev(COMPLEX* ptr, size_t len, double ripple) {
     double ripple_power = pow(10.0, -ripple / 10.0);

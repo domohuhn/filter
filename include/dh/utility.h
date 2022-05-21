@@ -13,8 +13,6 @@
 extern "C" {
 #endif
 
-#include "complex.h"
-
 #define COMPLEX double _Complex
 
 /**

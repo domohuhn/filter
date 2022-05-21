@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 #include "math.h"
 #include "stdlib.h"
+#include "complex.h"
 
 void compute_butterworth_poles_on_z_plane(COMPLEX* ptr, size_t len, double transformed_frequency)
 {

@@ -11,7 +11,7 @@ SCENARIO( "An FIR exponential lowpass filter can be used", "[filter]" ) {
 
     GIVEN( "An options structure filled with values for FIR exponential lowpass filters" ) {
         dh_filter_data filter_data;
-        dh_filter_options opts;
+        dh_filter_parameters opts;
         opts.filter_type = DH_FIR_EXPONENTIAL_MOVING_AVERAGE_LOWPASS;
         opts.cutoff_frequency_low = 20;
         opts.sampling_frequency = 40;

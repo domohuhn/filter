@@ -23,16 +23,9 @@ a {
   }
 }
 </style>
-  <script>
-    var Module = {
-      onRuntimeInitialized: function() {
-        console.log('lerp result: ' + Module.lerp(1, 2, 0.5));
-      }
-    };
-  </script>
   <script src="js/filter.js"></script>
   <head>
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="manifest" href="/site.webmanifest">
@@ -52,10 +45,13 @@ a {
      </tr>
 <tr><td class="title"  width="50%">
 <div>
-  <canvas id="myChart"></canvas>
+  <canvas id="gainChart"></canvas>
 </div>
 </td>
-<td class="ItemLabel" width="50%">a</td>
+<td class="ItemLabel" width="50%">
+<div>
+  <canvas id="phaseChart"></canvas>
+</div></td>
 </tr>
 </table>
 
@@ -94,63 +90,6 @@ a {
 
 </body>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  const labels = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-  ];
-
-  const data = {
-    datasets: [{
-      label: 'My First dataset',
-      backgroundColor: 'rgb(255, 99, 132)',
-      borderColor: 'rgb(255, 99, 132)',
-      data: [{x: 10, y: 20}, {x: 15, y: 35}, {x: 20, y: 50}, {x: 25, y: 80}],
-    },
-	{
-      label: 'My First dataset2',
-      backgroundColor: 'rgb(0, 255, 0)',
-      borderColor: 'rgb(0, 255, 0)',
-      data: [{x: 10, y: 35}, {x: 15, y: 55}, {x: 20, y: 67}, {x: 25, y: 70}],
-    }]
-  };
-
-  const config = {
-type: 'scatter',
-data: {
-    datasets: [{
-      label: 'My First dataset',
-      backgroundColor: 'rgb(85, 170, 255)',
-      borderColor: 'rgb(85, 170, 255)',
-        data: [{fs: 10, g: 1500}, {fs: 15, g: 500}, {fs: 20, g: 450}],
-         showLine: true
-    }]
-},
-options: {
-    parsing: {
-        xAxisKey: 'fs',
-        yAxisKey: 'g'
-    },
-	
-        scales: {
-            y: {
-                min: 0,
-                max: 2000
-            }
-        }
-}
-
-  };
-  
-  const myChart = new Chart(
-    document.getElementById('myChart'),
-    config
-  );
-</script>
 
 <script>
 function disableInputs(name,inactive) {
@@ -211,28 +150,91 @@ for (i = 0; i < coll.length; i++) {
 	var num1 = document.getElementById("num1").value;
 	var num2 = document.getElementById("num2").value;
 	var pos = document.getElementById("pos").value;
-    alert(`Inputs: ${num1} - ${num2} - ${pos}\n` + 'lerp result: ' + Module.lerp(parseFloat(num1), parseFloat(num2), parseFloat(pos)));
-var x = new Module.MyStruct();
-x.a = 10;
-x.b = 20;
-x.c = 30;
-var y = Module.Foo(x, 21);
-console.log(y, y.a, y.b, y.c);
 
-x.delete();
-y.delete();	
-var wrap = new Module.FilterWrapper();
-var filterText = 'Created filter: \n'
-for(i=0;i<wrap.size; i++){
-console.log(wrap.getValue(i));
-filterText += wrap.getValue(i) + '\n'
+var pars = new Module.FilterParameters();
+pars.filterType = Module.FilterType.IIR_BUTTERWORTH_LOWPASS;
+pars.cutoffFrequencyLow = parseFloat(num1);
+pars.cutoffFrequencyHigh = parseFloat(num2);
+pars.samplingFrequency = parseFloat(pos);
+pars.ripple = -3.0;
+pars.filterOrder = 3;
+Module.Foo2(pars);
+var startTime = performance.now()
+var filt = new Module.Filter(pars);
+var resp = filt.frequencyResponse(200);
+var endTime = performance.now()
+console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
+var nfw = filt.countFeedforwardCoefficients;
+var nfb = filt.countFeedbackCoefficients;
+console.log(`Inputs: ${nfw} - Outputs ${nfb}\n`);
+console.log(`idx 0: ${filt.feedforwardCoefficient(0)} - Outputs ${filt.feedbackCoefficient(0)}\n`);
+
+for (let i = 0; i < filt.countFeedforwardCoefficients; i++) {
+console.log(`feedfwd: ${i} - ${filt.feedforwardCoefficient(i)}\n`);
 }
-wrap.delete();
-document.getElementById("result").textContent = filterText
+for (let i = 0; i < filt.countFeedbackCoefficients; i++) {
+console.log(`feedback: ${i} - ${filt.feedbackCoefficient(i)}\n`);
+}
 
+
+const config = {
+type: 'scatter',
+data: {
+    datasets: [{
+      label: 'Gain',
+      backgroundColor: 'rgb(85, 170, 255)',
+      borderColor: 'rgb(85, 170, 255)',
+        data: [],
+         showLine: true
+    }]
+},
+options: {
+    parsing: {
+        xAxisKey: 'fs',
+        yAxisKey: 'g'
+    },
+}
+  };
+
+const configPhase = {
+type: 'scatter',
+data: {
+    datasets: [{
+      label: 'Phase',
+      backgroundColor: 'rgb(85, 170, 255)',
+      borderColor: 'rgb(85, 170, 255)',
+        data: [],
+         showLine: true
+    }]
+},
+options: {
+    parsing: {
+        xAxisKey: 'fs',
+        yAxisKey: 'p'
+    },
+}
+  };
+
+for (let i = 0; i < resp.size-1; i++) {
+console.log(`f: ${resp.frequency(i)} g: ${resp.gain(i)} p: ${resp.phase(i)}\n`);
+config.data.datasets[0].data.push({fs: resp.frequency(i), g: resp.gain(i)});
+configPhase.data.datasets[0].data.push({fs: resp.frequency(i), p: resp.phase(i)});
+}
+
+  const gainChart = new Chart(
+    document.getElementById('gainChart'),
+    config
+  );
+  const phaseChart = new Chart(
+    document.getElementById('phaseChart'),
+    configPhase
+  );
 
   });
 }
+
+
+
 </script>
 </html>
 

@@ -44,14 +44,23 @@ if(DH_CFILTER_BUILD_EXAMPLES)
 endif()
 
 if(DH_CFILTER_BUILD_CPP_BINDINGS OR DH_CFILTER_BUILD_JS_BINDINGS)
-
+  add_library(filter_cpp
+    src/bindings/cpp/filter.cpp
+  )
+  target_link_libraries(filter_cpp PUBLIC dh::filter)
+  add_library(dh::filter_cpp ALIAS filter_cpp)
+  if(MSVC)
+    target_compile_options(filter_cpp PRIVATE /W4 /WX)
+  else()
+    target_compile_options(filter_cpp PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  endif()
 endif()
 
 if(DH_CFILTER_BUILD_JS_BINDINGS)
   add_executable(filter.js
     src/bindings/js/emscripten.cpp
   )
-  target_link_libraries(filter.js PRIVATE -lembind -Wl,--whole-archive dh::filter -Wl,--no-whole-archive)
+  target_link_libraries(filter.js PRIVATE -lembind -Wl,--whole-archive dh::filter dh::filter_cpp -Wl,--no-whole-archive)
 endif()
 
 
