@@ -72,7 +72,8 @@ img.icon {
   <tr><td class="InputLabel" width="50%">Cutoff 1 (Hz):</td><td class="InputBox" width="50%"><input name="frequencies" type="number" id="cutoff1" step="0.001"  min="0" value="15"/></td></tr>
   <tr><td class="InputLabel" width="50%">Cutoff 2 (Hz):</td><td class="InputBox" width="50%"><input name="frequencies2" type="number" id="cutoff2" step="0.001"  min="0" value="35"/></td></tr>
   <tr><td class="InputLabel" width="50%">Ripple (dB):</td><td class="InputBox" width="50%"><input name="chebyshev" type="number" id="ripple" step="0.001" max="0" value="-3"/></td></tr>
-  </table>
+  <tr><td class="InputLabel" width="50%">Share:</td><td width="50%"><button onclick="createLink()">Copy to link clipboard</button> </td> </tr>
+</table>
 
 <table width ="70%" cellspacing="0" border="0">
 <tr><td class="chart"  width="50%">
@@ -180,6 +181,28 @@ function getSelectedFilter() {
   }
 }
 
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+if(urlParams.get('filter')!=null){
+  let element = document.getElementById("filterType");
+  element.value = urlParams.get('filter');
+}
+if(urlParams.get('order')!=null) {
+  document.getElementById("order").value = urlParams.get('order');
+}
+if(urlParams.get('freq')!=null) {
+  document.getElementById("frequency").value = urlParams.get('freq');
+}
+if(urlParams.get('cut1')!=null) {
+  document.getElementById("cutoff1").value = urlParams.get('cut1');
+}
+if(urlParams.get('cut2')!=null) {
+  document.getElementById("cutoff2").value = urlParams.get('cut2');
+}
+if(urlParams.get('ripple')!=null) {
+  document.getElementById("ripple").value = urlParams.get('ripple');
+}
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="js/graphs.js"></script>
@@ -249,6 +272,22 @@ function getSelectedFilter() {
   addUpdateListener("frequencies");
   addUpdateListener("frequencies2");
   addUpdateListener("chebyshev");
+</script>
+<script>
+  function createLink() {
+    var url = window.location.href;
+    if(url.includes('?')){
+      var end = url.indexOf('?');
+      url = url.substring(0,end);
+    }
+    url += '?filter=' + filterSel.options[filterSel.selectedIndex].value;
+    url += '&order=' + document.getElementById("order").value;
+    url += '&freq=' + document.getElementById("frequency").value;
+    url += '&cut1=' + document.getElementById("cutoff1").value;
+    url += '&cut2=' + document.getElementById("cutoff2").value;
+    url += '&ripple=' + document.getElementById("ripple").value;
+    navigator.clipboard.writeText(url);
+  }
 </script>
 </html>
 
