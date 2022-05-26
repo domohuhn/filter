@@ -1,6 +1,7 @@
 #include "catch2/catch_test_macros.hpp"
 #include "catch2/catch_approx.hpp"
 #include "dh/filter.h"
+#include "cpp/filter.hpp"
 #include <cstring>
 
 /**
@@ -15,7 +16,7 @@ SCENARIO( "An FIR exponential lowpass filter can be used", "[filter]" ) {
         opts.filter_type = DH_FIR_EXPONENTIAL_MOVING_AVERAGE_LOWPASS;
         opts.cutoff_frequency_low = 20;
         opts.sampling_frequency = 40;
-        opts.filter_order = 16;
+        opts.filter_order = 15;
 
         WHEN( "the create function is called" ) {
             dh_create_filter(&filter_data, &opts);
@@ -23,14 +24,14 @@ SCENARIO( "An FIR exponential lowpass filter can be used", "[filter]" ) {
             THEN( "the buffers are initialized" ) {
                 REQUIRE(filter_data.buffer_needs_cleanup);
                 REQUIRE(filter_data.number_coefficients_in == 16);
-                REQUIRE(filter_data.number_coefficients_out == 0);
+                REQUIRE(filter_data.number_coefficients_out == 1);
                 REQUIRE((void*)filter_data.coefficients_in == (void*)filter_data.buffer);
-                REQUIRE((void*)filter_data.inputs == (filter_data.buffer + 16 * sizeof(double)));
-                REQUIRE((void*)filter_data.coefficients_out == (void*)NULL);
-                REQUIRE((void*)filter_data.outputs == (void*)NULL);
+                REQUIRE((void*)filter_data.inputs == (void*)(filter_data.buffer + 16 * sizeof(double)));
+                REQUIRE((void*)filter_data.coefficients_out == (void*)(filter_data.buffer + 32 * sizeof(double)));
+                REQUIRE((void*)filter_data.outputs == (void*)(filter_data.buffer + 33 * sizeof(double)));
                 REQUIRE(filter_data.current_input_index == 0);
                 REQUIRE(filter_data.current_output_index == 0);
-                REQUIRE(filter_data.buffer_length == 32*sizeof(double));
+                REQUIRE(filter_data.buffer_length == 34*sizeof(double));
                 REQUIRE(filter_data.initialized == false);
             }
             double output=0.0;

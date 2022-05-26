@@ -11,7 +11,14 @@ body {
 a {
   color: #0033cc;
 }
+h1.title {
+  color: #809fff;
+  text-align: center
+}
 
+img.icon {
+  margin-right: 8px;
+}
 @media (prefers-color-scheme: dark) {
   body {
     color: #c9d1d9;
@@ -23,7 +30,7 @@ a {
   }
 }
 </style>
-  <script src="js/filter.js"></script>
+
   <head>
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -31,65 +38,58 @@ a {
 <link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
-  <input type="number" id="num1" step="0.01"/>
-  <input type="number" id="num2" step="0.01"/>
-  <input type="number" id="pos" step="0.01"/><br>
-  <button class="run-cmd">Create Filter</button>
+<h1 class="title"><img class="icon" src="favicon-32x32.png" width="32" height="32"></img>Design your filter!</h1>
+
+
+<center>
+  <table width ="25%" cellspacing="0" border="0">
+  <tr>
+  <td class="InputLabel" width="50%">Filter type:</td>
+  <td class="InputBox" width="50%">
+  <select id="filterType">
+    <option value="BwLP">Butterworth low pass (IIR)</option>
+    <option value="BwHP">Butterworth high pass (IIR)</option>
+    <option value="BwBP">Butterworth band pass (IIR)</option>
+    <option value="BwBS">Butterworth band stop (IIR)</option>
+    <option value="ChLP">Chebyshev low pass (IIR)</option>
+    <option value="ChHP">Chebyshev high pass (IIR)</option>
+    <option value="ChBP">Chebyshev band pass (IIR)</option>
+    <option value="ChBS">Chebyshev band stop (IIR)</option>
+    <option value="WsLP">Brickwall low pass (FIR)</option>
+    <option value="WsHP">Brickwall high pass (FIR)</option>
+    <option value="WsBP">Brickwall band pass (FIR)</option>
+    <option value="WsBS">Brickwall band stop (FIR)</option>
+    <option value="MaLP">Moving average low pass (FIR)</option>
+    <option value="MaHP">Moving average high pass (FIR)</option>
+    <option value="ExLP">Exponential low pass (IIR)</option>
+    <option value="ExLP2">Exponential low pass (FIR)</option>
+    <option value="noFi">No Filter (FIR)</option>
+  </select></td>
+  </tr>
   
-  <pre class="box" id="result">click run filter to create a filter</pre>
-  
+  <tr><td class="InputLabel" width="50%">Order:</td><td class="InputBox" width="50%"><input name="order" type="number" id="order" step="1" min="0" value="5"/></td></tr>
+  <tr><td class="InputLabel" width="50%">Sampling Frequency (Hz):</td><td class="InputBox" width="50%"><input name="frequencies" type="number" id="frequency" step="0.001"  min="0" value="100"/></td></tr>
+  <tr><td class="InputLabel" width="50%">Cutoff 1 (Hz):</td><td class="InputBox" width="50%"><input name="frequencies" type="number" id="cutoff1" step="0.001"  min="0" value="15"/></td></tr>
+  <tr><td class="InputLabel" width="50%">Cutoff 2 (Hz):</td><td class="InputBox" width="50%"><input name="frequencies2" type="number" id="cutoff2" step="0.001"  min="0" value="35"/></td></tr>
+  <tr><td class="InputLabel" width="50%">Ripple (dB):</td><td class="InputBox" width="50%"><input name="chebyshev" type="number" id="ripple" step="0.001" max="0" value="-3"/></td></tr>
+  </table>
+  </center>
+
 <table width ="100%" cellspacing="0" border="0">
-     <tr>
-     <td class="ItemLabel" width="50%">Date:</td>
-     <td class="ItemText" width="50%">2022-05-15 13:58:19.253411</td>
-     </tr>
-<tr><td class="title"  width="50%">
+<tr><td class="chart"  width="50%">
 <div>
   <canvas id="gainChart"></canvas>
 </div>
 </td>
-<td class="ItemLabel" width="50%">
+<td class="chart" width="50%">
 <div>
   <canvas id="phaseChart"></canvas>
 </div></td>
 </tr>
 </table>
 
-<center>
-<table width ="25%" cellspacing="0" border="0">
-<tr>
-<td class="InputLabel" width="50%">Filter type:</td>
-<td class="InputBox" width="50%">
-<select id="filterType">
-  <option value="BwLP">Butterworth low pass (IIR)</option>
-  <option value="BwHP">Butterworth high pass (IIR)</option>
-  <option value="BwBP">Butterworth band pass (IIR)</option>
-  <option value="BwBS">Butterworth band stop (IIR)</option>
-  <option value="ChLP">Chebyshev low pass (IIR)</option>
-  <option value="ChHP">Chebyshev high pass (IIR)</option>
-  <option value="ChBP">Chebyshev band pass (IIR)</option>
-  <option value="ChBS">Chebyshev band stop (IIR)</option>
-  <option value="WsLP">Brickwall low pass (FIR)</option>
-  <option value="WsHP">Brickwall high pass (FIR)</option>
-  <option value="WsBP">Brickwall band pass (FIR)</option>
-  <option value="WsBS">Brickwall band stop (FIR)</option>
-  <option value="MaLP">Moving average low pass (FIR)</option>
-  <option value="MaHP">Moving average high pass (FIR)</option>
-  <option value="ExLP">Exponential low pass (IIR)</option>
-</select></td>
-</tr>
-
-<tr><td class="InputLabel" width="50%">Order:</td><td class="InputBox" width="50%"><input name="order" type="number" id="order" step="1" min="0" value="5"/></td></tr>
-<tr><td class="InputLabel" width="50%">Sampling Frequency (Hz):</td><td class="InputBox" width="50%"><input name="frequencies" type="number" id="frequency" step="0.001"  min="0" value="100"/></td></tr>
-<tr><td class="InputLabel" width="50%">Cutoff 1 (Hz):</td><td class="InputBox" width="50%"><input name="frequencies" type="number" id="cutoff1" step="0.001"  min="0" value="15"/></td></tr>
-<tr><td class="InputLabel" width="50%">Cutoff 2 (Hz):</td><td class="InputBox" width="50%"><input name="frequencies2" type="number" id="cutoff2" step="0.001"  min="0" value="35"/></td></tr>
-<tr><td class="InputLabel" width="50%">Ripple (dB):</td><td class="InputBox" width="50%"><input name="chebyshev" type="number" id="ripple" step="0.001" max="0" value="-3"/></td></tr>
-
-</table>
-</center>
 
 </body>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 function disableInputs(name,inactive) {
@@ -99,6 +99,8 @@ function disableInputs(name,inactive) {
   }
 }
 disableInputs("chebyshev",true);
+
+
 
 var filterSel = document.getElementById("filterType");
 filterSel.addEventListener("change", function() {
@@ -126,6 +128,7 @@ filterSel.addEventListener("change", function() {
 			disableInputs("chebyshev",true);
 			break;
 		case "ExLP":
+		case "ExLP2":
 			console.log('switching to exp input mask');
 			disableInputs("order",true);
 			disableInputs("frequencies",false);
@@ -137,132 +140,98 @@ filterSel.addEventListener("change", function() {
 			disableInputs("frequencies",false);
 			disableInputs("chebyshev",false);
 	}
+  updateGraphs();
 });
 
+function getSelectedFilter() {
+  switch(filterSel.options[filterSel.selectedIndex].value){
+    case "BwLP": return Module.FilterType.IIR_BUTTERWORTH_LOWPASS;
+    case "BwHP": return Module.FilterType.IIR_BUTTERWORTH_HIGHPASS;
+    case "BwBP": return Module.FilterType.IIR_BUTTERWORTH_BANDPASS;
+    case "BwBS": return Module.FilterType.IIR_BUTTERWORTH_BANDSTOP;
+    case "ChLP": return Module.FilterType.IIR_CHEBYSHEV_LOWPASS;
+    case "ChHP": return Module.FilterType.IIR_CHEBYSHEV_HIGHPASS;
+    case "ChBP": return Module.FilterType.IIR_CHEBYSHEV_BANDPASS;
+    case "ChBS": return Module.FilterType.IIR_CHEBYSHEV_BANDSTOP;
+    case "WsLP": return Module.FilterType.FIR_BRICKWALL_LOWPASS;
+    case "WsHP": return Module.FilterType.FIR_BRICKWALL_HIGHPASS;
+    case "WsBP": return Module.FilterType.FIR_BRICKWALL_BANDPASS;
+    case "WsBS": return Module.FilterType.FIR_BRICKWALL_BANDSTOP;
+    case "MaLP": return Module.FilterType.FIR_MOVING_AVERAGE_LOWPASS;
+    case "MaHP": return Module.FilterType.FIR_MOVING_AVERAGE_HIGHPASS;
+    case "ExLP": return Module.FilterType.IIR_EXPONENTIAL_LOWPASS;
+    case "ExLP2": return Module.FilterType.FIR_EXPONENTIAL_MOVING_AVERAGE_LOWPASS;
+    default: return Module.FilterType.NO_FILTER;
+  }
+}
+
 </script>
-
 <script>
-var coll = document.getElementsByClassName("run-cmd");
-var i;
-
-for (i = 0; i < coll.length; i++) {
-  coll[i].addEventListener("click", function() {
-	var num1 = document.getElementById("num1").value;
-	var num2 = document.getElementById("num2").value;
-	var pos = document.getElementById("pos").value;
-
-var pars = new Module.FilterParameters();
-pars.filterType = Module.FilterType.IIR_BUTTERWORTH_LOWPASS;
-pars.cutoffFrequencyLow = parseFloat(num1);
-pars.cutoffFrequencyHigh = parseFloat(num2);
-pars.samplingFrequency = parseFloat(pos);
-pars.ripple = -3.0;
-pars.filterOrder = 3;
-Module.Foo2(pars);
-var startTime = performance.now()
-var filt = new Module.Filter(pars);
-var resp = filt.frequencyResponse(200);
-var endTime = performance.now()
-console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
-var nfw = filt.countFeedforwardCoefficients;
-var nfb = filt.countFeedbackCoefficients;
-console.log(`Inputs: ${nfw} - Outputs ${nfb}\n`);
-console.log(`idx 0: ${filt.feedforwardCoefficient(0)} - Outputs ${filt.feedbackCoefficient(0)}\n`);
-
-for (let i = 0; i < filt.countFeedforwardCoefficients; i++) {
-console.log(`feedfwd: ${i} - ${filt.feedforwardCoefficient(i)}\n`);
-}
-for (let i = 0; i < filt.countFeedbackCoefficients; i++) {
-console.log(`feedback: ${i} - ${filt.feedbackCoefficient(i)}\n`);
-}
-
-
-const config = {
-type: 'scatter',
-data: {
-    datasets: [{
-      label: 'Gain',
-      backgroundColor: 'rgb(85, 170, 255)',
-      borderColor: 'rgb(85, 170, 255)',
-        data: [],
-         showLine: true
-    }]
-},
-options: {
-    parsing: {
-        xAxisKey: 'fs',
-        yAxisKey: 'g'
-    },
-    scales: {
-      x: {
-        title : {
-        display: true,
-        text: 'Frequency [Hz]'
-        }
-      },
-      y: {
-        title : {
-          display: true,
-          text: 'Gain'
-        }
-      }
+  var Module = {
+    onRuntimeInitialized: function() {
+      updateGraphs();
     }
-}
   };
+</script>
+<script src="js/filter.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="js/graphs.js"></script>
+<script>
 
-const configPhase = {
-type: 'scatter',
-data: {
-    datasets: [{
-      label: 'Phase',
-      backgroundColor: 'rgb(85, 170, 255)',
-      borderColor: 'rgb(85, 170, 255)',
-        data: [],
-         showLine: true
-    }]
-},
-options: {
-    parsing: {
-        xAxisKey: 'fs',
-        yAxisKey: 'p'
-    },
-    scales: {
-      x: {
-        title : {
-        display: true,
-        text: 'Frequency [Hz]'
-        }
-      },
-      y: {
-        title : {
-          display: true,
-          text: 'Phase [\xB0]'
-        }
-      }
+  function updateGraphs() {
+    var pars = new Module.FilterParameters();
+    pars.filterType = getSelectedFilter();
+    console.log(pars.filterType);
+    pars.cutoffFrequencyLow = parseFloat(document.getElementById("cutoff1").value);
+    pars.cutoffFrequencyHigh = parseFloat(document.getElementById("cutoff2").value);
+    pars.samplingFrequency = parseFloat(document.getElementById("frequency").value);
+    pars.ripple = parseFloat(document.getElementById("ripple").value);
+    pars.filterOrder = parseFloat(document.getElementById("order").value);
+
+    var startTime = performance.now()
+    Module.Foo2(pars);
+    var filt = new Module.Filter(pars);
+    console.log(`computing response`);
+
+    var endTime = performance.now()
+    console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
+    var nfw = filt.countFeedforwardCoefficients;
+    var nfb = filt.countFeedbackCoefficients;
+    console.log(`Inputs: ${nfw} - Outputs ${nfb}\n`);
+    console.log(`idx 0: ${filt.feedforwardCoefficient(0)} - Outputs ${filt.feedbackCoefficient(0)}\n`);
+
+    for (let i = 0; i < filt.countFeedforwardCoefficients; i++) {
+      console.log(`feedfwd: ${i} - ${filt.feedforwardCoefficient(i)}\n`);
     }
-}
-  };
+    for (let i = 0; i < filt.countFeedbackCoefficients; i++) {
+      console.log(`feedback: ${i} - ${filt.feedbackCoefficient(i)}\n`);
+    }
 
-for (let i = 0; i < resp.size-1; i++) {
-console.log(`f: ${resp.frequency(i)} g: ${resp.gain(i)} p: ${resp.phase(i)}\n`);
-config.data.datasets[0].data.push({fs: resp.frequency(i), g: resp.gain(i)});
-configPhase.data.datasets[0].data.push({fs: resp.frequency(i), p: resp.phase(i)});
-}
+    const chartConfig = {
+      gain: {
+        name: 'gain1',
+        id: 'gainChart'
+      },
+      phase: {
+        name: 'phase1',
+        id: 'phaseChart'
+      },
+    };
+    var resp = filt.frequencyResponse(200);
+    plotPhaseAndGain(resp, chartConfig);
+  }
 
-  const gainChart = new Chart(
-    document.getElementById('gainChart'),
-    config
-  );
-  const phaseChart = new Chart(
-    document.getElementById('phaseChart'),
-    configPhase
-  );
-
-  });
-}
-
-
-
+  function addUpdateListener(name, inactive) {
+    var elems = document.getElementsByName(name);
+    for (i = 0; i < elems.length; i++) {
+      elems[i].addEventListener("change", function () {
+        updateGraphs();
+      });
+    }
+  }
+  addUpdateListener("order");
+  addUpdateListener("frequencies");
+  addUpdateListener("chebyshev");
 </script>
 </html>
 

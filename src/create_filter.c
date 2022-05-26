@@ -244,13 +244,14 @@ static DH_FILTER_RETURN_VALUE dh_iir_exponential_lowpass(dh_filter_data* filter,
 
 static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter, dh_filter_parameters* options)
 {
-    if (dh_filter_allocate_buffers(filter, options->filter_order, 0) != DH_FILTER_OK) {
+    if (dh_filter_allocate_buffers(filter, options->filter_order+1, 1) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    double current = 1.0;
+    double val = (1.0-options->cutoff_frequency_low)/options->sampling_frequency;
+    double current = val;
     double integrated = 0.0;
+    filter->coefficients_out[0] = 1.0;
     // TODO Check if this is correct
-    double val = options->cutoff_frequency_low/options->sampling_frequency;
     for (size_t i=0; i<filter->number_coefficients_in; ++i) {
         filter->coefficients_in[i] = current;
         integrated += current;

@@ -86,4 +86,8 @@ if(DH_CFILTER_BUILD_TESTS)
     test/utility-test.cpp
   )
   target_link_libraries(test-filter PRIVATE Catch2::Catch2WithMain dh::filter)
+  if(DH_CFILTER_BUILD_CPP_BINDINGS)
+    target_sources(test-filter PRIVATE test/cpp-bindings-test.cpp)
+    target_link_libraries(test-filter PRIVATE dh::filter_cpp)
+  endif()
 endif()

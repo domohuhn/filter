@@ -6,22 +6,11 @@
 
 using namespace emscripten;
 
-
-
-void Foo2(const dh_filter_parameters x) {
-  printf("Got freq: %f\n",x.sampling_frequency);
-  printf("Got low: %f\n",x.cutoff_frequency_low);
-  printf("Got hi: %f\n",x.cutoff_frequency_high);
-  printf("Got ripp: %f\n",x.ripple);
-  printf("Got ord: %zu\n",x.filter_order);
-  printf("Got type: %u\n",x.filter_type);
-}
-
 EMSCRIPTEN_BINDINGS(filter_params) {
   enum_<DH_FILTER_TYPE>("FilterType")
     .value("NO_FILTER", DH_NO_FILTER)
     .value("FIR_MOVING_AVERAGE_LOWPASS", DH_FIR_MOVING_AVERAGE_LOWPASS)
-    .value("FIR_MOVING_AVERAGE_LOWPASS", DH_FIR_MOVING_AVERAGE_HIGHPASS)
+    .value("FIR_MOVING_AVERAGE_HIGHPASS", DH_FIR_MOVING_AVERAGE_HIGHPASS)
     .value("FIR_EXPONENTIAL_MOVING_AVERAGE_LOWPASS", DH_FIR_EXPONENTIAL_MOVING_AVERAGE_LOWPASS)
     .value("FIR_BRICKWALL_LOWPASS", DH_FIR_BRICKWALL_LOWPASS)
     .value("FIR_BRICKWALL_HIGHPASS", DH_FIR_BRICKWALL_HIGHPASS)
@@ -45,8 +34,6 @@ EMSCRIPTEN_BINDINGS(filter_params) {
     .property("ripple", &dh_filter_parameters::ripple)
     .property("filterOrder", &dh_filter_parameters::filter_order)
     .property("filterType", &dh_filter_parameters::filter_type);
-    
-  function("Foo2", &Foo2);
 }
 
 
@@ -78,6 +65,7 @@ val feedbackCoefficient(const dh::filter& filter, size_t index) {
 
 class frequency_response {
 public:
+  frequency_response() = default;
   frequency_response(std::vector<dh_frequency_response_t> d) : data_(d) {}
 
   size_t size() const noexcept {
@@ -109,7 +97,7 @@ public:
   }
 
 private:
-  std::vector<dh_frequency_response_t> data_;
+  std::vector<dh_frequency_response_t> data_{};
 };
 
 frequency_response frequencyResponse(const dh::filter& filter, size_t count) {
