@@ -60,13 +60,33 @@ public:
      * @brief Computes the frequency response of the filter and returns
      * a vector with count entries. 
      * 
-     * The response is computed in the rang of [0,sampling_frequency/2].
+     * The response is computed in the range of [0,sampling_frequency/2].
      * The distance between the entries will be half of sampling_frequency/count. 
      * 
      * @param count Number values to compute
      * @return Frequency response curve. 
      */
     std::vector<dh_frequency_response_t> compute_frequency_response(size_t count) const;
+
+    struct graph_point {
+        double x;
+        double input;
+        double output;
+    };
+
+    /**
+     * @brief Computes the step response of the filter. 
+     * 
+     * The response is computed in the range of [-10,2*number of feedforward coefficients].
+     */
+    std::vector<graph_point> compute_step_response() const;
+
+    /**
+     * @brief Computes the impulse response of the filter. 
+     * 
+     * The response is computed in the range of [-10,2*number of feedforward coefficients].
+     */
+    std::vector<graph_point> compute_impulse_response() const;
 
     /** this class is thrown in case of errors. */
     class error {

@@ -1,6 +1,6 @@
 #include "dh/filter-types.h"
 #include "cpp/filter.hpp"
-#include <cstdio>
+#include <algorithm>
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
@@ -104,12 +104,66 @@ frequency_response frequencyResponse(const dh::filter& filter, size_t count) {
   return frequency_response(filter.compute_frequency_response(count));
 }
 
+
+class graph_data {
+public:
+  graph_data() = default;
+
+  using elements = dh::filter::graph_point;
+  graph_data(std::vector<elements> d) : data_(d) {}
+
+  size_t size() const noexcept {
+    return data_.size();
+  }
+
+  val x(size_t i) const noexcept {
+    if (i < data_.size()) {
+      return val(data_[i].x);
+    } else {
+      return val::undefined();
+    }
+  }
+
+  val input(size_t i) const noexcept {
+    if (i < data_.size()) {
+      return val(data_[i].input);
+    } else {
+      return val::undefined();
+    }
+  }
+
+  val output(size_t i) const noexcept {
+    if (i < data_.size()) {
+      return val(data_[i].output);
+    } else {
+      return val::undefined();
+    }
+  }
+
+private:
+  std::vector<elements> data_{};
+};
+
+graph_data stepResponse(const dh::filter& filter) {
+  return graph_data(filter.compute_step_response());
+}
+
+graph_data impulseResponse(const dh::filter& filter) {
+  return graph_data(filter.compute_impulse_response());
+}
+
 EMSCRIPTEN_BINDINGS(filter_wrapper) {
   class_<frequency_response>("FrequencyResponse")
     .property("size", &frequency_response::size)
     .function("frequency", &frequency_response::frequency)
     .function("gain", &frequency_response::gain)
     .function("phase", &frequency_response::phase);
+
+  class_<graph_data>("GraphData")
+    .property("size", &graph_data::size)
+    .function("x", &graph_data::x)
+    .function("input", &graph_data::input)
+    .function("output", &graph_data::output);
   
   class_<dh::filter>("Filter")
     .constructor<dh_filter_parameters>()
@@ -118,6 +172,10 @@ EMSCRIPTEN_BINDINGS(filter_wrapper) {
     .function("feedforwardCoefficient", &feedforwardCoefficient)
     .function("feedbackCoefficient", &feedbackCoefficient)
     .function("frequencyResponse", &frequencyResponse)
+    .function("stepResponse", &stepResponse)
+    .function("impulseResponse", &impulseResponse)
     ;
+  
+
 }
 

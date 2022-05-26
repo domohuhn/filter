@@ -125,4 +125,46 @@ filter::span filter::feedback_coefficients() const noexcept {
     }
 }
 
+
+std::vector<filter::graph_point> filter::compute_step_response() const
+{
+    std::vector<filter::graph_point> rv{};
+    size_t count = std::max<size_t>(50U,2*data_.number_coefficients_in);
+    auto copy = dh::filter(options_);
+    double input = 0.0;
+    double output = 0.0;
+    for(size_t i=0;i<count;++i) {
+        if(i>9) {
+            input = 1.0;
+        } else {
+            input = 0.0;
+        }
+        output = copy.update(input);
+        double x = (static_cast<double>(i)-9.0)*1.0/options_.sampling_frequency;
+        rv.emplace_back(graph_point{x,input,output});
+    }
+    return rv;
+}
+
+std::vector<filter::graph_point> filter::compute_impulse_response() const
+{
+    std::vector<filter::graph_point> rv{};
+    size_t count = std::max<size_t>(50U,2*data_.number_coefficients_in);
+    auto copy = dh::filter(options_);
+    double input = 0.0;
+    double output = 0.0;
+    for(size_t i=0;i<count;++i) {
+        if(i==9) {
+            input = 1.0;
+        } else {
+            input = 0.0;
+        }
+        output = copy.update(input);
+        double x = (static_cast<double>(i)-9.0)*1.0/options_.sampling_frequency;
+        rv.emplace_back(graph_point{x,input,output});
+    }
+    return rv;
+}
+
+
 }

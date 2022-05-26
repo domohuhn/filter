@@ -38,7 +38,7 @@ img.icon {
 <link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
-<h1 class="title"><img class="icon" src="favicon-32x32.png" width="32" height="32"></img>Design your filter!</h1>
+<h1 class="title"><img class="icon" src="favicon-32x32.png" width="32" height="32"></img>Design your digital filter!</h1>
 
 
 <center>
@@ -73,9 +73,8 @@ img.icon {
   <tr><td class="InputLabel" width="50%">Cutoff 2 (Hz):</td><td class="InputBox" width="50%"><input name="frequencies2" type="number" id="cutoff2" step="0.001"  min="0" value="35"/></td></tr>
   <tr><td class="InputLabel" width="50%">Ripple (dB):</td><td class="InputBox" width="50%"><input name="chebyshev" type="number" id="ripple" step="0.001" max="0" value="-3"/></td></tr>
   </table>
-  </center>
 
-<table width ="100%" cellspacing="0" border="0">
+<table width ="70%" cellspacing="0" border="0">
 <tr><td class="chart"  width="50%">
 <div>
   <canvas id="gainChart"></canvas>
@@ -86,8 +85,19 @@ img.icon {
   <canvas id="phaseChart"></canvas>
 </div></td>
 </tr>
+<tr><td class="chart"  width="50%">
+  <div>
+    <canvas id="stepChart"></canvas>
+  </div>
+  </td>
+  <td class="chart" width="50%">
+  <div>
+    <canvas id="impulseChart"></canvas>
+  </div></td>
+  </tr>
 </table>
 
+</center>
 
 </body>
 
@@ -128,9 +138,14 @@ filterSel.addEventListener("change", function() {
 			disableInputs("chebyshev",true);
 			break;
 		case "ExLP":
-		case "ExLP2":
 			console.log('switching to exp input mask');
 			disableInputs("order",true);
+			disableInputs("frequencies",false);
+			disableInputs("chebyshev",true);
+			break;
+		case "ExLP2":
+			console.log('switching to exp input mask');
+			disableInputs("order",false);
 			disableInputs("frequencies",false);
 			disableInputs("chebyshev",true);
 			break;
@@ -166,46 +181,24 @@ function getSelectedFilter() {
 }
 
 </script>
-<script>
-  var Module = {
-    onRuntimeInitialized: function() {
-      updateGraphs();
-    }
-  };
-</script>
-<script src="js/filter.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="js/graphs.js"></script>
 <script>
-
   function updateGraphs() {
     var pars = new Module.FilterParameters();
     pars.filterType = getSelectedFilter();
-    console.log(pars.filterType);
     pars.cutoffFrequencyLow = parseFloat(document.getElementById("cutoff1").value);
     pars.cutoffFrequencyHigh = parseFloat(document.getElementById("cutoff2").value);
     pars.samplingFrequency = parseFloat(document.getElementById("frequency").value);
     pars.ripple = parseFloat(document.getElementById("ripple").value);
     pars.filterOrder = parseFloat(document.getElementById("order").value);
 
-    var startTime = performance.now()
-    Module.Foo2(pars);
+    var startTime = performance.now();
     var filt = new Module.Filter(pars);
-    console.log(`computing response`);
 
-    var endTime = performance.now()
-    console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
+    var endTime = performance.now();
     var nfw = filt.countFeedforwardCoefficients;
     var nfb = filt.countFeedbackCoefficients;
-    console.log(`Inputs: ${nfw} - Outputs ${nfb}\n`);
-    console.log(`idx 0: ${filt.feedforwardCoefficient(0)} - Outputs ${filt.feedbackCoefficient(0)}\n`);
-
-    for (let i = 0; i < filt.countFeedforwardCoefficients; i++) {
-      console.log(`feedfwd: ${i} - ${filt.feedforwardCoefficient(i)}\n`);
-    }
-    for (let i = 0; i < filt.countFeedbackCoefficients; i++) {
-      console.log(`feedback: ${i} - ${filt.feedbackCoefficient(i)}\n`);
-    }
 
     const chartConfig = {
       gain: {
@@ -219,7 +212,30 @@ function getSelectedFilter() {
     };
     var resp = filt.frequencyResponse(200);
     plotPhaseAndGain(resp, chartConfig);
+    
+    const chartConfigStep = {
+      name: 'step1',
+      id: 'stepChart'
+    };
+    const chartConfigImpulse = {
+      name: 'impulse1',
+      id: 'impulseChart'
+    };
+    var respStep = filt.stepResponse();
+    plotResponse(respStep, chartConfigStep);
+    var respImpulse = filt.impulseResponse();
+    plotResponse(respImpulse, chartConfigImpulse);
   }
+
+  var Module = {
+    onRuntimeInitialized: function() {
+      updateGraphs();
+    }
+  };
+</script>
+<script src="js/filter.js"></script>
+<script>
+
 
   function addUpdateListener(name, inactive) {
     var elems = document.getElementsByName(name);
