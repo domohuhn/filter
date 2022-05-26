@@ -27,9 +27,6 @@ SCENARIO( "The cpp bindings can be used", "[filter]" ) {
                 REQUIRE(resp.size() == 201);
                 REQUIRE(filt.feedback_coefficients().size() == 1);
                 REQUIRE(filt.feedforward_coefficients().size() == 5);
-                for(auto & sp: filt.feedforward_coefficients()){
-                    printf("%f\n",sp);
-                }
             }
         }
     }
