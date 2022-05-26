@@ -12,6 +12,9 @@ var graphDictionary = {};
 // charts.phase.name
 // charts.phase.id
 function plotPhaseAndGain(response, charts) {
+    var canvasGain = document.getElementById(charts.gain.id);
+    var textcolor = window.getComputedStyle(canvasGain).getPropertyValue("color");
+    var gridcolor = window.getComputedStyle(canvasGain).getPropertyValue("--main-grid-color");
     const configGain = {
         type: 'scatter',
         data: {
@@ -20,10 +23,16 @@ function plotPhaseAndGain(response, charts) {
                 backgroundColor: 'rgb(85, 170, 255)',
                 borderColor: 'rgb(85, 170, 255)',
                 data: [],
-                showLine: true
+                showLine: true,
+                labelColor: textcolor
             }]
         },
         options: {
+            plugins: {
+                legend: {
+                    labels :{
+                        color: textcolor
+            }}},
             parsing: {
                 xAxisKey: 'fs',
                 yAxisKey: 'g'
@@ -32,13 +41,29 @@ function plotPhaseAndGain(response, charts) {
                 x: {
                     title: {
                         display: true,
-                        text: 'Frequency [Hz]'
+                        text: 'Frequency [Hz]',
+                        color: textcolor
+                    },
+                    ticks: {
+                        color: textcolor
+                    },
+                    grid: {
+                        color: gridcolor,
+                        borderColor: gridcolor
                     }
                 },
                 y: {
                     title: {
                         display: true,
-                        text: 'Gain'
+                        text: 'Gain',
+                        color: textcolor
+                    },
+                    ticks: {
+                        color: textcolor
+                    },
+                    grid: {
+                        color: gridcolor,
+                        borderColor: gridcolor
                     }
                 }
             }
@@ -57,6 +82,11 @@ function plotPhaseAndGain(response, charts) {
             }]
         },
         options: {
+            plugins: {
+                legend: {
+                    labels :{
+                        color: textcolor
+            }}},
             parsing: {
                 xAxisKey: 'fs',
                 yAxisKey: 'p'
@@ -65,13 +95,29 @@ function plotPhaseAndGain(response, charts) {
                 x: {
                     title: {
                         display: true,
-                        text: 'Frequency [Hz]'
+                        text: 'Frequency [Hz]',
+                        color: textcolor
+                    },
+                    ticks: {
+                        color: textcolor
+                    },
+                    grid: {
+                        color: gridcolor,
+                        borderColor: gridcolor
                     }
                 },
                 y: {
                     title: {
                         display: true,
-                        text: 'Phase [\xB0]'
+                        text: 'Phase [\xB0]',
+                        color: textcolor
+                    },
+                    ticks: {
+                        color: textcolor
+                    },
+                    grid: {
+                        color: gridcolor,
+                        borderColor: gridcolor
                     }
                 }
             }
@@ -87,7 +133,7 @@ function plotPhaseAndGain(response, charts) {
     }
 
     graphDictionary[charts.gain.name] = new Chart(
-        document.getElementById(charts.gain.id),
+        canvasGain,
         configGain
     );
 
@@ -108,6 +154,9 @@ function plotPhaseAndGain(response, charts) {
 // chart.name
 // chart.id
 function plotResponse(response, chart) {
+    var canvas = document.getElementById(chart.id);
+    var textcolor = window.getComputedStyle(canvas).getPropertyValue("color");
+    var gridcolor = window.getComputedStyle(canvas).getPropertyValue("--main-grid-color");
     const configPlot = {
         type: 'scatter',
         data: {
@@ -128,6 +177,11 @@ function plotResponse(response, chart) {
         ]
         },
         options: {
+            plugins: {
+                legend: {
+                    labels :{
+                        color: textcolor
+            }}},
             parsing: {
                 xAxisKey: 'x',
                 yAxisKey: 'y'
@@ -136,13 +190,29 @@ function plotResponse(response, chart) {
                 x: {
                     title: {
                         display: true,
-                        text: 'Time [s]'
+                        text: 'Time [s]',
+                        color: textcolor
+                    },
+                    ticks: {
+                        color: textcolor
+                    },
+                    grid: {
+                        color: gridcolor,
+                        borderColor: gridcolor
                     }
                 },
                 y: {
                     title: {
                         display: true,
-                        text: 'Signal (a.u.)'
+                        text: 'Signal (a.u.)',
+                        color: textcolor
+                    },
+                    ticks: {
+                        color: textcolor
+                    },
+                    grid: {
+                        color: gridcolor,
+                        borderColor: gridcolor
                     }
                 }
             }
@@ -159,7 +229,7 @@ function plotResponse(response, chart) {
     }
 
     graphDictionary[chart.name] = new Chart(
-        document.getElementById(chart.id),
+        canvas,
         configPlot
     );
 }
