@@ -199,10 +199,14 @@ span.number {
     <option value="BwHP">Butterworth high pass (IIR)</option>
     <option value="BwBP">Butterworth band pass (IIR)</option>
     <option value="BwBS">Butterworth band stop (IIR)</option>
-    <option value="ChLP">Chebyshev low pass (IIR)</option>
-    <option value="ChHP">Chebyshev high pass (IIR)</option>
-    <option value="ChBP">Chebyshev band pass (IIR)</option>
-    <option value="ChBS">Chebyshev band stop (IIR)</option>
+    <option value="ChLP">Chebyshev type 1 low pass (IIR)</option>
+    <option value="ChHP">Chebyshev type 1 high pass (IIR)</option>
+    <option value="ChBP">Chebyshev type 1 band pass (IIR)</option>
+    <option value="ChBS">Chebyshev type 1 band stop (IIR)</option>
+    <option value="ChLP2">Chebyshev type 2 low pass (IIR)</option>
+    <option value="ChHP2">Chebyshev type 2 high pass (IIR)</option>
+    <option value="ChBP2">Chebyshev type 2 band pass (IIR)</option>
+    <option value="ChBS2">Chebyshev type 2 band stop (IIR)</option>
     <option value="WsLP">Brickwall low pass (FIR)</option>
     <option value="WsHP">Brickwall high pass (FIR)</option>
     <option value="WsBP">Brickwall band pass (FIR)</option>
@@ -303,7 +307,7 @@ disableInputs("chebyshev",true);
 var filterSel = document.getElementById("filterType");
 filterSel.addEventListener("change", function() {
 	var type = filterSel.options[filterSel.selectedIndex].value;
-	disableInputs("frequencies2",type.substring(2)!="BP" && type.substring(2)!="BS");
+	disableInputs("frequencies2",type.substring(2,4)!="BP" && type.substring(2,4)!="BS");
 	switch(type) {
 		case "BwLP": 
 		case "BwHP": 
@@ -356,6 +360,10 @@ function getSelectedFilter() {
     case "ChHP": return Module.FilterType.IIR_CHEBYSHEV_HIGHPASS;
     case "ChBP": return Module.FilterType.IIR_CHEBYSHEV_BANDPASS;
     case "ChBS": return Module.FilterType.IIR_CHEBYSHEV_BANDSTOP;
+    case "ChLP2": return Module.FilterType.IIR_CHEBYSHEV2_LOWPASS;
+    case "ChHP2": return Module.FilterType.IIR_CHEBYSHEV2_HIGHPASS;
+    case "ChBP2": return Module.FilterType.IIR_CHEBYSHEV2_BANDPASS;
+    case "ChBS2": return Module.FilterType.IIR_CHEBYSHEV2_BANDSTOP;
     case "WsLP": return Module.FilterType.FIR_BRICKWALL_LOWPASS;
     case "WsHP": return Module.FilterType.FIR_BRICKWALL_HIGHPASS;
     case "WsBP": return Module.FilterType.FIR_BRICKWALL_BANDPASS;

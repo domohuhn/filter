@@ -75,8 +75,9 @@ DH_FILTER_RETURN_VALUE compute_chebyshev_bandfilter_coefficients(double* numerat
  * @param len length of the input array.
  * @param transformed_frequency the transfomed frequency
  * @param ripple_db the ripple value in db. Range [-inf, 0.0[
+ * @param invert if the poles should be inverted to create a type 2 filter
  */
-void compute_chebyshev_poles_on_z_plane(COMPLEX* ptr, size_t len, double transformed_frequency, double ripple_db);
+void compute_chebyshev_poles_on_z_plane(COMPLEX* ptr, size_t len, double transformed_frequency, double ripple_db, bool invert);
 
 /**
  * @brief Computes the donimator polynomial for a chebyshev filter. These are the feedback coefficients.
@@ -85,9 +86,10 @@ void compute_chebyshev_poles_on_z_plane(COMPLEX* ptr, size_t len, double transfo
  * @param filter_order Order of the filter.
  * @param transformed_frequency Transformed frequency.
  * @param ripple_db the ripple value in db. Range [-inf, 0.0[
+ * @param invert if the poles should be inverted to create a type 2 filter
  * @return DH_FILTER_RETURN_VALUE 
  */
-DH_FILTER_RETURN_VALUE compute_chebyshev_lowpass_denominator(double* ptr, size_t filter_order, double transformed_frequency, double ripple_db);
+DH_FILTER_RETURN_VALUE compute_chebyshev_lowpass_denominator(double* ptr, size_t filter_order, double transformed_frequency, double ripple_db, bool invert);
 
 /**
  * @brief Transforms s-plane butterworth poles to chebyshev poles.
@@ -97,6 +99,39 @@ DH_FILTER_RETURN_VALUE compute_chebyshev_lowpass_denominator(double* ptr, size_t
  * @param ripple_db desired ripple in db. Must be negative.
  */
 void dh_transform_s_poles_to_chebyshev(COMPLEX* ptr, size_t len, double ripple_db);
+
+
+/**
+ * @brief Computes all coefficients for a chebyshev type 2 low pass filter.
+ * 
+ * This function will allocate temporary buffers.
+ * 
+ * @param numerator Pointer to array with feedforward coefficients. Will be filled with output values. Must be filter_order+1 large.
+ * @param denominator Pointer to array with feedback coefficients. Will be filled with output values. Must be filter_order+1 large.
+ * @param filter_order Order of the filter.
+ * @param cutoff_hz The desired 3db cutoff frequency in Hz. Must be larger than 0.
+ * @param sampling_frequency_hz The sampling frequency in Hz. Must be larger than cutoff_hz.
+ * @param ripple_db ripple of the filter. Must be a negative value in dB.
+ * @return enum with status of operation 
+ */
+DH_FILTER_RETURN_VALUE compute_chebyshev2_lowpass_coefficients(double* numerator, double* denominator, size_t filter_order,
+        double cutoff_hz, double sampling_frequency_hz, double ripple_db);
+        
+/**
+ * @brief Computes all coefficients for a chebyshev type 2 high pass filter.
+ * 
+ * This function will allocate temporary buffers.
+ * 
+ * @param numerator Pointer to array with feedforward coefficients. Will be filled with output values. Must be filter_order+1 large.
+ * @param denominator Pointer to array with feedback coefficients. Will be filled with output values. Must be filter_order+1 large.
+ * @param filter_order Order of the filter.
+ * @param cutoff_hz The desired 3db cutoff frequency in Hz. Must be larger than 0.
+ * @param sampling_frequency_hz The sampling frequency in Hz. Must be larger than cutoff_hz.z.
+ * @param ripple_db ripple of the filter. Must be a negative value in dB.
+ * @return DH_FILTER_RETURN_VALUE 
+ */
+DH_FILTER_RETURN_VALUE compute_chebyshev2_highpass_coefficients(double* numerator, double* denominator, size_t filter_order,
+ double cutoff_hz, double sampling_frequency_hz, double ripple);
 
 #ifdef __cplusplus
 }

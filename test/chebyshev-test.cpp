@@ -13,7 +13,7 @@ SCENARIO("Chebyshev output coefficients can be computed", "[filter]") {
           WHEN("denominator is computed") {
                double coeffs[5];
                double transformed = transform_frequency(0.25);
-               int status = compute_chebyshev_lowpass_denominator(coeffs, 4, transformed, -3.0);
+               int status = compute_chebyshev_lowpass_denominator(coeffs, 4, transformed, -3.0, false);
                THEN("results are correct") {
                     REQUIRE(status == DH_FILTER_OK);
                     REQUIRE(coeffs[4] == Catch::Approx(0.4080348558));

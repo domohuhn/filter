@@ -52,7 +52,15 @@ typedef enum {
     /** A chebyshev type 1 filter. Ripples in pass band. */
     DH_IIR_CHEBYSHEV_BANDPASS,
     /** A chebyshev type 1 filter. Ripples in pass band. */
-    DH_IIR_CHEBYSHEV_BANDSTOP
+    DH_IIR_CHEBYSHEV_BANDSTOP,
+    /** A chebyshev type 2 filter. Ripples in pass band. */
+    DH_IIR_CHEBYSHEV2_LOWPASS,
+    /** A chebyshev type 2 filter. Ripples in pass band. */
+    DH_IIR_CHEBYSHEV2_HIGHPASS,
+    /** A chebyshev type 2 filter. Ripples in pass band. */
+    DH_IIR_CHEBYSHEV2_BANDPASS,
+    /** A chebyshev type 2 filter. Ripples in pass band. */
+    DH_IIR_CHEBYSHEV2_BANDSTOP
 } DH_FILTER_TYPE;
 
 

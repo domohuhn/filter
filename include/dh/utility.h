@@ -168,6 +168,15 @@ DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_coefficients(double* numerat
  */
 void convolve_parameters(double * param1,double * param2, size_t len,double * out );
 
+/**
+ * @brief Computes the zeros on the s-plane for a chebyshev type 2 filter.
+ * 
+ * @param ptr Array to store the zeros in
+ * @param len number of zeros
+ * @param transformed_frequency prewarped frequency
+ */
+void compute_zeros_on_s_plane_chebyshev2(COMPLEX* ptr, size_t len, double transformed_frequency);
+
 #ifdef __cplusplus
 }
 #endif

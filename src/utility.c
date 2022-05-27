@@ -53,6 +53,13 @@ void compute_poles_on_s_plane(COMPLEX* ptr, size_t len, double transformed_frequ
     }
 }
 
+void compute_zeros_on_s_plane_chebyshev2(COMPLEX* ptr, size_t len, double transformed_frequency) {
+    for(size_t i=0; i<len; ++i) {
+        double phi = (2*i+1)*M_PI/(2*len);
+        ptr[i] = transformed_frequency*I/cos(phi);
+    }
+}
+
 void compute_polynomial_coefficients_from_roots(COMPLEX* roots, size_t len, COMPLEX* outputs)
 {
     if ( roots==(void*)NULL|| len==0 || outputs==(void*)NULL ) {

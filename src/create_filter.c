@@ -22,6 +22,8 @@ static DH_FILTER_RETURN_VALUE dh_iir_butterworth_high_lowpass(dh_filter_data* fi
 static DH_FILTER_RETURN_VALUE dh_iir_butterworth_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass);
 static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_high_lowpass(dh_filter_data* filter, dh_filter_parameters* options, bool lowpass);
 static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass);
+static DH_FILTER_RETURN_VALUE dh_iir_chebyshev2_high_lowpass(dh_filter_data* filter, dh_filter_parameters* options, bool lowpass);
+static DH_FILTER_RETURN_VALUE dh_iir_chebyshev2_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass);
 static DH_FILTER_RETURN_VALUE dh_fir_create_sinc(dh_filter_data* filter, dh_filter_parameters* options);
 static DH_FILTER_RETURN_VALUE dh_fir_create_sinc_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass);
 
@@ -73,6 +75,10 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_parame
         case DH_IIR_CHEBYSHEV_BANDPASS: // fallthrough
         case DH_IIR_CHEBYSHEV_BANDSTOP:
             rv = dh_iir_chebyshev_bandfilter(filter, options, options->filter_type == DH_IIR_CHEBYSHEV_BANDPASS);
+            break;
+        case DH_IIR_CHEBYSHEV2_LOWPASS: // fallthrough
+        case DH_IIR_CHEBYSHEV2_HIGHPASS:
+            rv = dh_iir_chebyshev2_high_lowpass(filter, options, options->filter_type == DH_IIR_CHEBYSHEV2_LOWPASS);
             break;
     }
     return rv;
@@ -304,6 +310,24 @@ static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_high_lowpass(dh_filter_data* filt
     } else {
         filter->initialized = true;
         return compute_chebyshev_highpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->filter_order,
+            options->cutoff_frequency_low, options->sampling_frequency,
+            options->ripple);
+    }
+}
+
+static DH_FILTER_RETURN_VALUE dh_iir_chebyshev2_high_lowpass(dh_filter_data* filter, dh_filter_parameters* options, bool lowpass)
+{
+    size_t coefficients = options->filter_order + 1;
+    if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    if (lowpass) {
+        return compute_chebyshev2_lowpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->filter_order,
+            options->cutoff_frequency_low, options->sampling_frequency,
+            options->ripple);
+    } else {
+        filter->initialized = true;
+        return compute_chebyshev2_highpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->filter_order,
             options->cutoff_frequency_low, options->sampling_frequency,
             options->ripple);
     }

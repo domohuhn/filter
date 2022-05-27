@@ -1,5 +1,5 @@
 #include "dh/filter-types.h"
-#include "cpp/filter.hpp"
+#include "dh/cpp/filter.hpp"
 #include <algorithm>
 #include <emscripten.h>
 #include <emscripten/bind.h>
@@ -24,7 +24,11 @@ EMSCRIPTEN_BINDINGS(filter_params) {
     .value("IIR_CHEBYSHEV_LOWPASS", DH_IIR_CHEBYSHEV_LOWPASS)
     .value("IIR_CHEBYSHEV_HIGHPASS", DH_IIR_CHEBYSHEV_HIGHPASS)
     .value("IIR_CHEBYSHEV_BANDPASS", DH_IIR_CHEBYSHEV_BANDPASS)
-    .value("IIR_CHEBYSHEV_BANDSTOP", DH_IIR_CHEBYSHEV_BANDSTOP);
+    .value("IIR_CHEBYSHEV_BANDSTOP", DH_IIR_CHEBYSHEV_BANDSTOP)
+    .value("IIR_CHEBYSHEV2_LOWPASS", DH_IIR_CHEBYSHEV2_LOWPASS)
+    .value("IIR_CHEBYSHEV2_HIGHPASS", DH_IIR_CHEBYSHEV2_HIGHPASS)
+    .value("IIR_CHEBYSHEV2_BANDPASS", DH_IIR_CHEBYSHEV2_BANDPASS)
+    .value("IIR_CHEBYSHEV2_BANDSTOP", DH_IIR_CHEBYSHEV2_BANDSTOP);
 
   class_<dh_filter_parameters>("FilterParameters")
     .constructor<>()

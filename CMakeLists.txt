@@ -79,6 +79,7 @@ if(DH_CFILTER_BUILD_TESTS)
     test/brickwall-test.cpp
     test/butterworth-test.cpp
     test/chebyshev-test.cpp
+    test/chebyshev2-test.cpp
     test/moving-average-test.cpp
     test/generated_c_code.c
     test/generated-code-test.cpp

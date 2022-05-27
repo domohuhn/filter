@@ -18,6 +18,10 @@ function convert_type_to_enum(type){
         case 14: return "DH_IIR_CHEBYSHEV_HIGHPASS";
         case 15: return "DH_IIR_CHEBYSHEV_BANDPASS";
         case 16: return "DH_IIR_CHEBYSHEV_BANDSTOP";
+        case 17: return "DH_IIR_CHEBYSHEV2_LOWPASS";
+        case 18: return "DH_IIR_CHEBYSHEV2_HIGHPASS";
+        case 19: return "DH_IIR_CHEBYSHEV2_BANDPASS";
+        case 20: return "DH_IIR_CHEBYSHEV2_BANDSTOP";
         default: return "THERE WAS AN ERROR";
     }
 }
