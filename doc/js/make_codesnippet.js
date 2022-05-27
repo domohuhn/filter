@@ -52,7 +52,7 @@ function generate_c_lib(options) {
 
 function generate_cpp_lib(options) {
     return `<pre class="code">
-<span class="preprocessor">#include</span> <span class="string">"dh/filter.hpp"</span>
+<span class="preprocessor">#include</span> <span class="string">"dh/cpp/filter.hpp"</span>
 
 <span class="comment">// Generates a filter designed on the webpage of the
 // dh filter library.

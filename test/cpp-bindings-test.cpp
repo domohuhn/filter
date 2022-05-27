@@ -1,8 +1,7 @@
 
 #include "catch2/catch_test_macros.hpp"
 #include "catch2/catch_approx.hpp"
-#include "dh/filter.h"
-#include "cpp/filter.hpp"
+#include "dh/cpp/filter.hpp"
 #include <cstring>
 
 /**

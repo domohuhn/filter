@@ -175,7 +175,5 @@ EMSCRIPTEN_BINDINGS(filter_wrapper) {
     .function("stepResponse", &stepResponse)
     .function("impulseResponse", &impulseResponse)
     ;
-  
-
 }
 
