@@ -80,6 +80,8 @@ if(DH_CFILTER_BUILD_TESTS)
     test/butterworth-test.cpp
     test/chebyshev-test.cpp
     test/moving-average-test.cpp
+    test/generated_c_code.c
+    test/generated-code-test.cpp
     test/iir-filter-test.cpp
     test/fir-exponential-test.cpp
     test/iir-exponential-test.cpp

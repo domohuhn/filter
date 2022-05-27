@@ -12,12 +12,15 @@ body {
 a {
   color: #0033cc;
 }
-h1.title {
+.title {
   color: #809fff;
   text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
-.text-center {
-  margin: auto;
+.main-center {
+  margin-left: auto;
+  margin-right: auto;
   width: 60%;
 }
 
@@ -34,6 +37,94 @@ input[type="number"][disabled] {
   border-color: #b7b7b7;
   border-style: solid;
 }
+
+.toggleButton {
+  border-radius: 4px;
+  border-style: solid;
+  background-color: #809fff;
+  border-color: #809fff;
+  color: #000;
+}
+
+.toggleButton:hover {
+  background-color: #c7d5ff;
+  border-color: #c7d5ff;
+}
+
+.toggleButton:active {
+  background-color: #6588f0;
+  border-color: #6588f0;
+}
+
+table.chart {
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+.tab {
+  margin: auto;
+  width: 60%;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+.tab button:hover {
+  background-color: #ddd;
+}
+
+.tab button.active {
+  background-color: #ccc;
+}
+
+.tabcontent {
+  margin: auto;
+  width: 60%;
+  display: none;
+  padding: 6px 0px;
+  border: 1px solid #ccc;
+  border-top: none;
+  animation: fadeEffect 1s;
+  background-color: #f9f9f9;
+}
+
+@keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+span.comment {
+  color:rgb(32, 123, 39);
+}
+span.type {
+  color:rgb(33, 36, 224);
+}
+span.enum {
+  color:rgb(35, 100, 241);
+}
+span.preprocessor {
+  color:rgb(209, 16, 209);
+}
+span.keyword {
+  color:rgb(209, 16, 209);
+}
+span.number {
+  color:rgb(46, 108, 60);
+}
+span.string {
+  color:rgb(185, 58, 58);
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     color: #c9d1d9;
@@ -49,6 +140,40 @@ input[type="number"][disabled] {
   border-color: #9e9e9e;
   border-style: solid;
   }
+  .tab {
+  border: 1px solid rgb(90, 90, 97);
+  background-color: #707070;
+  }
+  .tab button {
+    color: #c9d1d9;
+}
+  
+.tab button:hover {
+  color: #222;
+  background-color: #aaa;
+}
+
+.tab button.active {
+  color: #222;
+  background-color: #aaa;
+}
+
+.tabcontent {
+  border: 1px solid #707070;
+  background-color: #1c1e20;
+}
+span.comment {
+  color:rgb(54, 185, 65);
+}
+span.type {  
+  color: rgb(137, 139, 255);
+}
+span.enum {
+  color:rgb(136, 173, 255);
+}
+span.number {
+  color:rgb(186, 240, 198);
+}
 }
 </style>
 
@@ -59,12 +184,13 @@ input[type="number"][disabled] {
 <link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
-<div class="text-center">
+<div class="main-center">
 <h1 class="title"><img class="icon" src="favicon-32x32.png" width="25" height="25"></img>Design your digital filter!</h1>
 <p>Design a filter according to your needs by selecting the values below. Scroll to the bottom of the page to get code snippets in your favourite programming language that generates a filter with the same characteristic! The source code for the generator and a library for C/C++/Javascript can found on <a href="https://github.com/domohuhn/filter">Github.</a></p>
 </div>
-<center>
-  <table width ="60%" cellspacing="0" border="0">
+
+<div class="main-center">
+  <table cellspacing="0" border="0">
   <tr>
   <td class="InputLabel" width="25%">Filter type:</td>
   <td class="InputBox" width="25%">
@@ -92,39 +218,77 @@ input[type="number"][disabled] {
     <td class="InputLabel" width="25%">Cutoff 2 (Hz):</td><td class="InputBox" width="25%"><input name="frequencies2" type="number" id="cutoff2" step="0.001"  min="0" value="35"/></td></tr>
   <tr><td class="InputLabel" width="25%">Cutoff 1 (Hz):</td><td class="InputBox" width="25%"><input name="frequencies" type="number" id="cutoff1" step="0.001"  min="0" value="15"/></td>
   <td class="InputLabel" width="25%">Ripple (dB):</td><td class="InputBox" width="25%"><input name="chebyshev" type="number" id="ripple" step="0.001" max="0" value="-3"/></td></tr>
-  <tr><td class="InputLabel" width="25%">Share:</td><td width="25%"><button onclick="createLink()">Copy to link clipboard</button> </td> </tr>
+  <tr><td class="InputLabel" width="25%">Share:</td><td width="25%"><button class="toggleButton" onclick="createLink()">Copy to link clipboard</button> </td> </tr>
 </table>
+</div>
 
-<table width ="60%" cellspacing="0" border="0">
+<center>
+<table class="chart" width="60%" cellspacing="0" border="0">
 <tr><td class="chart"  width="50%">
 <div>
-  <canvas id="gainChart"></canvas>
+  <canvas id="gainChart">Please enable javascript or use a newer browser!</canvas>
 </div>
 </td>
 <td class="chart" width="50%">
 <div>
-  <canvas id="phaseChart"></canvas>
+  <canvas id="phaseChart">Please enable javascript or use a newer browser!</canvas>
 </div></td>
 </tr>
 <tr><td class="chart"  width="50%">
   <div>
-    <canvas id="stepChart"></canvas>
+    <canvas id="stepChart">Please enable javascript or use a newer browser!</canvas>
   </div>
   </td>
   <td class="chart" width="50%">
   <div>
-    <canvas id="impulseChart"></canvas>
+    <canvas id="impulseChart">Please enable javascript or use a newer browser!</canvas>
   </div></td>
   </tr>
 </table>
-
 </center>
+
+<h2 class="main-center title">Code snippets</h2>
+
+<div class="tab">
+  <button class="tablinks" onclick="openTab(event, 'recurrence')" id="defaultOpen">Recurrence relation</button>
+  <button class="tablinks" onclick="openTab(event, 'c-lib')">C (with library)</button>
+  <button class="tablinks" onclick="openTab(event, 'c++-lib')">C++ (with library)</button>
+  <button class="tablinks" onclick="openTab(event, 'javascript-lib')">Javascript (with library)</button>
+  <button class="tablinks" onclick="openTab(event, 'c')">C</button>
+</div>
+
+
+<div id="recurrence" class="tabcontent" style="display: block;">
+  <pre>  Please enable javascript to see the generated code!</pre>
+</div>
+<div id="c-lib" class="tabcontent"></div>
+<div id="c++-lib" class="tabcontent"></div>
+<div id="javascript-lib" class="tabcontent"></div>
+<div id="c" class="tabcontent"></div>
 
 <div class="text-center">
   <p class="footer"><a href="https://github.com/domohuhn/filter">Filter library</a> by domohuhn.</p>
 </div>
 </body>
+<script>
+function openTab(evt, tab) {
+  var i, tabcontent, tablinks;
 
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  document.getElementById(tab).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+document.getElementById("defaultOpen").click();
+</script>
 <script>
 function disableInputs(name,inactive) {
   var elems = document.getElementsByName(name);
@@ -229,6 +393,7 @@ if(urlParams.get('ripple')!=null) {
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="js/graphs.js"></script>
+<script src="js/make_codesnippet.js"></script>
 <script>
   function updateGraphs() {
     var pars = new Module.FilterParameters();
@@ -271,6 +436,11 @@ if(urlParams.get('ripple')!=null) {
     plotResponse(respStep, chartConfigStep);
     var respImpulse = filt.impulseResponse();
     plotResponse(respImpulse, chartConfigImpulse);
+    document.getElementById("recurrence").innerHTML = generate_recurrence_relation(pars,filt);
+    document.getElementById("c-lib").innerHTML = generate_c_lib(pars);
+    document.getElementById("c++-lib").innerHTML = generate_cpp_lib(pars);
+    document.getElementById("javascript-lib").innerHTML = generate_javascript_lib(pars);
+    document.getElementById("c").innerHTML = generate_c(pars,filt);
   }
 
   var Module = {
@@ -281,8 +451,6 @@ if(urlParams.get('ripple')!=null) {
 </script>
 <script src="js/filter.js"></script>
 <script>
-
-
   function addUpdateListener(name, inactive) {
     var elems = document.getElementsByName(name);
     for (i = 0; i < elems.length; i++) {
