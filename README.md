@@ -15,7 +15,8 @@ This repostitory contains a C-library that can be used to both design digital fi
 | exponential    | FIR     | lowpass |
 | exponential    | IIR     | lowpass | [Examples](doc/exponential.md)
 | butterworth    | IIR     | lowpass, highpass, bandpass, bandstop | [Examples](doc/butterworth.md) |
-| chebyshev    | IIR     | lowpass, highpass, bandpass, bandstop | [Examples](doc/chebyshev.md) |
+| chebyshev (type 1)    | IIR     | lowpass, highpass, bandpass, bandstop | [Examples](doc/chebyshev.md) |
+| chebyshev (type 2)    | IIR     | lowpass, highpass, bandpass, bandstop |  |
 | brickwall    | FIR     | lowpass, highpass, bandpass, bandstop | [Examples](doc/brickwall.md) |
 
 The filters are designed using the bilinear z-transform.
