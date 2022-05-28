@@ -35,7 +35,7 @@ SCENARIO( "Chebyshev type 2 design", "[filter]" ) {
       double sampling_frequency_hz = 100.0;
       double ripple = -0.3;
       WHEN("the values are computed"){
-        auto status = compute_chebyshev2_lowpass_coefficients(numerator,denominator,filter_order,cutoff_hz,sampling_frequency_hz,ripple);
+        auto status = compute_chebyshev_filter_coefficients(DH_LOWPASS,numerator,denominator,filter_order,cutoff_hz,cutoff_hz,sampling_frequency_hz,ripple,true);
         THEN("the status is ok"){
           REQUIRE(status == DH_FILTER_OK);
         }
@@ -60,7 +60,7 @@ SCENARIO( "Chebyshev type 2 design", "[filter]" ) {
       double sampling_frequency_hz = 100.0;
       double ripple = -0.3;
       WHEN("the values are computed"){
-        auto status = compute_chebyshev2_highpass_coefficients(numerator,denominator,filter_order,cutoff_hz,sampling_frequency_hz,ripple);
+        auto status = compute_chebyshev_filter_coefficients(DH_HIGHPASS,numerator,denominator,filter_order,cutoff_hz,cutoff_hz,sampling_frequency_hz,ripple,true);
         THEN("the status is ok"){
           REQUIRE(status == DH_FILTER_OK);
         }
@@ -100,7 +100,7 @@ SCENARIO( "Chebyshev type 2 design", "[filter]" ) {
       WHEN("i compute the polynomial"){
         double num[5];
         double denom[5];
-        auto status = compute_chebyshev2_bandfilter_coefficients(num,denom,2,30.0,60.0,200.0,true,-3.0);
+        auto status = compute_chebyshev_filter_coefficients(DH_BANDPASS,num,denom,2,30.0,60.0,200.0,-3.0,true);
         THEN("the status is ok"){
           REQUIRE(status == DH_FILTER_OK);
         }
@@ -125,7 +125,7 @@ SCENARIO( "Chebyshev type 2 design", "[filter]" ) {
       WHEN("i compute the polynomial"){
         double num[5];
         double denom[5];
-        auto status = compute_chebyshev2_bandfilter_coefficients(num,denom,2,30.0,60.0,200.0,false,-3.0);
+        auto status = compute_chebyshev_filter_coefficients(DH_BANDSTOP,num,denom,2,30.0,60.0,200.0,-3.0,true);
         THEN("the status is ok"){
           REQUIRE(status == DH_FILTER_OK);
         }
@@ -145,5 +145,4 @@ SCENARIO( "Chebyshev type 2 design", "[filter]" ) {
         }
       }
     }
-
 }

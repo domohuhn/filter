@@ -108,21 +108,31 @@ SCENARIO("Chebyshev low pass filters are correctly initialized", "[filter]") {
           opts.filter_order = 4;
           WHEN("filter is created") {
                int status = dh_create_filter(&filter_data,&opts);
-               THEN("results are correct") {
+               THEN("the status is ok") {
                     REQUIRE(status == DH_FILTER_OK);
+               }
+               THEN("buffers are initialized") {
                     REQUIRE(filter_data.coefficients_in != (void*)NULL);
                     REQUIRE(filter_data.coefficients_out != (void*)NULL);
                     REQUIRE(filter_data.initialized == false);
                     REQUIRE(filter_data.buffer_needs_cleanup == true);
                     REQUIRE(filter_data.number_coefficients_in == 5);
                     REQUIRE(filter_data.number_coefficients_out == 5);
+               }
+               THEN("feedback coefficients are correct") {
                     REQUIRE(filter_data.coefficients_out[4] == Catch::Approx(0.4080348558));
                     REQUIRE(filter_data.coefficients_out[3] == Catch::Approx(-0.8817615727));
                     REQUIRE(filter_data.coefficients_out[2] == Catch::Approx(1.4174806064));
                     REQUIRE(filter_data.coefficients_out[1] == Catch::Approx(-1.0939919582));
                     REQUIRE(filter_data.coefficients_out[0] == Catch::Approx(1.0));
                }
-               
+               THEN("feedforward coefficients are correct") {
+                    REQUIRE(filter_data.coefficients_in[0] == Catch::Approx(0.053110120709293177));
+                    REQUIRE(filter_data.coefficients_in[1] == Catch::Approx(0.2124404828371727));
+                    REQUIRE(filter_data.coefficients_in[2] == Catch::Approx(0.3186607242557591));
+                    REQUIRE(filter_data.coefficients_in[3] == Catch::Approx(0.2124404828371727));
+                    REQUIRE(filter_data.coefficients_in[4] == Catch::Approx(0.053110120709293177));
+               }
                REQUIRE(dh_free_filter(&filter_data) == DH_FILTER_OK);
           }
      }
@@ -139,20 +149,32 @@ SCENARIO("Chebyshev high pass filters are correctly initialized", "[filter]") {
           opts.filter_order = 5;
           WHEN("coefficients are computed") {
                int status = dh_create_filter(&filter_data,&opts);
-               THEN("results are correct") {
+               THEN("the status is ok") {
                     REQUIRE(status == DH_FILTER_OK);
+               }
+               THEN("buffers are initialized") {
                     REQUIRE(filter_data.coefficients_in != (void*)NULL);
                     REQUIRE(filter_data.coefficients_out != (void*)NULL);
                     REQUIRE(filter_data.initialized == true);
                     REQUIRE(filter_data.buffer_needs_cleanup == true);
                     REQUIRE(filter_data.number_coefficients_in == 6);
                     REQUIRE(filter_data.number_coefficients_out == 6);
+               }
+               THEN("feedback coefficients are correct") {
                     REQUIRE(filter_data.coefficients_out[5] == Catch::Approx(0.2657574384));
                     REQUIRE(filter_data.coefficients_out[4] == Catch::Approx(0.4386539929));
                     REQUIRE(filter_data.coefficients_out[3] == Catch::Approx(0.6053373580));
                     REQUIRE(filter_data.coefficients_out[2] == Catch::Approx(1.1506939843));
                     REQUIRE(filter_data.coefficients_out[1] == Catch::Approx(0.2289297075));
                     REQUIRE(filter_data.coefficients_out[0] == Catch::Approx(1.0));
+               }
+               THEN("feedforward coefficients are correct") {
+                    REQUIRE(filter_data.coefficients_in[0] == Catch::Approx(0.046541358543162804));
+                    REQUIRE(filter_data.coefficients_in[1] == Catch::Approx(-0.23270679271581401));
+                    REQUIRE(filter_data.coefficients_in[2] == Catch::Approx(0.46541358543162803));
+                    REQUIRE(filter_data.coefficients_in[3] == Catch::Approx(-0.46541358543162803));
+                    REQUIRE(filter_data.coefficients_in[4] == Catch::Approx(0.23270679271581401));
+                    REQUIRE(filter_data.coefficients_in[5] == Catch::Approx(-0.046541358543162804));
                }
                REQUIRE(dh_free_filter(&filter_data) == DH_FILTER_OK);
           }
@@ -172,6 +194,9 @@ SCENARIO("Chebyshev band pass filters are correctly initialized", "[filter]") {
           opts.filter_order = 3;
           WHEN("coefficients are computed") {
                int status = dh_create_filter(&filter_data,&opts);
+               for(size_t i=0;i<7;++i){
+                    printf("bp %zu: ffw %f fb %f\n",i,filter_data.coefficients_in[i],filter_data.coefficients_out[i]);
+               }
                THEN("results are correct") {
                     REQUIRE(status == DH_FILTER_OK);
                     REQUIRE(filter_data.coefficients_in != (void*)NULL);
@@ -214,6 +239,9 @@ SCENARIO("Chebyshev band stop filters are correctly initialized", "[filter]") {
           opts.filter_order = 3;
           WHEN("coefficients are computed") {
                int status = dh_create_filter(&filter_data,&opts);
+               for(size_t i=0;i<7;++i){
+                    printf("bs %zu: ffw %f fb %f\n",i,filter_data.coefficients_in[i],filter_data.coefficients_out[i]);
+               }
                THEN("results are correct") {
                     REQUIRE(status == DH_FILTER_OK);
                     REQUIRE(filter_data.coefficients_in != (void*)NULL);

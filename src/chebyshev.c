@@ -124,7 +124,9 @@ size_t lowpassToBandstop(COMPLEX* lowpass, size_t num_entries, double center, do
         lowpass[i] = current + csqrt( current*current - center*center);
         lowpass[i + num_entries] = current - csqrt( current*current - center*center);
     }
-    return append_to_array(lowpass,2*num_entries,0.0,append);
+    // move zeros from infinity to stopband
+    num_entries = append_to_array(lowpass,2*num_entries,center * I,append);
+    return append_to_array(lowpass,num_entries,-center * I,append);
 }
 
 size_t shiftLowpassFrequency(COMPLEX* lowpass, size_t num_entries, double cutoff) {
@@ -155,23 +157,28 @@ size_t bilinear_z_transform_and_append_ones(COMPLEX* splane, size_t num_entries,
 }
 
 
-size_t compute_transferfunction_polynomial(DH_FILTER_CHARACTERISTIC type, COMPLEX* roots, size_t count, double center, double width, COMPLEX* polynomial, double* output){
+size_t compute_transferfunction_polynomial(DH_FILTER_CHARACTERISTIC type, COMPLEX* roots, size_t count,
+                         double center, double width,
+                         COMPLEX* polynomial, double* output,
+                         size_t target_count){
     switch(type) {
     case DH_LOWPASS:
         count = shiftLowpassFrequency(roots,count,center);
         break;
     case DH_HIGHPASS:
-        count = lowpassToHighpass(roots,count,center,0);
+        count = lowpassToHighpass(roots,count,center,target_count-count);
         break;
     case DH_BANDPASS:
-        count = lowpassToBandpass(roots,count,center,width,0);
+        count = lowpassToBandpass(roots,count,center,width,target_count-count);
+        target_count = 2*target_count;
         break;
     case DH_BANDSTOP:
-        count = lowpassToBandstop(roots,count,center,width,0);
+        count = lowpassToBandstop(roots,count,center,width,target_count-count);
+        target_count = 2*target_count;
         break;
     }
 
-    count = bilinear_z_transform_and_append_ones(roots,count,2.0,0);
+    count = bilinear_z_transform_and_append_ones(roots,count,2.0,target_count-count);
     size_t polylen = count+1;
 
     compute_polynomial_coefficients_from_roots(roots, polylen, polynomial);
@@ -182,11 +189,11 @@ size_t compute_transferfunction_polynomial(DH_FILTER_CHARACTERISTIC type, COMPLE
 }
 
 
-double position_for_gain(DH_FILTER_CHARACTERISTIC type, double center) {
+double position_for_gain(DH_FILTER_CHARACTERISTIC type, double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz) {
     switch(type) {
     case DH_LOWPASS: return 0.0;
     case DH_HIGHPASS: return 0.5;
-    case DH_BANDPASS: return center;
+    case DH_BANDPASS: return (0.5*cutoff_low_hz + 0.5*cutoff_high_hz)/sampling_frequency_hz;
     case DH_BANDSTOP: return 0.0;
     }
 }
@@ -206,7 +213,7 @@ double compute_width(DH_FILTER_CHARACTERISTIC type, double warped_low, double wa
 }
 
 DH_FILTER_RETURN_VALUE compute_chebyshev_filter_coefficients(DH_FILTER_CHARACTERISTIC type, double* numerator, double* denominator, size_t filter_order, 
-    double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz, double ripple_db)
+    double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz, double ripple_db, bool isType2)
 {
     if(numerator == NULL || denominator == NULL) {
         return DH_FILTER_NO_DATA_STRUCTURE;
@@ -231,48 +238,29 @@ DH_FILTER_RETURN_VALUE compute_chebyshev_filter_coefficients(DH_FILTER_CHARACTER
     COMPLEX* polynomial = buffer + 2*filter_order;
 
     // feedforward coefficients
-    compute_zeros_on_s_plane_chebyshev2(splane, number_zeros, 1.0);
-    number_zeros = compute_transferfunction_polynomial(type, splane, number_zeros, center, width, polynomial, numerator);
+    if(isType2) {
+        compute_zeros_on_s_plane_chebyshev2(splane, number_zeros, 1.0);
+    } else {
+        number_zeros = 0;
+    }
+    number_zeros = compute_transferfunction_polynomial(type, splane, number_zeros, center, width, polynomial, numerator, filter_order);
     
     // feedback coefficients
-    
     compute_poles_on_s_plane(splane,number_poles,1.0);
     dh_transform_s_poles_to_chebyshev(splane,number_poles,ripple_db);
     // convert to chebyshev type 2
-    for(size_t i=0; i< number_poles; ++i){
-        splane[i] = 1.0/splane[i];
+    if(isType2) {
+        for(size_t i=0; i< number_poles; ++i){
+            splane[i] = 1.0/splane[i];
+        }
     }
-    number_poles = compute_transferfunction_polynomial(type, splane, number_poles, center, width, polynomial, denominator);
+    number_poles = compute_transferfunction_polynomial(type, splane, number_poles, center, width, polynomial, denominator, filter_order);
 
     free(buffer);
-    // normalize gain to 1 at 0 for bandstop, center of passband for bandpass
-    const double position = position_for_gain(type, (0.5*cutoff_low_hz + 0.5*cutoff_high_hz)/sampling_frequency_hz);
+
+    // normalize gain to 1
+    const double position = position_for_gain(type, cutoff_low_hz, cutoff_high_hz, sampling_frequency_hz);
     dh_normalize_gain_at(numerator,number_zeros,denominator,number_poles, position);
     return DH_FILTER_OK;
-}
-
-DH_FILTER_RETURN_VALUE compute_chebyshev2_bandfilter_coefficients(double* numerator, double* denominator, size_t filter_order, 
-    double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz, bool bandpass, double ripple_db)
-{
-    return compute_chebyshev_filter_coefficients(bandpass ? DH_BANDPASS : DH_BANDSTOP,numerator, denominator, filter_order, cutoff_low_hz, cutoff_high_hz, sampling_frequency_hz, ripple_db);
-}
-
-DH_FILTER_RETURN_VALUE compute_chebyshev2_lowpass_coefficients(double* numerator, double* denominator, size_t filter_order,
-        double cutoff_hz, double sampling_frequency_hz, double ripple)
-{
-    return compute_chebyshev_filter_coefficients(DH_LOWPASS,numerator, denominator, filter_order, cutoff_hz, cutoff_hz, sampling_frequency_hz, ripple);
-}
-
-DH_FILTER_RETURN_VALUE compute_chebyshev2_highpass_coefficients(double* numerator, double* denominator, size_t filter_order, double cutoff_hz, double sampling_frequency_hz, double ripple)
-{
-    return compute_chebyshev_filter_coefficients(DH_HIGHPASS,numerator, denominator, filter_order, cutoff_hz, cutoff_hz, sampling_frequency_hz, ripple);
-    /*double mirrored_frequency = 0.5*sampling_frequency_hz - cutoff_hz;
-    int rv = compute_chebyshev2_lowpass_coefficients(numerator,denominator,filter_order,mirrored_frequency,sampling_frequency_hz, ripple);
-    if(rv != DH_FILTER_OK) {
-        return rv;
-    }
-    dh_alternate_signs(numerator,filter_order+1);
-    dh_alternate_signs(denominator,filter_order+1);
-    return rv;*/
 }
 
