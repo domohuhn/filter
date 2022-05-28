@@ -76,4 +76,74 @@ SCENARIO( "Chebyshev type 2 design", "[filter]" ) {
         }
       }
     }
+
+    GIVEN("I need to compute 4 zeros on the s-plane at 10 Hz/100Hz") {
+      WHEN("i compute them"){
+        //auto f = std::tan (M_PI * 10.0/100.0);
+        COMPLEX zeros[4];
+        compute_zeros_on_s_plane_chebyshev2(zeros, 4, 1.0);
+        THEN("the result is correct"){
+          REQUIRE(creal(zeros[0]) == Catch::Approx(0.0));
+          REQUIRE(cimag(zeros[0]) == Catch::Approx(1.08239));
+          REQUIRE(creal(zeros[1]) == Catch::Approx(0.0));
+          REQUIRE(cimag(zeros[1]) == Catch::Approx(2.61313));
+          REQUIRE(creal(zeros[2]) == Catch::Approx(0.0));
+          REQUIRE(cimag(zeros[2]) == Catch::Approx(-2.61313));
+          REQUIRE(creal(zeros[3]) == Catch::Approx(0.0));
+          REQUIRE(cimag(zeros[3]) == Catch::Approx(-1.08239));
+        }
+      }
+    }
+    // s-zero are correct -> call without warped frequency
+
+    GIVEN("I need to compute a second order bandpass at [30Hz,60Hz] for 200Hz sampling rate with 3db ripple") {
+      WHEN("i compute the polynomial"){
+        double num[5];
+        double denom[5];
+        auto status = compute_chebyshev2_bandfilter_coefficients(num,denom,2,30.0,60.0,200.0,true,-3.0);
+        THEN("the status is ok"){
+          REQUIRE(status == DH_FILTER_OK);
+        }
+        THEN("the feedforward coefficients are correct"){
+          REQUIRE(num[0] == Catch::Approx(0.5860528708));
+          REQUIRE(num[1] == Catch::Approx(-0.270909442));
+          REQUIRE(num[2] == Catch::Approx(0.4184816227));
+          REQUIRE(num[3] == Catch::Approx(-0.270909442));
+          REQUIRE(num[4] == Catch::Approx(0.5860528708));
+        }
+        THEN("the feedback coefficients are correct"){
+          REQUIRE(denom[0] == Catch::Approx(1.0));
+          REQUIRE(denom[1] == Catch::Approx(-0.4725982399));
+          REQUIRE(denom[2] == Catch::Approx(0.759131302));
+          REQUIRE(denom[3] == Catch::Approx(-0.2945605108));
+          REQUIRE(denom[4] == Catch::Approx(0.4929736931));
+        }
+      }
+    }
+
+    GIVEN("I need to compute a second order bandstop at [30Hz,60Hz] for 200Hz sampling rate with 3db ripple") {
+      WHEN("i compute the polynomial"){
+        double num[5];
+        double denom[5];
+        auto status = compute_chebyshev2_bandfilter_coefficients(num,denom,2,30.0,60.0,200.0,false,-3.0);
+        THEN("the status is ok"){
+          REQUIRE(status == DH_FILTER_OK);
+        }
+        THEN("the feedforward coefficients are correct"){
+          REQUIRE(num[0] == Catch::Approx(0.747036));
+          REQUIRE(num[1] == Catch::Approx(-0.464353));
+          REQUIRE(num[2] == Catch::Approx(1.232279));
+          REQUIRE(num[3] == Catch::Approx(-0.464353));
+          REQUIRE(num[4] == Catch::Approx(0.747036));
+        }
+        THEN("the feedback coefficients are correct"){
+          REQUIRE(denom[0] == Catch::Approx(1.0));
+          REQUIRE(denom[1] == Catch::Approx(-0.540645));
+          REQUIRE(denom[2] == Catch::Approx(1.160887));
+          REQUIRE(denom[3] == Catch::Approx(-0.388062));
+          REQUIRE(denom[4] == Catch::Approx(0.565465));
+        }
+      }
+    }
+
 }

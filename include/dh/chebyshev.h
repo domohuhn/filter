@@ -133,6 +133,24 @@ DH_FILTER_RETURN_VALUE compute_chebyshev2_lowpass_coefficients(double* numerator
 DH_FILTER_RETURN_VALUE compute_chebyshev2_highpass_coefficients(double* numerator, double* denominator, size_t filter_order,
  double cutoff_hz, double sampling_frequency_hz, double ripple);
 
+/**
+ * @brief Computes all coefficients for a chebyshev type 2 band pass or band stop filter.
+ * 
+ * This function will allocate temporary buffers.
+ * 
+ * @param numerator Pointer to array with feedforward coefficients. Will be filled with output values. Must be 2*filter_order+1 large.
+ * @param denominator Pointer to array with feedback coefficients. Will be filled with output values. Must be 2*filter_order+1 large.
+ * @param filter_order Order of the filter.
+ * @param cutoff_low_hz The desired 3db cutoff frequency in Hz. Must be larger than 0.
+ * @param cutoff_high_hz The desired 3db cutoff frequency in Hz. Must be larger than cutoff_low_hz.
+ * @param sampling_frequency_hz The sampling frequency in Hz. Must be larger than 2*cutoff_high_hz.
+ * @param bandpass if a bandpass or bandstop should be created.
+ * @param ripple_db Ripple in db. Must be less than 0
+ * @return DH_FILTER_RETURN_VALUE 
+ */
+DH_FILTER_RETURN_VALUE compute_chebyshev2_bandfilter_coefficients(double* numerator, double* denominator, size_t filter_order, 
+    double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz, bool bandpass, double ripple_db);
+
 #ifdef __cplusplus
 }
 #endif
