@@ -278,14 +278,10 @@ static DH_FILTER_RETURN_VALUE dh_iir_butterworth_high_lowpass(dh_filter_data* fi
     if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    if (lowpass) {
-        return compute_butterworth_lowpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->filter_order,
-            options->cutoff_frequency_low, options->sampling_frequency);
-    } else {
-        filter->initialized = true;
-        return compute_butterworth_highpass_coefficients(filter->coefficients_in, filter->coefficients_out, options->filter_order,
-            options->cutoff_frequency_low, options->sampling_frequency);
-    }
+    
+    DH_FILTER_CHARACTERISTIC chara =  lowpass ? DH_LOWPASS : DH_HIGHPASS;
+    filter->initialized = !lowpass;
+    return compute_butterworth_filter_coefficients(filter,options,chara);
 }
 
 static DH_FILTER_RETURN_VALUE dh_iir_butterworth_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass)
@@ -294,10 +290,10 @@ static DH_FILTER_RETURN_VALUE dh_iir_butterworth_bandfilter(dh_filter_data* filt
     if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
+    
     filter->initialized = true;
-    return compute_butterworth_bandfilter_coefficients(filter->coefficients_in, filter->coefficients_out, options->filter_order,
-        options->cutoff_frequency_low, options->cutoff_frequency_high,
-        options->sampling_frequency,bandpass);
+    DH_FILTER_CHARACTERISTIC chara =  bandpass ? DH_BANDPASS : DH_BANDSTOP;
+    return compute_butterworth_filter_coefficients(filter,options,chara);
 }
 
 

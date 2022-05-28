@@ -266,3 +266,5 @@ DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_coefficients(double* numerat
     dh_normalize_gain_at(numerator,2*filter_order+1,denominator,2*filter_order+1, center);
     return DH_FILTER_OK;
 }
+
+

@@ -43,6 +43,9 @@ void dh_transform_s_poles_to_chebyshev(COMPLEX* ptr, size_t len, double ripple_d
  */
 DH_FILTER_RETURN_VALUE compute_chebyshev_filter_coefficients(DH_FILTER_CHARACTERISTIC type, double* numerator, double* denominator, size_t filter_order, 
     double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz, double ripple_db, bool isType2);
+    
+DH_FILTER_RETURN_VALUE compute_butterworth_filter_coefficients(dh_filter_data* filter, dh_filter_parameters* options, DH_FILTER_CHARACTERISTIC characteristic);
+    
 
 #ifdef __cplusplus
 }

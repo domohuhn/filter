@@ -187,3 +187,106 @@ DH_FILTER_RETURN_VALUE compute_chebyshev_filter_coefficients(DH_FILTER_CHARACTER
     return DH_FILTER_OK;
 }
 
+
+/** This struct holds the functions that are used to compute
+ * the zeros and poles. */
+typedef struct 
+{
+    /** Callback function to compute the zeros of a lowpass on the s-plane.
+     * The resulting filter should have its cutoff at 1 rad/s.
+     * 
+     * Argument 1 : pointer to array
+     * Argument 2 : Max size of the array
+     * Argument 3 : Filter order
+     * Argument 4 : user data
+     * 
+     * Returns the number initialized zeros.
+     */
+    size_t (*zeros)(COMPLEX*,size_t,size_t,void*);
+    
+    /** Callback function to compute the poles of a lowpass on the s-plane.
+     * The resulting filter should have its cutoff at 1 rad/s.
+     * 
+     * Argument 1 : pointer to array
+     * Argument 2 : Max size of the array
+     * Argument 3 : Filter order
+     * Argument 4 : user data
+     * 
+     * Returns the number initialized zeros.
+     */
+    size_t (*poles)(COMPLEX*,size_t,size_t,void*);
+    
+    /** User data for the functions */
+    void* user_data;
+
+    /** The filter characteristic */
+    DH_FILTER_CHARACTERISTIC characteristic;
+} dh_transfer_function_callbacks;
+
+
+DH_FILTER_RETURN_VALUE compute_transfer_function_polynomials(dh_filter_data* filter, dh_filter_parameters* options, dh_transfer_function_callbacks cbs)
+{
+    if(filter == NULL || options == NULL || filter->coefficients_in == NULL || filter->coefficients_out == NULL || cbs.zeros == NULL || cbs.poles == NULL) {
+        return DH_FILTER_NO_DATA_STRUCTURE;
+    }
+    const DH_FILTER_CHARACTERISTIC type = cbs.characteristic;
+    const size_t filter_order = options->filter_order;
+    double* numerator = filter->coefficients_in;
+    double* denominator = filter->coefficients_out;
+    const double cutoff_frequency_low =  options->cutoff_frequency_low;
+    const double cutoff_frequency_high =  options->cutoff_frequency_high;
+    const double sampling_frequency =  options->sampling_frequency;
+    
+    double warped_low = 4 * transform_frequency(cutoff_frequency_low/sampling_frequency);
+    double warped_high = 4 * transform_frequency(cutoff_frequency_high/sampling_frequency);
+    
+    double center = compute_center(type,warped_low,warped_high);
+    double width = compute_width(type,warped_low,warped_high);
+
+    // allocate temporary buffers
+    size_t buffer_length = 4*filter_order+1;
+    COMPLEX* buffer = (COMPLEX*)malloc(sizeof(COMPLEX) * buffer_length);
+    if(buffer == NULL) {
+        return DH_FILTER_ALLOCATION_FAILED;
+    }
+    COMPLEX* splane = buffer;
+    COMPLEX* polynomial = buffer + 2*filter_order;
+    size_t polylen = 2*(filter_order)+1;
+
+    // feedforward coefficients
+    size_t number_zeros = cbs.zeros(splane,polylen,filter_order,cbs.user_data);
+    number_zeros = compute_transferfunction_polynomial(type, splane, number_zeros, center, width, polynomial, numerator, filter_order);
+    
+    // feedback coefficients
+    size_t number_poles = cbs.poles(splane,polylen,filter_order,cbs.user_data);
+    number_poles = compute_transferfunction_polynomial(type, splane, number_poles, center, width, polynomial, denominator, filter_order);
+
+    free(buffer);
+
+    // normalize gain to 1
+    const double position = position_for_gain(type, cutoff_frequency_low, cutoff_frequency_high, sampling_frequency);
+    dh_normalize_gain_at(numerator,number_zeros,denominator,number_poles, position);
+    return DH_FILTER_OK;
+}
+
+
+static size_t butterworth_splane_zeros(COMPLEX* a,size_t b,size_t c,void* d) {
+    return 0;
+}
+
+static size_t butterworth_splane_poles(COMPLEX* splane,size_t count,size_t order,void* user) {
+    compute_poles_on_s_plane(splane,order,1.0);
+    return order;
+}
+
+DH_FILTER_RETURN_VALUE compute_butterworth_filter_coefficients(dh_filter_data* filter, dh_filter_parameters* options, DH_FILTER_CHARACTERISTIC characteristic)
+{
+    if(filter == NULL || options == NULL || filter->coefficients_in == NULL || filter->coefficients_out == NULL) {
+        return DH_FILTER_NO_DATA_STRUCTURE;
+    }
+    dh_transfer_function_callbacks cbs;
+    cbs.characteristic = characteristic;
+    cbs.zeros = &butterworth_splane_zeros;
+    cbs.poles = &butterworth_splane_poles;
+    return compute_transfer_function_polynomials(filter,options,cbs);
+}
