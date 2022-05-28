@@ -54,7 +54,7 @@ DH_FILTER_RETURN_VALUE compute_butterworth_lowpass_coefficients(double* numerato
     if(rv != DH_FILTER_OK) {
         return rv;
     }
-    dh_normalize_gain_at(numerator,denominator,filter_order+1, 0.0);
+    dh_normalize_gain_at(numerator,filter_order+1,denominator,filter_order+1, 0.0);
     return DH_FILTER_OK;
 }
 
@@ -70,7 +70,7 @@ DH_FILTER_RETURN_VALUE compute_butterworth_highpass_coefficients(double* numerat
         return rv;
     }
     dh_alternate_signs(numerator,filter_order+1);
-    dh_normalize_gain_at(numerator,denominator,filter_order+1, 0.5);
+    dh_normalize_gain_at(numerator,filter_order+1,denominator,filter_order+1, 0.5);
     return rv;
 }
 

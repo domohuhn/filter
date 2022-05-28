@@ -214,13 +214,13 @@ COMPLEX dh_gain_at(double* numerator, size_t len_numerator,double* denominator, 
     return num/denom;
 }
 
-void dh_normalize_gain_at(double* numerator,double* denominator,size_t len, double x_evaluate)
+void dh_normalize_gain_at(double* numerator, size_t len_numerator,double* denominator, size_t len_denominator, double x_evaluate)
 {
     if(numerator == NULL || denominator == NULL) {
         return;
     }
-    double scale = cabs(1.0/dh_gain_at(numerator,len,denominator,len,x_evaluate));
-    for(size_t i=0; i<len; ++i) {
+    double scale = cabs(1.0/dh_gain_at(numerator,len_numerator,denominator,len_denominator,x_evaluate));
+    for(size_t i=0; i<len_numerator; ++i) {
         numerator[i] *= scale;
     }
 }
@@ -263,6 +263,6 @@ DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_coefficients(double* numerat
         return rv;
     }
     double center = bandpass ? (0.5*cutoff_low_hz + 0.5*cutoff_high_hz)/sampling_frequency_hz : 0.0;
-    dh_normalize_gain_at(numerator,denominator,2*filter_order+1, center);
+    dh_normalize_gain_at(numerator,2*filter_order+1,denominator,2*filter_order+1, center);
     return DH_FILTER_OK;
 }

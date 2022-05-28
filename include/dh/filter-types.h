@@ -64,6 +64,13 @@ typedef enum {
 } DH_FILTER_TYPE;
 
 
+/** The filter characteristics supported by this library */
+typedef enum {
+    DH_LOWPASS,
+    DH_HIGHPASS,
+    DH_BANDPASS,
+    DH_BANDSTOP,
+} DH_FILTER_CHARACTERISTIC;
 
 
 /**

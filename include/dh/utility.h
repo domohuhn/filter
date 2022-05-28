@@ -120,11 +120,12 @@ DH_FILTER_RETURN_VALUE compute_butt_cheb_bandfilter_denominator(double* ptr, siz
  * @brief Evaluates the polynomials at the given positions and normalizes the numerator for gain 1.0 at [x_evaluate].
  * 
  * @param numerator Array of polynomial coefficients. Will be modified in place.
+ * @param len_numerator Number of entries in numerator array.
  * @param denominator Array of polynomial coefficients.
- * @param len Number of entries.
+ * @param len_denominator Number of entries in denominator array.
  * @param x_evaluate Position where the polynominals are evaluated on the complex unit circle.
  */
-void dh_normalize_gain_at(double* numerator,double* denominator,size_t len, double x_evaluate);
+void dh_normalize_gain_at(double* numerator, size_t len_numerator,double* denominator, size_t len_denominator, double x_evaluate);
 
 
 /**
