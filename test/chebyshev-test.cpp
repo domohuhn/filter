@@ -10,28 +10,45 @@
 
 SCENARIO("Chebyshev output coefficients can be computed", "[filter]") {
      GIVEN("parameters: fourth order chebyshev, 100 Hz sampling rate, 25Hz cutoff, 3 db ripple, lowpass") {
+          dh_filter_data filter_data;
+          dh_filter_parameters opts;
+          opts.filter_type = DH_IIR_CHEBYSHEV_LOWPASS;
+          opts.cutoff_frequency_low = 25.0;
+          opts.sampling_frequency = 100.0;
+          opts.ripple = -3.0;
+          opts.filter_order = 4;
           WHEN("denominator is computed") {
-               double num[5];
-               double coeffs[5];
-               int status = compute_chebyshev_filter_coefficients(DH_LOWPASS,num,coeffs, 4, 25.0,0.0,100.0, -3.0, false);
-               THEN("results are correct") {
+               int status = dh_create_filter(&filter_data,&opts);
+               THEN("the status is ok"){
                     REQUIRE(status == DH_FILTER_OK);
+               }
+               double * coeffs = filter_data.coefficients_out;
+               THEN("results are correct") {
                     REQUIRE(coeffs[4] == Catch::Approx(0.4080348558));
                     REQUIRE(coeffs[3] == Catch::Approx(-0.8817615727));
                     REQUIRE(coeffs[2] == Catch::Approx(1.4174806064));
                     REQUIRE(coeffs[1] == Catch::Approx(-1.0939919582));
                     REQUIRE(coeffs[0] == Catch::Approx(1.0));
                }
+               dh_free_filter(&filter_data);
           }
      }
 
      GIVEN("parameters: fifth order chebyshev, 100 Hz sampling rate, 20Hz cutoff, 2 db ripple, high pass") {
+          dh_filter_data filter_data;
+          dh_filter_parameters opts;
+          opts.filter_type = DH_IIR_CHEBYSHEV_HIGHPASS;
+          opts.cutoff_frequency_low = 20.0;
+          opts.sampling_frequency = 100.0;
+          opts.ripple = -2.0;
+          opts.filter_order = 5;
           WHEN("coefficients are computed") {
-               double num[6];
-               double denom[6];
-               int status = compute_chebyshev_filter_coefficients(DH_HIGHPASS,num,denom,5,20,0.0,100, -2.0,false);
-               THEN("results are correct") {
+               int status = dh_create_filter(&filter_data,&opts);
+               THEN("the status is ok"){
                     REQUIRE(status == DH_FILTER_OK);
+               }
+               double * denom = filter_data.coefficients_out;
+               THEN("results are correct") {
                     REQUIRE(denom[5] == Catch::Approx(0.2657574384));
                     REQUIRE(denom[4] == Catch::Approx(0.4386539929));
                     REQUIRE(denom[3] == Catch::Approx(0.6053373580));
@@ -39,16 +56,26 @@ SCENARIO("Chebyshev output coefficients can be computed", "[filter]") {
                     REQUIRE(denom[1] == Catch::Approx(0.2289297075));
                     REQUIRE(denom[0] == Catch::Approx(1.0));
                }
+               dh_free_filter(&filter_data);
           }
      }
      
      GIVEN("parameters: third order chebyshev, 100 Hz sampling rate, 15, 30Hz cutoff, 3 db ripple, band pass") {
+          dh_filter_data filter_data;
+          dh_filter_parameters opts;
+          opts.filter_type = DH_IIR_CHEBYSHEV_BANDPASS;
+          opts.cutoff_frequency_low = 15.0;
+          opts.cutoff_frequency_high = 30.0;
+          opts.sampling_frequency = 100.0;
+          opts.ripple = -3.0;
+          opts.filter_order = 3;
           WHEN("coefficients are computed") {
-               double num[7];
-               double denom[7];
-               int status = compute_chebyshev_filter_coefficients(DH_BANDPASS,num,denom,3,15,30,100, -3.0, false);
-               THEN("results are correct") {
+               int status = dh_create_filter(&filter_data,&opts);
+               THEN("the status is ok"){
                     REQUIRE(status == DH_FILTER_OK);
+               }
+               double * denom = filter_data.coefficients_out;
+               THEN("denomiator is correct") {
                     REQUIRE(denom[6] == Catch::Approx( 0.5724244477));
                     REQUIRE(denom[5] == Catch::Approx(-0.5855928827));
                     REQUIRE(denom[4] == Catch::Approx( 1.8286681732));
@@ -56,7 +83,9 @@ SCENARIO("Chebyshev output coefficients can be computed", "[filter]") {
                     REQUIRE(denom[2] == Catch::Approx( 2.1357801602));
                     REQUIRE(denom[1] == Catch::Approx(-0.8563748024));
                     REQUIRE(denom[0] == Catch::Approx(1.0));
-
+               }
+               double * num = filter_data.coefficients_in;
+               THEN("numerator is correct") {
                     double gain = 4.731343700e+001;
                     REQUIRE(num[6] == Catch::Approx(-1.0/gain));
                     REQUIRE(num[5] == Catch::Approx(0.0));
@@ -70,12 +99,27 @@ SCENARIO("Chebyshev output coefficients can be computed", "[filter]") {
      }
 
      GIVEN("parameters: third order chebyshev, 100 Hz sampling rate, 15, 30Hz cutoff, 3 db ripple, band stop") {
+          dh_filter_data filter_data;
+          dh_filter_parameters opts;
+          opts.filter_type = DH_IIR_CHEBYSHEV_BANDSTOP;
+          opts.cutoff_frequency_low = 15.0;
+          opts.cutoff_frequency_high = 30.0;
+          opts.sampling_frequency = 100.0;
+          opts.ripple = -3.0;
+          opts.filter_order = 3;
           WHEN("coefficients are computed") {
-               double num[7];
-               double denom[7];
-               int status = compute_chebyshev_filter_coefficients(DH_BANDSTOP,num,denom,3,15,30,100, -3.0, false);
-               THEN("results are correct") {
+               int status = dh_create_filter(&filter_data,&opts);
+               THEN("the status is ok"){
                     REQUIRE(status == DH_FILTER_OK);
+                    REQUIRE(filter_data.coefficients_in != (void*)NULL);
+                    REQUIRE(filter_data.coefficients_out != (void*)NULL);
+                    REQUIRE(filter_data.initialized == true);
+                    REQUIRE(filter_data.buffer_needs_cleanup == true);
+                    REQUIRE(filter_data.number_coefficients_in == 7);
+                    REQUIRE(filter_data.number_coefficients_out == 7);
+               }
+               double * denom = filter_data.coefficients_out;
+               THEN("denomiator is correct") {
                     REQUIRE(denom[6] == Catch::Approx(-0.1974887770));
                     REQUIRE(denom[5] == Catch::Approx( 0.0136148879));
                     REQUIRE(denom[4] == Catch::Approx( 0.5489194787));
@@ -83,7 +127,10 @@ SCENARIO("Chebyshev output coefficients can be computed", "[filter]") {
                     REQUIRE(denom[2] == Catch::Approx( 0.8150006537));
                     REQUIRE(denom[1] == Catch::Approx(-0.6435743840));
                     REQUIRE(denom[0] == Catch::Approx(1.0));
+               }
 
+               double * num = filter_data.coefficients_in;
+               THEN("numerator is correct") {
                     double gain = 4.034192003e+000;
                     REQUIRE(num[6] == Catch::Approx(1.0/gain));
                     REQUIRE(num[5] == Catch::Approx(-1.0534230275/gain));

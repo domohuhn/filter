@@ -8,90 +8,23 @@
  */
 
 #include "dh/filter-types.h"
-#include "dh/utility.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief Computes all coefficients for a butterworth low pass filter.
+ * @brief Computes all coefficients for a butterworth filter.
  * 
  * This function will allocate temporary buffers.
  * 
- * @param numerator Pointer to array with feedforward coefficients. Will be filled with output values. Must be filter_order+1 large.
- * @param denominator Pointer to array with feedback coefficients. Will be filled with output values. Must be filter_order+1 large.
- * @param filter_order Order of the filter.
- * @param cutoff_hz The desired 3db cutoff frequency in Hz. Must be larger than 0.
- * @param sampling_frequency_hz The sampling frequency in Hz. Must be larger than cutoff_hz.
+ * @param filter The data structure with the filter parameters. It will be modified in place (the coefficient arrays are initialized).
+ * @param options The selected options for the filter.
+ * @param characteristic The type of butterworth filter that will be created.
+ * @param isType2 if the filter should be a type 2 filter.
  * @return DH_FILTER_RETURN_VALUE 
  */
-DH_FILTER_RETURN_VALUE compute_butterworth_lowpass_coefficients(double* numerator, double* denominator, size_t filter_order, double cutoff_hz, double sampling_frequency_hz);
-
-
-/**
- * @brief Computes all coefficients for a butterworth high pass filter.
- * 
- * This function will allocate temporary buffers.
- * 
- * @param numerator Pointer to array with feedforward coefficients. Will be filled with output values. Must be filter_order+1 large.
- * @param denominator Pointer to array with feedback coefficients. Will be filled with output values. Must be filter_order+1 large.
- * @param filter_order Order of the filter.
- * @param cutoff_hz The desired 3db cutoff frequency in Hz. Must be larger than 0.
- * @param sampling_frequency_hz The sampling frequency in Hz. Must be larger than cutoff_hz.
- * @return DH_FILTER_RETURN_VALUE 
- */
-DH_FILTER_RETURN_VALUE compute_butterworth_highpass_coefficients(double* numerator, double* denominator, size_t filter_order, double cutoff_hz, double sampling_frequency_hz);
-
-/**
- * @brief Computes all coefficients for a butterworth band pass or band stop filter.
- * 
- * This function will allocate temporary buffers.
- * 
- * @param numerator Pointer to array with feedforward coefficients. Will be filled with output values. Must be 2*filter_order+1 large.
- * @param denominator Pointer to array with feedback coefficients. Will be filled with output values. Must be 2*filter_order+1 large.
- * @param filter_order Order of the filter.
- * @param cutoff_low_hz The desired 3db cutoff frequency in Hz. Must be larger than 0.
- * @param cutoff_high_hz The desired 3db cutoff frequency in Hz. Must be larger than cutoff_low_hz.
- * @param sampling_frequency_hz The sampling frequency in Hz. Must be larger than 2*cutoff_high_hz.
- * @param bandpass if a bandpass or bandstop should be created.
- * @return DH_FILTER_RETURN_VALUE 
- */
-DH_FILTER_RETURN_VALUE compute_butterworth_bandfilter_coefficients(double* numerator, double* denominator, size_t filter_order, 
-    double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz, bool bandpass);
-
-
-/**
- * @brief Computes the poles of the filter on the z-plane.
- * 
- * @param ptr pointer to array of complex numbers.
- * @param len length of the input array.
- * @param transformed_frequency the transfomed frequency
- */
-void compute_butterworth_poles_on_z_plane(COMPLEX* ptr, size_t len, double transformed_frequency);
-
-/**
- * @brief Computes the donimator polynomial for a butterworth filter. These are the feedback coefficients.
- * 
- * @param ptr Pointer to array with coefficients. Must have filter_order+1 entries.
- * @param filter_order Order of the filter.
- * @param transformed_frequency Transformed frequency.
- * @return DH_FILTER_RETURN_VALUE 
- */
-DH_FILTER_RETURN_VALUE compute_butterworth_lowpass_denominator(double* ptr, size_t filter_order, double transformed_frequency);
-
-
-/**
- * @brief Computes the donimator polynomial for a butterworth filter. These are the feedback coefficients.
- * 
- * @param ptr Pointer to array with coefficients. Must have 2*filter_order+1 entries.
- * @param filter_order Order of the filter.
- * @param transformed_frequency_low Transformed frequency.
- * @param transformed_frequency_high Transformed frequency.
- * @param bandpass if a bandpass is desired.
- * @return DH_FILTER_RETURN_VALUE 
- */
-DH_FILTER_RETURN_VALUE compute_butterworth_bandfilter_denominator(double* ptr, size_t filter_order, double transformed_frequency_low, double transformed_frequency_high, bool bandpass);
+DH_FILTER_RETURN_VALUE compute_butterworth_filter_coefficients(dh_filter_data* filter, dh_filter_parameters* options, DH_FILTER_CHARACTERISTIC characteristic);
 
 #ifdef __cplusplus
 }

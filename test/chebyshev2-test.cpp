@@ -9,101 +9,92 @@
 
 
 SCENARIO( "Chebyshev type 2 design", "[filter]" ) {
-    GIVEN("I need to compute 4 zeros on the s-plane at 15 Hz/100Hz") {
-      WHEN("i compute them"){
-        auto f = std::tan (M_PI * 15.0/100.0);
-        COMPLEX zeros[4];
-        compute_zeros_on_s_plane_chebyshev2(zeros, 4, f);
-        THEN("the result is correct"){
-          REQUIRE(creal(zeros[0]) == Catch::Approx(0.0));
-          REQUIRE(cimag(zeros[0]) == Catch::Approx(0.5515063724));
-          REQUIRE(creal(zeros[1]) == Catch::Approx(0.0));
-          REQUIRE(cimag(zeros[1]) == Catch::Approx(1.331454));
-          REQUIRE(creal(zeros[2]) == Catch::Approx(0.0));
-          REQUIRE(cimag(zeros[2]) == Catch::Approx(-1.331454));
-          REQUIRE(creal(zeros[3]) == Catch::Approx(0.0));
-          REQUIRE(cimag(zeros[3]) == Catch::Approx(-0.5515063724));
-        }
-      }
-    }
-
     GIVEN("I need to compute coefficients for a second order chebyshev type2 lowpass at 15 Hz/100Hz with -0.3dB ripple") {
-      double numerator[3];
-      double denominator[3];
-      size_t filter_order=2;
-      double cutoff_hz = 15.0;
-      double sampling_frequency_hz = 100.0;
-      double ripple = -0.3;
+      dh_filter_data filter_data;
+      dh_filter_parameters opts;
+      opts.filter_type = DH_IIR_CHEBYSHEV2_LOWPASS;
+      opts.cutoff_frequency_low = 15.0;
+      opts.sampling_frequency = 100.0;
+      opts.ripple = -0.3;
+      opts.filter_order = 2;
       WHEN("the values are computed"){
-        auto status = compute_chebyshev_filter_coefficients(DH_LOWPASS,numerator,denominator,filter_order,cutoff_hz,cutoff_hz,sampling_frequency_hz,ripple,true);
+        int status = dh_create_filter(&filter_data,&opts);
         THEN("the status is ok"){
           REQUIRE(status == DH_FILTER_OK);
+          REQUIRE(filter_data.coefficients_in != (void*)NULL);
+          REQUIRE(filter_data.coefficients_out != (void*)NULL);
+          REQUIRE(filter_data.initialized == false);
+          REQUIRE(filter_data.buffer_needs_cleanup == true);
+          REQUIRE(filter_data.number_coefficients_in == 3);
+          REQUIRE(filter_data.number_coefficients_out == 3);
         }
+        double * numerator = filter_data.coefficients_in;
         THEN("the feedforward coefficients are correct"){
           REQUIRE(numerator[0] == Catch::Approx(0.24838217728259915));
           REQUIRE(numerator[1] == Catch::Approx(-0.15720322174019702));
           REQUIRE(numerator[2] == Catch::Approx(0.24838217728259912));
         }
+        double * denominator = filter_data.coefficients_out;
         THEN("the feedback coefficients are correct"){
           REQUIRE(denominator[0] == Catch::Approx(1.0));
           REQUIRE(denominator[1] == Catch::Approx(-1.0958722136716665));
           REQUIRE(denominator[2] == Catch::Approx(0.4354333464966677));
         }
+        dh_free_filter(&filter_data);
       }
     }
 
     GIVEN("I need to compute coefficients for a second order chebyshev type2 highpass at 15 Hz/100Hz with -0.3dB ripple") {
-      double numerator[3];
-      double denominator[3];
-      size_t filter_order=2;
-      double cutoff_hz = 15.0;
-      double sampling_frequency_hz = 100.0;
-      double ripple = -0.3;
+      dh_filter_data filter_data;
+      dh_filter_parameters opts;
+      opts.filter_type = DH_IIR_CHEBYSHEV2_HIGHPASS;
+      opts.cutoff_frequency_low = 15.0;
+      opts.sampling_frequency = 100.0;
+      opts.ripple = -0.3;
+      opts.filter_order = 2;
       WHEN("the values are computed"){
-        auto status = compute_chebyshev_filter_coefficients(DH_HIGHPASS,numerator,denominator,filter_order,cutoff_hz,cutoff_hz,sampling_frequency_hz,ripple,true);
+        int status = dh_create_filter(&filter_data,&opts);
         THEN("the status is ok"){
           REQUIRE(status == DH_FILTER_OK);
+          REQUIRE(filter_data.coefficients_in != (void*)NULL);
+          REQUIRE(filter_data.coefficients_out != (void*)NULL);
+          REQUIRE(filter_data.initialized == true);
+          REQUIRE(filter_data.buffer_needs_cleanup == true);
+          REQUIRE(filter_data.number_coefficients_in == 3);
+          REQUIRE(filter_data.number_coefficients_out == 3);
         }
+        double * numerator = filter_data.coefficients_in;
         THEN("the feedforward coefficients are correct"){
           REQUIRE(numerator[0] == Catch::Approx(0.47757040911141263));
           REQUIRE(numerator[1] == Catch::Approx(-0.7356610535644991));
           REQUIRE(numerator[2] == Catch::Approx(0.4775704091114126));
         }
+        double * denominator = filter_data.coefficients_out;
         THEN("the feedback coefficients are correct"){
           REQUIRE(denominator[0] == Catch::Approx(1.0));
           REQUIRE(denominator[1] == Catch::Approx(-0.42063190394656946));
           REQUIRE(denominator[2] == Catch::Approx(0.27016996784075514));
         }
+        dh_free_filter(&filter_data);
       }
     }
-
-    GIVEN("I need to compute 4 zeros on the s-plane at 10 Hz/100Hz") {
-      WHEN("i compute them"){
-        //auto f = std::tan (M_PI * 10.0/100.0);
-        COMPLEX zeros[4];
-        compute_zeros_on_s_plane_chebyshev2(zeros, 4, 1.0);
-        THEN("the result is correct"){
-          REQUIRE(creal(zeros[0]) == Catch::Approx(0.0));
-          REQUIRE(cimag(zeros[0]) == Catch::Approx(1.08239));
-          REQUIRE(creal(zeros[1]) == Catch::Approx(0.0));
-          REQUIRE(cimag(zeros[1]) == Catch::Approx(2.61313));
-          REQUIRE(creal(zeros[2]) == Catch::Approx(0.0));
-          REQUIRE(cimag(zeros[2]) == Catch::Approx(-2.61313));
-          REQUIRE(creal(zeros[3]) == Catch::Approx(0.0));
-          REQUIRE(cimag(zeros[3]) == Catch::Approx(-1.08239));
-        }
-      }
-    }
-    // s-zero are correct -> call without warped frequency
 
     GIVEN("I need to compute a second order bandpass at [30Hz,60Hz] for 200Hz sampling rate with 3db ripple") {
+      dh_filter_data filter_data;
+      dh_filter_parameters opts;
+      opts.filter_type = DH_IIR_CHEBYSHEV2_BANDPASS;
+      opts.cutoff_frequency_low = 30.0;
+      opts.cutoff_frequency_high = 60.0;
+      opts.sampling_frequency = 200.0;
+      opts.ripple = -3.0;
+      opts.filter_order = 2;
       WHEN("i compute the polynomial"){
-        double num[5];
-        double denom[5];
-        auto status = compute_chebyshev_filter_coefficients(DH_BANDPASS,num,denom,2,30.0,60.0,200.0,-3.0,true);
+        int status = dh_create_filter(&filter_data,&opts);
         THEN("the status is ok"){
           REQUIRE(status == DH_FILTER_OK);
         }
+        double * num = filter_data.coefficients_in;
+        double * denom = filter_data.coefficients_out;
         THEN("the feedforward coefficients are correct"){
           REQUIRE(num[0] == Catch::Approx(0.5860528708));
           REQUIRE(num[1] == Catch::Approx(-0.270909442));
@@ -118,17 +109,26 @@ SCENARIO( "Chebyshev type 2 design", "[filter]" ) {
           REQUIRE(denom[3] == Catch::Approx(-0.2945605108));
           REQUIRE(denom[4] == Catch::Approx(0.4929736931));
         }
+        dh_free_filter(&filter_data);
       }
     }
 
     GIVEN("I need to compute a second order bandstop at [30Hz,60Hz] for 200Hz sampling rate with 3db ripple") {
+      dh_filter_data filter_data;
+      dh_filter_parameters opts;
+      opts.filter_type = DH_IIR_CHEBYSHEV2_BANDSTOP;
+      opts.cutoff_frequency_low = 30.0;
+      opts.cutoff_frequency_high = 60.0;
+      opts.sampling_frequency = 200.0;
+      opts.ripple = -3.0;
+      opts.filter_order = 2;
       WHEN("i compute the polynomial"){
-        double num[5];
-        double denom[5];
-        auto status = compute_chebyshev_filter_coefficients(DH_BANDSTOP,num,denom,2,30.0,60.0,200.0,-3.0,true);
+        int status = dh_create_filter(&filter_data,&opts);
         THEN("the status is ok"){
           REQUIRE(status == DH_FILTER_OK);
         }
+        double * num = filter_data.coefficients_in;
+        double * denom = filter_data.coefficients_out;
         THEN("the feedforward coefficients are correct"){
           REQUIRE(num[0] == Catch::Approx(0.747036));
           REQUIRE(num[1] == Catch::Approx(-0.464353));
@@ -143,6 +143,7 @@ SCENARIO( "Chebyshev type 2 design", "[filter]" ) {
           REQUIRE(denom[3] == Catch::Approx(-0.388062));
           REQUIRE(denom[4] == Catch::Approx(0.565465));
         }
+        dh_free_filter(&filter_data);
       }
     }
 }

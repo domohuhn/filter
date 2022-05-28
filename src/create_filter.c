@@ -1,6 +1,7 @@
 #include "dh/filter.h"
 #include "dh/butterworth.h"
 #include "dh/chebyshev.h"
+#include "dh/utility.h"
 #include <assert.h>
 #include <stdlib.h>
 #define _USE_MATH_DEFINES
@@ -212,7 +213,7 @@ static DH_FILTER_RETURN_VALUE dh_fir_create_sinc_bandfilter(dh_filter_data* filt
     fill_array_fir_sinc(coeff_in_temp_low,count_single_filter,cutoff_low, bandpass);
     fill_array_fir_sinc(coeff_in_temp_high,count_single_filter,cutoff_high, !bandpass);
     if(bandpass) {
-        convolve_parameters(coeff_in_temp_low,coeff_in_temp_high,count_single_filter,filter->coefficients_in);
+        dh_convolve_parameters(coeff_in_temp_low,coeff_in_temp_high,count_single_filter,filter->coefficients_in);
     } else {
         for(size_t i=0; i<count_single_filter;++i) {
             filter->coefficients_in[i]= coeff_in_temp_low[i] + coeff_in_temp_high[i];
@@ -306,9 +307,7 @@ static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_high_lowpass(dh_filter_data* filt
     
     DH_FILTER_CHARACTERISTIC chara =  lowpass ? DH_LOWPASS : DH_HIGHPASS;
     filter->initialized = !lowpass;
-    return compute_chebyshev_filter_coefficients(chara,filter->coefficients_in, filter->coefficients_out, options->filter_order,
-            options->cutoff_frequency_low, options->cutoff_frequency_low, options->sampling_frequency,
-            options->ripple,isType2);
+    return compute_chebyshev_filter_coefficients(filter,options,chara,isType2);
 }
 
 static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass, bool isType2)
@@ -319,7 +318,5 @@ static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_bandfilter(dh_filter_data* filter
     }
     filter->initialized = true;
     DH_FILTER_CHARACTERISTIC chara =  bandpass ? DH_BANDPASS : DH_BANDSTOP;
-    return compute_chebyshev_filter_coefficients(chara,filter->coefficients_in, filter->coefficients_out, options->filter_order,
-            options->cutoff_frequency_low, options->cutoff_frequency_high, options->sampling_frequency,
-            options->ripple,isType2);
+    return compute_chebyshev_filter_coefficients(filter,options,chara,isType2);
 }
