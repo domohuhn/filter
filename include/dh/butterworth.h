@@ -24,7 +24,7 @@ extern "C" {
  * @param isType2 if the filter should be a type 2 filter.
  * @return DH_FILTER_RETURN_VALUE 
  */
-DH_FILTER_RETURN_VALUE compute_butterworth_filter_coefficients(dh_filter_data* filter, dh_filter_parameters* options, DH_FILTER_CHARACTERISTIC characteristic);
+DH_FILTER_RETURN_VALUE dh_compute_butterworth_filter_coefficients(dh_filter_data* filter, dh_filter_parameters* options, DH_FILTER_CHARACTERISTIC characteristic);
 
 #ifdef __cplusplus
 }

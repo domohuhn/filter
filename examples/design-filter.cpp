@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include "dh/filter.h"
+#include "dh/cpp/filter.hpp"
 #include "dh/utility.h"
 #include <stdexcept>
 #include <iomanip>

@@ -28,19 +28,10 @@ if(DH_CFILTER_BUILD_TESTS OR DH_CFILTER_BUILD_EXAMPLES)
   Include(FetchContent)
 endif()
 
-if(DH_CFILTER_BUILD_EXAMPLES)
-  FetchContent_Declare(
-    Cxxopts
-    GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
-    GIT_TAG        v3.0.0
-  )
-  FetchContent_MakeAvailable(Cxxopts)
-
-  add_executable(design-filter
-    examples/design-filter.cpp
-  )
-  target_link_libraries(design-filter PRIVATE cxxopts::cxxopts dh::filter)
-
+if(MSVC)
+  target_compile_options(filter PRIVATE /W4 /WX)
+else()
+  target_compile_options(filter PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
 if(DH_CFILTER_BUILD_CPP_BINDINGS OR DH_CFILTER_BUILD_JS_BINDINGS)
@@ -54,6 +45,21 @@ if(DH_CFILTER_BUILD_CPP_BINDINGS OR DH_CFILTER_BUILD_JS_BINDINGS)
   else()
     target_compile_options(filter_cpp PRIVATE -Wall -Wextra -Wpedantic -Werror)
   endif()
+endif()
+
+if(DH_CFILTER_BUILD_EXAMPLES AND DH_CFILTER_BUILD_CPP_BINDINGS)
+  FetchContent_Declare(
+    Cxxopts
+    GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
+    GIT_TAG        v3.0.0
+  )
+  FetchContent_MakeAvailable(Cxxopts)
+
+  add_executable(design-filter
+    examples/design-filter.cpp
+  )
+  target_link_libraries(design-filter PRIVATE cxxopts::cxxopts dh::filter_cpp)
+
 endif()
 
 if(DH_CFILTER_BUILD_JS_BINDINGS)

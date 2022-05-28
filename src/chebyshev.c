@@ -2,13 +2,14 @@
 #define _USE_MATH_DEFINES
 #include "math.h"
 #include "complex.h"
+#include "assert.h"
 #include "dh/utility.h"
 
 static void dh_transform_s_poles_to_chebyshev(COMPLEX* ptr, size_t len, double ripple) {
     double ripple_power = pow(10.0, -ripple / 10.0);
 	double tmp = sqrt(ripple_power - 1.0);
 	double arg = asinh(1.0 / tmp) / (double) len;
-    for (int i = 0; i < len; i++)
+    for (size_t i = 0; i < len; i++)
 	{ 
         double real = creal(ptr[i]);
         double imag = cimag(ptr[i]);
@@ -24,6 +25,7 @@ typedef struct
 } dh_chebyshev_data;
 
 static size_t chebyshev_splane_zeros(COMPLEX* splane,size_t count,size_t order,void* user) {
+    assert(order <= count);
     size_t number_zeros = 0;
     dh_chebyshev_data* data = (dh_chebyshev_data*)user;
     if(data->isType2) {
@@ -37,6 +39,7 @@ static size_t chebyshev_splane_zeros(COMPLEX* splane,size_t count,size_t order,v
 }
 
 static size_t chebyshev_splane_poles(COMPLEX* splane,size_t count,size_t order,void* user) {
+    assert(order <= count);
     dh_chebyshev_data* data = (dh_chebyshev_data*)user;
     dh_compute_poles_on_s_plane(splane,order);
     dh_transform_s_poles_to_chebyshev(splane,order,data->ripple_db);
@@ -49,7 +52,7 @@ static size_t chebyshev_splane_poles(COMPLEX* splane,size_t count,size_t order,v
     return order;
 }
 
-DH_FILTER_RETURN_VALUE compute_chebyshev_filter_coefficients(dh_filter_data* filter, dh_filter_parameters* options, DH_FILTER_CHARACTERISTIC characteristic, bool isType2)
+DH_FILTER_RETURN_VALUE dh_compute_chebyshev_filter_coefficients(dh_filter_data* filter, dh_filter_parameters* options, DH_FILTER_CHARACTERISTIC characteristic, bool isType2)
 {
     if(filter == NULL || options == NULL || filter->coefficients_in == NULL || filter->coefficients_out == NULL) {
         return DH_FILTER_NO_DATA_STRUCTURE;

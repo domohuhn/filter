@@ -15,18 +15,14 @@
  * This source code is licensed under the MIT license. See file "LICENSE" at the root of the repository.
  */
 
-static DH_FILTER_RETURN_VALUE dh_create_moving_average(dh_filter_data* filter, dh_filter_parameters* options);
-static DH_FILTER_RETURN_VALUE dh_create_moving_average_highpass(dh_filter_data* filter, dh_filter_parameters* options);
-static DH_FILTER_RETURN_VALUE dh_iir_exponential_lowpass(dh_filter_data* filter, dh_filter_parameters* options);
-static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter, dh_filter_parameters* options);
-static DH_FILTER_RETURN_VALUE dh_iir_butterworth_high_lowpass(dh_filter_data* filter, dh_filter_parameters* options, bool lowpass);
-static DH_FILTER_RETURN_VALUE dh_iir_butterworth_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass);
-
-static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_high_lowpass(dh_filter_data* filter, dh_filter_parameters* options, bool lowpass, bool isType2);
-static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass, bool isType2);
-
-static DH_FILTER_RETURN_VALUE dh_fir_create_sinc(dh_filter_data* filter, dh_filter_parameters* options);
-static DH_FILTER_RETURN_VALUE dh_fir_create_sinc_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass);
+static DH_FILTER_RETURN_VALUE create_moving_average(dh_filter_data* filter, dh_filter_parameters* options);
+static DH_FILTER_RETURN_VALUE create_moving_average_highpass(dh_filter_data* filter, dh_filter_parameters* options);
+static DH_FILTER_RETURN_VALUE iir_exponential_lowpass(dh_filter_data* filter, dh_filter_parameters* options);
+static DH_FILTER_RETURN_VALUE fir_exponential_lowpass(dh_filter_data* filter, dh_filter_parameters* options);
+static DH_FILTER_RETURN_VALUE iir_butterworth(dh_filter_data* filter, dh_filter_parameters* options, DH_FILTER_CHARACTERISTIC type);
+static DH_FILTER_RETURN_VALUE iir_chebyshev(dh_filter_data* filter, dh_filter_parameters* options, DH_FILTER_CHARACTERISTIC type, bool isType2);
+static DH_FILTER_RETURN_VALUE fir_create_sinc(dh_filter_data* filter, dh_filter_parameters* options);
+static DH_FILTER_RETURN_VALUE fir_create_sinc_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass);
 
 DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_parameters* options)
 {
@@ -39,52 +35,40 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_parame
     switch(options->filter_type){
         case DH_NO_FILTER:
             options->filter_order = 0;
-            rv = dh_create_moving_average(filter, options);
+            rv = create_moving_average(filter, options);
             break;
         case DH_FIR_MOVING_AVERAGE_LOWPASS:
-            rv = dh_create_moving_average(filter, options);
+            rv = create_moving_average(filter, options);
             break;
         case DH_FIR_MOVING_AVERAGE_HIGHPASS:
-            rv = dh_create_moving_average_highpass(filter, options);
+            rv = create_moving_average_highpass(filter, options);
             break;
         case DH_FIR_EXPONENTIAL_MOVING_AVERAGE_LOWPASS:
-            rv = dh_fir_exponential_lowpass(filter, options);
+            rv = fir_exponential_lowpass(filter, options);
             break;
         case DH_FIR_BRICKWALL_LOWPASS: // falltrough
         case DH_FIR_BRICKWALL_HIGHPASS:
-            rv = dh_fir_create_sinc(filter, options);
+            rv = fir_create_sinc(filter, options);
             break;
         case DH_FIR_BRICKWALL_BANDPASS: // falltrough
         case DH_FIR_BRICKWALL_BANDSTOP:
-            rv = dh_fir_create_sinc_bandfilter(filter, options, options->filter_type == DH_FIR_BRICKWALL_BANDPASS);
+            rv = fir_create_sinc_bandfilter(filter, options, options->filter_type == DH_FIR_BRICKWALL_BANDPASS);
             break;
         case DH_IIR_EXPONENTIAL_LOWPASS:
-            rv = dh_iir_exponential_lowpass(filter, options);
+            rv = iir_exponential_lowpass(filter, options);
             break;
-        case DH_IIR_BUTTERWORTH_LOWPASS: // fallthrough
-        case DH_IIR_BUTTERWORTH_HIGHPASS:
-            rv = dh_iir_butterworth_high_lowpass(filter, options, options->filter_type == DH_IIR_BUTTERWORTH_LOWPASS);
-            break;
-        case DH_IIR_BUTTERWORTH_BANDPASS: // fallthrough
-        case DH_IIR_BUTTERWORTH_BANDSTOP:
-            rv = dh_iir_butterworth_bandfilter(filter, options, options->filter_type == DH_IIR_BUTTERWORTH_BANDPASS);
-            break;
-        case DH_IIR_CHEBYSHEV_LOWPASS: // fallthrough
-        case DH_IIR_CHEBYSHEV_HIGHPASS:
-            rv = dh_iir_chebyshev_high_lowpass(filter, options, options->filter_type == DH_IIR_CHEBYSHEV_LOWPASS,false);
-            break;
-        case DH_IIR_CHEBYSHEV_BANDPASS: // fallthrough
-        case DH_IIR_CHEBYSHEV_BANDSTOP:
-            rv = dh_iir_chebyshev_bandfilter(filter, options, options->filter_type == DH_IIR_CHEBYSHEV_BANDPASS,false);
-            break;
-        case DH_IIR_CHEBYSHEV2_LOWPASS: // fallthrough
-        case DH_IIR_CHEBYSHEV2_HIGHPASS:
-            rv = dh_iir_chebyshev_high_lowpass(filter, options, options->filter_type == DH_IIR_CHEBYSHEV2_LOWPASS,true);
-            break;
-        case DH_IIR_CHEBYSHEV2_BANDPASS: // fallthrough
-        case DH_IIR_CHEBYSHEV2_BANDSTOP:
-            rv = dh_iir_chebyshev_bandfilter(filter, options, options->filter_type == DH_IIR_CHEBYSHEV2_BANDPASS,true);
-            break;
+        case DH_IIR_BUTTERWORTH_LOWPASS : return iir_butterworth(filter, options, DH_LOWPASS);
+        case DH_IIR_BUTTERWORTH_HIGHPASS: return iir_butterworth(filter, options, DH_HIGHPASS);
+        case DH_IIR_BUTTERWORTH_BANDPASS: return iir_butterworth(filter, options, DH_BANDPASS);
+        case DH_IIR_BUTTERWORTH_BANDSTOP: return iir_butterworth(filter, options, DH_BANDSTOP);
+        case DH_IIR_CHEBYSHEV_LOWPASS   : return iir_chebyshev(filter, options, DH_LOWPASS,false);
+        case DH_IIR_CHEBYSHEV_HIGHPASS  : return iir_chebyshev(filter, options, DH_HIGHPASS,false);
+        case DH_IIR_CHEBYSHEV_BANDPASS  : return iir_chebyshev(filter, options, DH_BANDPASS,false);
+        case DH_IIR_CHEBYSHEV_BANDSTOP  : return iir_chebyshev(filter, options, DH_BANDSTOP,false);
+        case DH_IIR_CHEBYSHEV2_LOWPASS  : return iir_chebyshev(filter, options, DH_LOWPASS,true);
+        case DH_IIR_CHEBYSHEV2_HIGHPASS : return iir_chebyshev(filter, options, DH_HIGHPASS,true);
+        case DH_IIR_CHEBYSHEV2_BANDPASS : return iir_chebyshev(filter, options, DH_BANDPASS,true);
+        case DH_IIR_CHEBYSHEV2_BANDSTOP : return iir_chebyshev(filter, options, DH_BANDSTOP,true);
     }
     return rv;
 }
@@ -142,7 +126,7 @@ static DH_FILTER_RETURN_VALUE dh_filter_allocate_buffers(dh_filter_data* filter,
     return DH_FILTER_OK;
 }
 
-static DH_FILTER_RETURN_VALUE dh_create_moving_average(dh_filter_data* filter, dh_filter_parameters* options)
+static DH_FILTER_RETURN_VALUE create_moving_average(dh_filter_data* filter, dh_filter_parameters* options)
 {
     if (dh_filter_allocate_buffers(filter, options->filter_order+1, 1) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
@@ -172,7 +156,7 @@ static void fill_array_fir_sinc(double* data, size_t count,double cutoff, bool h
 
     if (highpass) {
         for (size_t i=0; i<count; ++i) {
-            if(i!=xshift) {
+            if(i!=(size_t)xshift) {
                 data[i] = -data[i];
             } else {
                 data[i] = 1.0 - data[i];
@@ -181,7 +165,7 @@ static void fill_array_fir_sinc(double* data, size_t count,double cutoff, bool h
     }
 }
 
-static DH_FILTER_RETURN_VALUE dh_fir_create_sinc(dh_filter_data* filter, dh_filter_parameters* options)
+static DH_FILTER_RETURN_VALUE fir_create_sinc(dh_filter_data* filter, dh_filter_parameters* options)
 {
     if (dh_filter_allocate_buffers(filter, options->filter_order+1, 1) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
@@ -195,7 +179,7 @@ static DH_FILTER_RETURN_VALUE dh_fir_create_sinc(dh_filter_data* filter, dh_filt
 }
 
 
-static DH_FILTER_RETURN_VALUE dh_fir_create_sinc_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass)
+static DH_FILTER_RETURN_VALUE fir_create_sinc_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass)
 {
     size_t count_single_filter = options->filter_order+1;
     if (dh_filter_allocate_buffers(filter, 2*count_single_filter-1, 1) != DH_FILTER_OK) {
@@ -208,7 +192,7 @@ static DH_FILTER_RETURN_VALUE dh_fir_create_sinc_bandfilter(dh_filter_data* filt
     // we need 2*count_single_filter -> ok, there are 8 bytes of buffer left
     double* coeff_in_temp_low = filter->inputs;
     double* coeff_in_temp_high = filter->inputs + count_single_filter;
-    assert(8 == (void*)(filter->buffer+ filter->buffer_length)-(void*)(coeff_in_temp_high + count_single_filter));
+    assert(8 == (char*)(filter->buffer+ filter->buffer_length)-(char*)(coeff_in_temp_high + count_single_filter));
 
     fill_array_fir_sinc(coeff_in_temp_low,count_single_filter,cutoff_low, bandpass);
     fill_array_fir_sinc(coeff_in_temp_high,count_single_filter,cutoff_high, !bandpass);
@@ -227,9 +211,9 @@ static DH_FILTER_RETURN_VALUE dh_fir_create_sinc_bandfilter(dh_filter_data* filt
 }
 
 
-static DH_FILTER_RETURN_VALUE dh_create_moving_average_highpass(dh_filter_data* filter, dh_filter_parameters* options)
+static DH_FILTER_RETURN_VALUE create_moving_average_highpass(dh_filter_data* filter, dh_filter_parameters* options)
 {
-    if (dh_create_moving_average(filter, options) != DH_FILTER_OK) {
+    if (create_moving_average(filter, options) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
     filter->coefficients_in[0] = 1.0 - filter->coefficients_in[0];
@@ -241,7 +225,7 @@ static DH_FILTER_RETURN_VALUE dh_create_moving_average_highpass(dh_filter_data* 
 }
 
 
-static DH_FILTER_RETURN_VALUE dh_iir_exponential_lowpass(dh_filter_data* filter, dh_filter_parameters* options)
+static DH_FILTER_RETURN_VALUE iir_exponential_lowpass(dh_filter_data* filter, dh_filter_parameters* options)
 {
     if (dh_filter_allocate_buffers(filter, 1, 2) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
@@ -253,7 +237,7 @@ static DH_FILTER_RETURN_VALUE dh_iir_exponential_lowpass(dh_filter_data* filter,
     return DH_FILTER_OK;
 }
 
-static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter, dh_filter_parameters* options)
+static DH_FILTER_RETURN_VALUE fir_exponential_lowpass(dh_filter_data* filter, dh_filter_parameters* options)
 {
     if (dh_filter_allocate_buffers(filter, options->filter_order+1, 1) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
@@ -273,50 +257,23 @@ static DH_FILTER_RETURN_VALUE dh_fir_exponential_lowpass(dh_filter_data* filter,
     return DH_FILTER_OK;
 }
 
-static DH_FILTER_RETURN_VALUE dh_iir_butterworth_high_lowpass(dh_filter_data* filter, dh_filter_parameters* options, bool lowpass)
+static DH_FILTER_RETURN_VALUE iir_butterworth(dh_filter_data* filter, dh_filter_parameters* options, DH_FILTER_CHARACTERISTIC type)
 {
-    size_t coefficients = options->filter_order + 1;
+    size_t coefficients = type==DH_LOWPASS || type==DH_HIGHPASS ? options->filter_order + 1 : 2*options->filter_order + 1;
     if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    
-    DH_FILTER_CHARACTERISTIC chara =  lowpass ? DH_LOWPASS : DH_HIGHPASS;
-    filter->initialized = !lowpass;
-    return compute_butterworth_filter_coefficients(filter,options,chara);
+    filter->initialized = type!=DH_LOWPASS;
+    return dh_compute_butterworth_filter_coefficients(filter,options,type);
 }
 
-static DH_FILTER_RETURN_VALUE dh_iir_butterworth_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass)
+static DH_FILTER_RETURN_VALUE iir_chebyshev(dh_filter_data* filter, dh_filter_parameters* options, DH_FILTER_CHARACTERISTIC type, bool isType2)
 {
-    size_t coefficients = 2*options->filter_order + 1;
+    size_t coefficients = type==DH_LOWPASS || type==DH_HIGHPASS ? options->filter_order + 1 : 2*options->filter_order + 1;
     if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    
-    filter->initialized = true;
-    DH_FILTER_CHARACTERISTIC chara =  bandpass ? DH_BANDPASS : DH_BANDSTOP;
-    return compute_butterworth_filter_coefficients(filter,options,chara);
+    filter->initialized = type!=DH_LOWPASS;
+    return dh_compute_chebyshev_filter_coefficients(filter,options,type,isType2);
 }
 
-
-static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_high_lowpass(dh_filter_data* filter, dh_filter_parameters* options, bool lowpass, bool isType2)
-{
-    size_t coefficients = options->filter_order + 1;
-    if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
-        return DH_FILTER_ALLOCATION_FAILED;
-    }
-    
-    DH_FILTER_CHARACTERISTIC chara =  lowpass ? DH_LOWPASS : DH_HIGHPASS;
-    filter->initialized = !lowpass;
-    return compute_chebyshev_filter_coefficients(filter,options,chara,isType2);
-}
-
-static DH_FILTER_RETURN_VALUE dh_iir_chebyshev_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass, bool isType2)
-{
-    size_t coefficients = 2*options->filter_order + 1;
-    if (dh_filter_allocate_buffers(filter, coefficients, coefficients) != DH_FILTER_OK) {
-        return DH_FILTER_ALLOCATION_FAILED;
-    }
-    filter->initialized = true;
-    DH_FILTER_CHARACTERISTIC chara =  bandpass ? DH_BANDPASS : DH_BANDSTOP;
-    return compute_chebyshev_filter_coefficients(filter,options,chara,isType2);
-}

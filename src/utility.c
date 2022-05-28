@@ -268,10 +268,9 @@ static size_t compute_transferfunction_polynomial(DH_FILTER_CHARACTERISTIC type,
  */
 static double normalize_at_frequency(DH_FILTER_CHARACTERISTIC type, double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz) {
     switch(type) {
-    case DH_LOWPASS: return 0.0;
     case DH_HIGHPASS: return 0.5;
     case DH_BANDPASS: return (0.5*cutoff_low_hz + 0.5*cutoff_high_hz)/sampling_frequency_hz;
-    case DH_BANDSTOP: return 0.0;
+    default: return 0.0;
     }
 }
 
