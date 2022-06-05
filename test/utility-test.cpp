@@ -2,6 +2,7 @@
 #include "dh/utility.h"
 #include "catch2/catch_approx.hpp"
 #include "complex_bridge.h"
+#include <cmath>
 
 /**
  * This source code is licensed under the MIT license. See file "LICENSE" at the root of the repository.
@@ -21,9 +22,9 @@ SCENARIO( "S-plane pole coefficients can be computed", "[filter]" ) {
                 REQUIRE(real[1] == Catch::Approx(-1.0));
                 REQUIRE(real[2] == Catch::Approx(-0.5));
 
-                REQUIRE(imag[0] == Catch::Approx(sqrt(3.0)/2.0));
+                REQUIRE(imag[0] == Catch::Approx(std::sqrt(3.0)/2.0));
                 REQUIRE(imag[1] == Catch::Approx(0.0).margin(0.0001));
-                REQUIRE(imag[2] == Catch::Approx(-sqrt(3.0)/2.0));
+                REQUIRE(imag[2] == Catch::Approx(-std::sqrt(3.0)/2.0));
             }
         }
     }
