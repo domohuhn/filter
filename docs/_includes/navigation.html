@@ -10,7 +10,7 @@
     {% if page.url contains 'examples' %}
     <button class="dropbtn current">Examples</button>
     {% else %}
-    <button class="dropbtn">Examples</button>
+    <button class="dropbtn" onclick="window.location.href='/examples/butterworth.html';">Examples</button>
     {% endif %}
   <div class="dropdown-content">
     {% for example in site.examples %}
