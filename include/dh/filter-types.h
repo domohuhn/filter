@@ -70,7 +70,7 @@ typedef enum {
     DH_LOWPASS,
     DH_HIGHPASS,
     DH_BANDPASS,
-    DH_BANDSTOP,
+    DH_BANDSTOP
 } DH_FILTER_CHARACTERISTIC;
 
 

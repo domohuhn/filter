@@ -40,6 +40,7 @@ if(DH_CFILTER_BUILD_CPP_BINDINGS OR DH_CFILTER_BUILD_JS_BINDINGS)
     src/bindings/cpp/filter.cpp
   )
   target_link_libraries(filter_cpp PUBLIC dh::filter)
+  target_compile_features(filter_cpp PUBLIC cxx_std_11)
   add_library(dh::filter_cpp ALIAS filter_cpp)
   if(MSVC)
     target_compile_options(filter_cpp PRIVATE /W4 /WX)
