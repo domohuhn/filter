@@ -1,0 +1,197 @@
+body {
+    color: #222;
+    background: #fff;
+    font: 100% system-ui;
+    --main-grid-color: rgb(216, 217, 220);
+}
+
+a {
+    color: #0033cc;
+}
+
+.title {
+    color: #809fff;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.main {
+    width: 60%;
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.footer {
+    text-align: center;
+    font-size: smaller;
+}
+
+img.icon {
+    margin-right: 8px;
+}
+
+input[type="number"][disabled] {
+    background: #b7b7b7;
+    border-color: #b7b7b7;
+    border-style: solid;
+}
+
+.toggleButton {
+    border-radius: 4px;
+    border-style: solid;
+    background-color: #809fff;
+    border-color: #809fff;
+    color: #000;
+}
+
+.toggleButton:hover {
+    background-color: #c7d5ff;
+    border-color: #c7d5ff;
+}
+
+.toggleButton:active {
+    background-color: #6588f0;
+    border-color: #6588f0;
+}
+
+table.chart {
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+.tab {
+    margin: auto;
+    width: 60%;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+}
+
+.tab button:hover {
+    background-color: #ddd;
+}
+
+.tab button.active {
+    background-color: #ccc;
+}
+
+.tabcontent {
+    margin: auto;
+    width: 60%;
+    display: none;
+    padding: 6px 0px;
+    border: 1px solid #ccc;
+    border-top: none;
+    animation: fadeEffect 1s;
+    background-color: #f9f9f9;
+}
+
+@keyframes fadeEffect {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+span.comment {
+    color: rgb(32, 123, 39);
+}
+
+span.type {
+    color: rgb(33, 36, 224);
+}
+
+span.enum {
+    color: rgb(35, 100, 241);
+}
+
+span.preprocessor {
+    color: rgb(209, 16, 209);
+}
+
+span.keyword {
+    color: rgb(209, 16, 209);
+}
+
+span.number {
+    color: rgb(46, 108, 60);
+}
+
+span.string {
+    color: rgb(185, 58, 58);
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #c9d1d9;
+        background: #21262d;
+        --main-grid-color: rgb(90, 90, 97);
+    }
+
+    body a {
+        color: #809fff;
+    }
+
+    input[type="number"][disabled] {
+        background: #9e9e9e;
+        border-color: #9e9e9e;
+        border-style: solid;
+    }
+
+    .tab {
+        border: 1px solid rgb(90, 90, 97);
+        background-color: #707070;
+    }
+
+    .tab button {
+        color: #c9d1d9;
+    }
+
+    .tab button:hover {
+        color: #222;
+        background-color: #aaa;
+    }
+
+    .tab button.active {
+        color: #222;
+        background-color: #aaa;
+    }
+
+    .tabcontent {
+        border: 1px solid #707070;
+        background-color: #1c1e20;
+    }
+
+    span.comment {
+        color: rgb(54, 185, 65);
+    }
+
+    span.type {
+        color: rgb(137, 139, 255);
+    }
+
+    span.enum {
+        color: rgb(136, 173, 255);
+    }
+
+    span.number {
+        color: rgb(186, 240, 198);
+    }
+}

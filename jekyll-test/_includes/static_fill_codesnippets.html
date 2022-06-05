@@ -1,0 +1,23 @@
+
+<script>
+    function static_fill_code_{{ include.filter.id }}() {
+      var pars = new Module.FilterParameters();
+      pars.filterType = Module.FilterType.{{ include.filter.type }};
+      pars.cutoffFrequencyLow = {{ include.filter.low }};
+      pars.cutoffFrequencyHigh = {{ include.filter.high }};
+      pars.samplingFrequency = {{ include.filter.sampling }};
+      pars.ripple = {{ include.filter.ripple }};
+      pars.filterOrder = {{ include.filter.order }};
+  
+      var filt = new Module.Filter(pars);
+  
+      document.getElementById("recurrence-{{ include.filter.id }}").innerHTML = generate_recurrence_relation(pars,filt);
+      document.getElementById("c-lib-{{ include.filter.id }}").innerHTML = generate_c_lib(pars);
+      document.getElementById("c++-lib-{{ include.filter.id }}").innerHTML = generate_cpp_lib(pars);
+      document.getElementById("javascript-lib-{{ include.filter.id }}").innerHTML = generate_javascript_lib(pars);
+      document.getElementById("c-{{ include.filter.id }}").innerHTML = generate_c(pars,filt);
+    };
+    static_fill_functions.push(static_fill_code_{{ include.filter.id }});
+</script>
+
+

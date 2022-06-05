@@ -1,0 +1,17 @@
+<div class="tab">
+  <button class="tablinks" onclick="openTab(event, 'recurrence-{{ include.filter.id }}', 'tab{{ include.filter.id }}')" name="defaultOpen">Recurrence relation</button>
+  <button class="tablinks" onclick="openTab(event, 'c-lib-{{ include.filter.id }}', 'tab{{ include.filter.id }}')">C (with library)</button>
+  <button class="tablinks" onclick="openTab(event, 'c++-lib-{{ include.filter.id }}', 'tab{{ include.filter.id }}')">C++ (with library)</button>
+  <button class="tablinks" onclick="openTab(event, 'javascript-lib-{{ include.filter.id }}', 'tab{{ include.filter.id }}')">Javascript (with library)</button>
+  <button class="tablinks" onclick="openTab(event, 'c-{{ include.filter.id }}', 'tab{{ include.filter.id }}')">C</button>
+</div>
+
+<div id="recurrence-{{ include.filter.id }}" class="tabcontent tab{{ include.filter.id }}" style="display: block;">
+  <div class="error">Please enable javascript to see the generated code!</div>
+</div>
+<div id="c-lib-{{ include.filter.id }}" class="tabcontent tab{{ include.filter.id }}"></div>
+<div id="c++-lib-{{ include.filter.id }}" class="tabcontent tab{{ include.filter.id }}"></div>
+<div id="javascript-lib-{{ include.filter.id }}" class="tabcontent tab{{ include.filter.id }}"></div>
+<div id="c-{{ include.filter.id }}" class="tabcontent tab{{ include.filter.id }}"></div>
+
+

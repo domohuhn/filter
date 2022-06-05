@@ -1,0 +1,24 @@
+
+<div class="error" name="makeInvisible">Please enable javascript to see the graphs!</div>
+<table class="center chartarray" cellspacing="0" border="0">
+    <tr><td class="chart"  width="50%">
+    <div>
+      <canvas id="gainChart-{{ include.filter.id }}"><div class="error">Drawing on a canvas is not supported by your browser!</div></canvas>
+    </div>
+    </td>
+    <td class="chart" width="50%">
+    <div>
+      <canvas id="phaseChart-{{ include.filter.id }}"><div class="error">Drawing on a canvas is not supported by your browser!</div></canvas>
+    </div></td>
+    </tr>
+    <tr><td class="chart"  width="50%">
+      <div>
+        <canvas id="stepChart-{{ include.filter.id }}"><div class="error">Drawing on a canvas is not supported by your browser!</div></canvas>
+      </div>
+      </td>
+      <td class="chart" width="50%">
+      <div>
+        <canvas id="impulseChart-{{ include.filter.id }}"><div class="error">Drawing on a canvas is not supported by your browser!</div></canvas>
+      </div></td>
+      </tr>
+</table>

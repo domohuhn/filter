@@ -1,0 +1,40 @@
+
+<script>
+function static_fill_graphs_{{ include.filter.id }}() {
+    var pars = new Module.FilterParameters();
+    pars.filterType = Module.FilterType.{{ include.filter.type }};
+    pars.cutoffFrequencyLow = {{ include.filter.low }};
+    pars.cutoffFrequencyHigh = {{ include.filter.high }};
+    pars.samplingFrequency = {{ include.filter.sampling }};
+    pars.ripple = {{ include.filter.ripple }};
+    pars.filterOrder = {{ include.filter.order }};
+    var filt = new Module.Filter(pars);
+  
+    const chartConfig = {
+        gain: {
+          name: 'gain-{{ include.filter.id }}',
+          id: 'gainChart-{{ include.filter.id }}'
+        },
+        phase: {
+          name: 'phase-{{ include.filter.id }}',
+          id: 'phaseChart-{{ include.filter.id }}'
+        },
+    };
+    var resp = filt.frequencyResponse(200);
+    plotPhaseAndGain(resp, chartConfig);
+    
+    const chartConfigStep = {
+      name: 'step-{{ include.filter.id }}',
+      id: 'stepChart-{{ include.filter.id }}'
+    };
+    const chartConfigImpulse = {
+      name: 'impulse-{{ include.filter.id }}',
+      id: 'impulseChart-{{ include.filter.id }}'
+    };
+    var respStep = filt.stepResponse();
+    plotResponse(respStep, chartConfigStep);
+    var respImpulse = filt.impulseResponse();
+    plotResponse(respImpulse, chartConfigImpulse);
+};
+static_fill_functions.push(static_fill_graphs_{{ include.filter.id }});
+</script>

@@ -1,0 +1,218 @@
+malp:
+  display: Moving average lowpass
+  id: malp
+  type: FIR_MOVING_AVERAGE_LOWPASS
+  order: 16
+  low: 15
+  high: 35
+  sampling: 100
+  ripple: -3
+mahp:
+  display: Moving average highpass
+  id: mahp
+  type: FIR_MOVING_AVERAGE_HIGHPASS
+  order: 16
+  low: 15
+  high: 35
+  sampling: 100
+  ripple: -3
+explp:
+  display: Exponential low pass
+  id: explp
+  type: IIR_EXPONENTIAL_LOWPASS
+  order: 1
+  low: 15
+  high: 35
+  sampling: 100
+  ripple: -3
+explp:
+  display: Exponential low pass
+  id: explp
+  type: IIR_EXPONENTIAL_LOWPASS
+  order: 1
+  low: 15
+  high: 35
+  sampling: 100
+  ripple: -3
+expfirlp:
+  display: Exponential low pass
+  id: expfirlp
+  type: FIR_EXPONENTIAL_MOVING_AVERAGE_LOWPASS
+  order: 32
+  low: 15
+  high: 35
+  sampling: 100
+  ripple: -3
+cheblp:
+  display: Chebyshev low pass
+  id: cheblp
+  type: IIR_CHEBYSHEV_LOWPASS
+  order: 4
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -3
+
+chebhp:
+  display: Chebyshev high pass
+  id: chebhp
+  type: IIR_CHEBYSHEV_HIGHPASS
+  order: 4
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -3
+
+
+chebbp:
+  display: Chebyshev band pass
+  id: chebbp
+  type: IIR_CHEBYSHEV_BANDPASS
+  order: 4
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -3
+
+chebbs:
+  display: Chebyshev band stop
+  id: chebbs
+  type: IIR_CHEBYSHEV_BANDSTOP
+  order: 4
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -3
+
+cheb2lp:
+  display: Chebyshev type 2 low pass
+  id: cheblp
+  type: IIR_CHEBYSHEV2_LOWPASS
+  order: 4
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -0.3
+
+cheb2hp:
+  display: Chebyshev type 2 high pass
+  id: chebhp
+  type: IIR_CHEBYSHEV2_HIGHPASS
+  order: 4
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -0.3
+
+
+cheb2bp:
+  display: Chebyshev type 2 band pass
+  id: chebbp
+  type: IIR_CHEBYSHEV2_BANDPASS
+  order: 4
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -0.3
+
+cheb2bs:
+  display: Chebyshev type 2 band stop
+  id: chebbs
+  type: IIR_CHEBYSHEV2_BANDSTOP
+  order: 4
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -0.3
+
+
+butlp:
+  display: Butterworth low pass
+  id: butlp
+  type: IIR_BUTTERWORTH_LOWPASS
+  order: 4
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -0.3
+
+design:
+  display: Butterworth low pass
+  id: design
+  type: IIR_BUTTERWORTH_LOWPASS
+  order: 4
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -0.3
+
+buthp:
+  display: Butterworth high pass
+  id: buthp
+  type: IIR_BUTTERWORTH_HIGHPASS
+  order: 4
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -0.3
+
+
+butbp:
+  display: Butterworth band pass
+  id: butbp
+  type: IIR_BUTTERWORTH_BANDPASS
+  order: 4
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -0.3
+
+butbs:
+  display: Butterworth band stop
+  id: butbs
+  type: IIR_BUTTERWORTH_BANDSTOP
+  order: 4
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -0.3
+
+brilp:
+  display: Brickwall low pass
+  id: brilp
+  type: FIR_BRICKWALL_LOWPASS
+  order: 80
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -0.3
+
+brihp:
+  display: Brickwall high pass
+  id: brihp
+  type: FIR_BRICKWALL_HIGHPASS
+  order: 80
+  low: 25
+  high: 35
+  sampling: 100
+  ripple: -0.3
+
+bribp:
+  display: Brickwall band pass
+  id: bribp
+  type: FIR_BRICKWALL_BANDPASS
+  order: 20
+  low: 25
+  high: 27
+  sampling: 100
+  ripple: -0.3
+
+bribs:
+  display: Brickwall band stop
+  id: bribs
+  type: FIR_BRICKWALL_BANDSTOP
+  order: 20
+  low: 25
+  high: 27
+  sampling: 100
+  ripple: -0.3

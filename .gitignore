@@ -2,4 +2,5 @@ build/
 .vscode
 .project
 .*project
-
+*/_site/*
+*/.jekyll-cache/*
