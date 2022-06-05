@@ -82,6 +82,9 @@ if(DH_CFILTER_BUILD_TESTS)
   )
 
   FetchContent_MakeAvailable(Catch2)
+  list(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/extras)
+  include(CTest)
+  include(Catch)
 
   add_executable(test-filter
     test/brickwall-test.cpp
@@ -89,6 +92,7 @@ if(DH_CFILTER_BUILD_TESTS)
     test/chebyshev-test.cpp
     test/chebyshev2-test.cpp
     test/moving-average-test.cpp
+    test/complex_bridge.c
     test/generated_c_code.c
     test/generated-code-test.cpp
     test/iir-filter-test.cpp
@@ -101,6 +105,7 @@ if(DH_CFILTER_BUILD_TESTS)
     target_sources(test-filter PRIVATE test/cpp-bindings-test.cpp)
     target_link_libraries(test-filter PRIVATE dh::filter_cpp)
   endif()
+  catch_discover_tests(test-filter)
 endif()
 
 if(TARGET Doxygen::doxygen)
