@@ -13,6 +13,7 @@
 extern "C" {
 #endif
 
+/** The complex data type for the computations. */
 #define COMPLEX double _Complex
 
 

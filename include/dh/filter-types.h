@@ -16,8 +16,9 @@ extern "C" {
 #include <stdbool.h>
 
 
-
-/** The filter types supported by this library */
+/** The filter types supported by this library.
+ * @ingroup C-API
+ */
 typedef enum {
     /** No filtering. Input = output */
     DH_NO_FILTER,
@@ -45,21 +46,21 @@ typedef enum {
     DH_IIR_BUTTERWORTH_BANDPASS,
     /** A butterworth filter. Has the smoothest possible frequency response. */
     DH_IIR_BUTTERWORTH_BANDSTOP,
-    /** A chebyshev type 1 filter. Ripples in pass band. */
+    /** A chebyshev type 1 filter. Ripples are in the pass band. */
     DH_IIR_CHEBYSHEV_LOWPASS,
-    /** A chebyshev type 1 filter. Ripples in pass band. */
+    /** A chebyshev type 1 filter. Ripples are in the pass band. */
     DH_IIR_CHEBYSHEV_HIGHPASS,
-    /** A chebyshev type 1 filter. Ripples in pass band. */
+    /** A chebyshev type 1 filter. Ripples are in the pass band. */
     DH_IIR_CHEBYSHEV_BANDPASS,
-    /** A chebyshev type 1 filter. Ripples in pass band. */
+    /** A chebyshev type 1 filter. Ripples are in the pass band. */
     DH_IIR_CHEBYSHEV_BANDSTOP,
-    /** A chebyshev type 2 filter. Ripples in pass band. */
+    /** A chebyshev type 2 filter. Ripples are in the stop band. */
     DH_IIR_CHEBYSHEV2_LOWPASS,
-    /** A chebyshev type 2 filter. Ripples in pass band. */
+    /** A chebyshev type 2 filter. Ripples are in the stop band. */
     DH_IIR_CHEBYSHEV2_HIGHPASS,
-    /** A chebyshev type 2 filter. Ripples in pass band. */
+    /** A chebyshev type 2 filter. Ripples are in the stop band. */
     DH_IIR_CHEBYSHEV2_BANDPASS,
-    /** A chebyshev type 2 filter. Ripples in pass band. */
+    /** A chebyshev type 2 filter. Ripples are in the stop band. */
     DH_IIR_CHEBYSHEV2_BANDSTOP
 } DH_FILTER_TYPE;
 
@@ -75,6 +76,7 @@ typedef enum {
 
 /**
  * The structure defining the parameters for a filter that will be created with dh_create_filter().
+ * @ingroup C-API
  */
 typedef struct {
     /** The first cutoff frequency of the filter.
@@ -87,11 +89,14 @@ typedef struct {
      * This parameter is used for the following filters:
      * 
      * ```
-     * DH_FIR_EXPONENTIAL_LOWPASS, DH_FIR_BRICKWALL_*, DH_IIR_EXPONENTIAL_*, DH_IIR_BUTTERWORTH_*, DH_IIR_CHEBYSHEV_*
+     * DH_FIR_EXPONENTIAL_MOVING_AVERAGE_LOWPASS, DH_FIR_BRICKWALL_*, DH_IIR_EXPONENTIAL_*, DH_IIR_BUTTERWORTH_*, DH_IIR_CHEBYSHEV_*
      * ```
      *  
-     * Valid Range : [0, sampling_frequency/2] or [0, cutoff_frequency_high/2]<br>
-     * Unit: Any frequency - but cutoff_frequency_low, cutoff_frequency_high and sampling_frequency must have the same unit.
+     * <b>Valid Range:</b><br>
+     *   - [0, sampling_frequency/2] or [0, cutoff_frequency_high/2]<br>
+     * 
+     * <b>Unit:</b><br>
+     *   - Any frequency, but cutoff_frequency_low, cutoff_frequency_high and sampling_frequency must have the same unit.
      **/
     double cutoff_frequency_low;
 
@@ -107,8 +112,11 @@ typedef struct {
      * *_BANDPASS, *_BANDSTOP
      * ```
      *  
-     * Valid Range : [cutoff_frequency_low, sampling_frequency/2]<br>
-     * Unit: Any frequency - but cutoff_frequency_low, cutoff_frequency_high and sampling_frequency must have the same unit.
+     * <b>Valid Range:</b><br>
+     *   - [cutoff_frequency_low, sampling_frequency/2]<br>
+     * 
+     * <b>Unit:</b><br>
+     *   - Any frequency - but cutoff_frequency_low, cutoff_frequency_high and sampling_frequency must have the same unit.
      **/
     double cutoff_frequency_high;
 
@@ -125,8 +133,11 @@ typedef struct {
      * BRICKWALL, EXPONENTIAL, CHEBYSHEV, BUTTERWORTH
      * ```
      *  
-     * Valid Range : [0, inf]<br>
-     * Unit: Any frequency - but cutoff_frequency_low, cutoff_frequency_high and sampling_frequency must have the same unit.
+     * <b>Valid Range:</b><br>
+     *   - [0, inf]<br>
+     * 
+     * <b>Unit:</b><br>
+     *   - Any frequency - but cutoff_frequency_low, cutoff_frequency_high and sampling_frequency must have the same unit.
      **/
     double sampling_frequency;
 
@@ -140,8 +151,11 @@ typedef struct {
      * CHEBYSHEV
      * ```
      *  
-     * Valid Range : [-inf, 0]
-     * Unit: dB
+     * <b>Valid Range:</b><br>
+     *   - [-inf, 0]
+     * 
+     * <b>Unit:</b><br>
+     *   - dB
      **/
     double ripple;
 
@@ -156,8 +170,11 @@ typedef struct {
      * DH_NO_FILTER, DH_IIR_EXPONENTIAL_LOWPASS
      * ```
      *  
-     * Valid Range : [0, inf]
-     * Unit: none
+     * <b>Valid Range:</b><br>
+     *   - [0, inf]
+     * 
+     * <b>Unit:</b><br>
+     *   - none
      **/
     size_t filter_order;
 
@@ -165,7 +182,9 @@ typedef struct {
     DH_FILTER_TYPE filter_type;
 } dh_filter_parameters;
 
-/** The return value for the public API of the library. */
+/** The return value for the public API of the library.
+ * @ingroup C-API 
+ **/
 typedef enum {
     /** Function was executed successfully. */
     DH_FILTER_OK,
@@ -174,16 +193,16 @@ typedef enum {
     /** No input data given to the function. */
     DH_FILTER_NO_DATA_STRUCTURE,
     /** Given input data was not correctly initialized. */
-    DH_FILTER_DATA_STRUCTURE_INPUTS_NOT_INITIALIZED,
-    /** Given output data was not correctly initialized. */
-    DH_FILTER_DATA_STRUCTURE_OUTPUTS_NOT_INITIALIZED,
+    DH_FILTER_DATA_STRUCTURE_NOT_INITIALIZED,
     /** The requested filter type does not exist. */
     DH_FILTER_UNKNOWN_FILTER_TYPE,
     /** Allocation of the buffers failed or there was not enough space in the provided buffer. */
     DH_FILTER_ALLOCATION_FAILED
 } DH_FILTER_RETURN_VALUE;
 
-/** The interal data for a filter. */
+/** The interal data for a filter.
+ * @ingroup C-API
+ **/
 typedef struct {
     /** Pointer to the array of the last inputs. Used as circular buffer. */
     double* inputs;

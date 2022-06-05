@@ -8,18 +8,31 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
     <link rel="manifest" href="/assets/images/site.webmanifest">
     <link rel="stylesheet" href="/assets/css/styles.css">
-    <link rel="stylesheet" href="/assets/css/syntax.css">
   </head>
   <body>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/assets/js/graphs.js"></script>
+    <script>
+      var static_fill_functions = [];
+    </script>
       <header class="site-header" role="banner">
-        <div class="main center">
         {% include navigation.html %}
-        </div>
       </header>
+      <div class="bg-pad">
       <div class="main center">
     {{ content }}
       </div>
+    </div>
   </body>
 </html>
-
+<script>
+  var Module = {
+    onRuntimeInitialized: function() {
+      for(const element of static_fill_functions){
+        element();
+      }
+    }
+  };
+</script>
+<script src="/assets/js/filter.js"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>

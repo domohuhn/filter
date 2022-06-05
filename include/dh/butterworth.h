@@ -21,7 +21,6 @@ extern "C" {
  * @param filter The data structure with the filter parameters. It will be modified in place (the coefficient arrays are initialized).
  * @param options The selected options for the filter.
  * @param characteristic The type of butterworth filter that will be created.
- * @param isType2 if the filter should be a type 2 filter.
  * @return DH_FILTER_RETURN_VALUE 
  */
 DH_FILTER_RETURN_VALUE dh_compute_butterworth_filter_coefficients(dh_filter_data* filter, dh_filter_parameters* options, DH_FILTER_CHARACTERISTIC characteristic);

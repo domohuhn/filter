@@ -28,7 +28,7 @@ DH_FILTER_RETURN_VALUE dh_filter(dh_filter_data* filter, double input, double* o
         return DH_FILTER_NO_DATA_STRUCTURE;
     }
     if (filter->number_coefficients_in == 0 || filter->inputs == NULL || filter->coefficients_in == NULL) {
-        return DH_FILTER_DATA_STRUCTURE_INPUTS_NOT_INITIALIZED;
+        return DH_FILTER_DATA_STRUCTURE_NOT_INITIALIZED;
     }
     if(!filter->initialized) {
         dh_initialize_filter(filter,input);
@@ -39,7 +39,7 @@ DH_FILTER_RETURN_VALUE dh_filter(dh_filter_data* filter, double input, double* o
 
     if (filter->number_coefficients_out > 1) {
         if (filter->outputs == NULL || filter->coefficients_out == NULL) {
-            return DH_FILTER_DATA_STRUCTURE_OUTPUTS_NOT_INITIALIZED;
+            return DH_FILTER_DATA_STRUCTURE_NOT_INITIALIZED;
         }
         dh_filter_shift_output(filter);
         dh_filter_run_output_loop(filter);
@@ -138,7 +138,7 @@ DH_FILTER_RETURN_VALUE dh_filter_set_gain(dh_filter_data* filter, double gain)
         return DH_FILTER_NO_DATA_STRUCTURE;
     }
     if (filter->number_coefficients_out == 0 || filter->coefficients_out == NULL) {
-        return DH_FILTER_DATA_STRUCTURE_INPUTS_NOT_INITIALIZED;
+        return DH_FILTER_DATA_STRUCTURE_NOT_INITIALIZED;
     }
     filter->current_value *= gain/filter->coefficients_out[0];
     filter->coefficients_out[0] = gain;
@@ -152,7 +152,7 @@ DH_FILTER_RETURN_VALUE dh_filter_get_gain(const dh_filter_data* filter, double* 
         return DH_FILTER_NO_DATA_STRUCTURE;
     }
     if (filter->number_coefficients_out == 0 || filter->coefficients_out == NULL) {
-        return DH_FILTER_DATA_STRUCTURE_INPUTS_NOT_INITIALIZED;
+        return DH_FILTER_DATA_STRUCTURE_NOT_INITIALIZED;
     }
     *gain = filter->coefficients_out[0];
     return DH_FILTER_OK;
@@ -165,7 +165,7 @@ DH_FILTER_RETURN_VALUE dh_filter_get_gain_at(const dh_filter_data* filter, doubl
         return DH_FILTER_NO_DATA_STRUCTURE;
     }
     if (filter->number_coefficients_out == 0 || filter->coefficients_out == NULL || filter->number_coefficients_in == 0 || filter->coefficients_in == NULL) {
-        return DH_FILTER_DATA_STRUCTURE_INPUTS_NOT_INITIALIZED;
+        return DH_FILTER_DATA_STRUCTURE_NOT_INITIALIZED;
     }
     gain->frequency = frequency;
     COMPLEX complex_gain = dh_gain_at(filter->coefficients_in,filter->number_coefficients_in,filter->coefficients_out,filter->number_coefficients_out, gain->frequency);

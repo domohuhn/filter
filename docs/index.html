@@ -4,14 +4,103 @@ title: Home
 ---
 <h1 class="title"><img class="icon" src="assets/images/favicon-32x32.png" width="25" height="25"></img>Digital filter designs!</h1>
 
-Welcome to the documentation of the embedded filter design library! 
+<p>Welcome to the documentation of the embedded filter design library! 
 This is an open source library written in C that was created with embedded systems in mind.
-There are also bindgins for other programming languages including C++ and Javascript via emscripten.
-The source code for the library and this page can be found on github.
-<br>
-<br>
-- Try it online<br>
-- See the examples<br>
-- Compile it yourself<br>
-- check out the API documentation<br>
+There are also bindings for other programming languages including C++ and Javascript via emscripten.
+The source code for the library and this webpage can be found on github.</p>
 
+
+<a href="/design_filter.html" style="text-decoration: none;">
+<div class="mainpage-box">
+  <div class="mainpage-box-element">
+    <h2 class="title">Try it online!</h2>
+    <p>You design any filter supported by the library online! The library is compiled to webassembly and included in this documentation site. It computes the values for all graphs.</p>
+  </div>
+  <div class="mainpage-box-element">
+    <canvas id="gainChart-main"><div class="error">Drawing on a canvas is not supported by your browser!</div></canvas>
+  </div>
+</div></a>
+
+<a href="/examples/butterworth.html" style="text-decoration: none;">
+<div class="mainpage-box">
+  <div class="mainpage-box-element">
+    <canvas id="steprespose-main"><div class="error">Drawing on a canvas is not supported by your browser!</div></canvas>
+  </div>
+  <div class="mainpage-box-element">
+    <h2 class="title">Check the examples!</h2>
+    <p>There are examples for every supported filter! You can look at the filter responses, and once you have found one that you like, you can adapt it to your needs.</p>
+  </div>
+</div></a>
+
+<a href="/api/index.html" style="text-decoration: none;">
+  <div class="mainpage-box">
+    <div class="mainpage-box-element">
+      <h2 class="title">Read the API documentation</h2>
+      <p>You can read the API documentation for C and C++ online. The documentation is generated from the comments in the source code with doxygen.</p>
+    </div>
+    <div class="tabcontent mainpage-box-element">
+<pre class="code"><span class="keyword">while</span> (do_stuff) {
+<span class="type">double</span> output;
+<span class="type">double</span> input = get_input();
+<span class="keyword">if</span> (dh_filter(&filter, input, &output) == <span class="enum">DH_FILTER_OK</span>) {
+    <span class="comment">// use output</span>
+    } <span class="keyword">else</span> { 
+    <span class="comment">// handle error</span>
+    }
+}
+</div>
+  </div></a>
+
+<a href="https://github.com/domohuhn/filter" style="text-decoration: none;">
+  <div class="mainpage-box" >
+    <div class="tabcontent mainpage-box-element">
+<pre class="code"><span class="preprocessor">#include</span> <span class="string">"dh/cpp/filter.hpp"</span>
+
+<span class="type">dh_filter_parameters</span> opts;
+opts.filter_type = <span class="enum">DH_IIR_BUTTERWORTH_LOWPASS</span>;
+opts.cutoff_frequency_low = <span class="number">2500.0</span>;
+opts.sampling_frequency = <span class="number">44100.0</span>;
+opts.filter_order = <span class="number">5</span>;
+<span class="keyword">auto</span> filter = <span class="type">dh::filter</span>(opts);
+</pre>
+    </div>
+    <div class="mainpage-box-element">
+      <h2 class="title">Get the source code</h2>
+      <p>The source code for this library and for this webpage is available on github.</p>
+    </div>
+  </div>
+</a>
+
+<script>
+  function static_fill_graphs_display() {
+    var pars = new Module.FilterParameters();
+    pars.filterType = Module.FilterType.IIR_BUTTERWORTH_LOWPASS;
+    pars.cutoffFrequencyLow = 45;
+    pars.cutoffFrequencyHigh = 75;
+    pars.samplingFrequency = 250;
+    pars.ripple = -3.0;
+    pars.filterOrder = 4;
+    var filt = new Module.Filter(pars);
+  
+    const chartConfig = {
+        gain: {
+          name: 'gain-moo',
+          id: 'gainChart-main'
+        },
+        phase: {
+          name: 'phase-moo',
+          id: 'phaseChart-undef'
+        },
+    };
+    var resp = filt.frequencyResponse(200);
+    plotPhaseAndGain(resp, chartConfig);
+    
+    const chartConfigStep = {
+      name: 'step-main',
+      id: 'steprespose-main'
+    };
+    var respStep = filt.stepResponse();
+    plotResponse(respStep, chartConfigStep);
+};
+static_fill_functions.push(static_fill_graphs_display);
+</script>

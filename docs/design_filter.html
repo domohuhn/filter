@@ -45,7 +45,7 @@ title: Design a filter
 {% include graph_canvas.html filter=filt %}
 
 <h2 class="main center title">Code snippets</h2>
-Here are snippets to create your filter:
+<p>Here are snippets to create the filter you with the same properties as above:</p>
 
 {% include display_codesnippets.html filter=filt %}
 
@@ -57,8 +57,7 @@ function disableInputs(name,inactive) {
   }
 }
 disableInputs("chebyshev",true);
-
-
+disableInputs("frequencies2",true);
 
 var filterSel = document.getElementById("filterType");
 filterSel.addEventListener("change", function() {

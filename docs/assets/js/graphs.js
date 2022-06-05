@@ -136,7 +136,9 @@ function plotPhaseAndGain(response, charts) {
         canvasGain,
         configGain
     );
-
+    if(document.getElementById(charts.phase.id) == null) {
+        return;
+    }
     
     if(!(graphDictionary[charts.phase.name] === undefined)){
         graphDictionary[charts.phase.name].destroy()

@@ -8,24 +8,22 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16x16.png">
     <link rel="manifest" href="/assets/images/site.webmanifest">
     <link rel="stylesheet" href="/assets/css/styles.css">
-    <link rel="stylesheet" href="/assets/css/syntax.css">
   </head>
   <body>
     <script src="/assets/js/make_codesnippet.js"></script>  
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="/assets/js/graphs.js"></script>  
+    <script src="/assets/js/graphs.js"></script>
     <script>
       var static_fill_functions = [];
     </script>
-      <header class="site-header" role="banner">
-        <div class="main center">
-        {% include navigation.html %}
-        </div>
-      </header>
+    <header class="site-header" role="banner">
+      {% include navigation.html %}
+    </header>
+    <div class="bg-pad">
       <div class="main center">
     {{ content }}
       </div>
-
+    </div>
   </body>
 </html>
 <script>
