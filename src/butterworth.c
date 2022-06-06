@@ -3,7 +3,7 @@
 #define _USE_MATH_DEFINES
 #include "math.h"
 #include "stdlib.h"
-#include "complex.h"
+#include "dh/dh_complex.h"
 #include "assert.h"
 #include "dh/utility.h"
 

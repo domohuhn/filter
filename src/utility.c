@@ -5,11 +5,6 @@
 #include "stdlib.h"
 #include "complex.h"
 
-/** Return a complex number on the complex unit circle located at the angle [phi]. */
-static COMPLEX complex_unit_circle(double phi) {
-    return cos(phi) + sin(phi) *I;
-}
-
 /**
  * @brief Transforms the input value into the [0, Pi/2] range.
  * 
@@ -33,14 +28,15 @@ void dh_compute_polynomial_coefficients_from_roots(COMPLEX* roots, size_t len, C
     if ( roots==(void*)NULL|| len==0 || outputs==(void*)NULL ) {
         return;
     }
-    outputs[0] = -roots[0];
-    outputs[1] = 1.0;
+    outputs[0] = COMPLEX_NEG(roots[0]);
+    outputs[1] = MAKE_COMPLEX_NUMER(1.0,0.0);
     for(size_t i=2; i<len; ++i) {
         outputs[i] = outputs[i-1];
         for(size_t k=i-1; k>=1; --k) {
-            outputs[k] = outputs[k-1] - outputs[k]*roots[i-1];
+            COMPLEX tmp = COMPLEX_MUL(outputs[k],roots[i-1]);
+            outputs[k] = COMPLEX_SUB(outputs[k-1], tmp);
         }
-        outputs[0] = -outputs[0]*roots[i-1];
+        outputs[0] = COMPLEX_MUL(COMPLEX_NEG(outputs[0]),roots[i-1]);
     }
 }
 
@@ -55,9 +51,11 @@ void dh_compute_polynomial_coefficients_from_roots(COMPLEX* roots, size_t len, C
  */
 static COMPLEX evaluate_polynomial(double* coeffs, size_t len, COMPLEX x) 
 {
-    COMPLEX rv = 0.0;
+    COMPLEX rv = MAKE_COMPLEX_NUMER(0.0,0.0);
     for(size_t i=0; i<len; ++i) {
-        rv = rv*x + coeffs[i];
+        COMPLEX coeff = MAKE_COMPLEX_NUMER(coeffs[i],0.0);
+        COMPLEX t1 = COMPLEX_MUL(rv,x);
+        rv = COMPLEX_ADD(t1,coeff);
     }
     return rv;
 }
@@ -65,12 +63,12 @@ static COMPLEX evaluate_polynomial(double* coeffs, size_t len, COMPLEX x)
 COMPLEX dh_gain_at(double* numerator, size_t len_numerator,double* denominator, size_t len_denominator, double x_evaluate)
 {
     if(numerator == NULL || denominator == NULL) {
-        return 1.0;
+        return MAKE_COMPLEX_NUMER(1.0,0.0);
     }
     COMPLEX arg = complex_unit_circle(2*M_PI*x_evaluate);
     COMPLEX num = evaluate_polynomial(numerator,len_numerator,arg);
     COMPLEX denom = evaluate_polynomial(denominator,len_denominator,arg);
-    return num/denom;
+    return COMPLEX_DIV(num,denom);
 }
 
 void dh_normalize_gain_at(double* numerator, size_t len_numerator,double* denominator, size_t len_denominator, double x_evaluate)
@@ -78,7 +76,7 @@ void dh_normalize_gain_at(double* numerator, size_t len_numerator,double* denomi
     if(numerator == NULL || denominator == NULL) {
         return;
     }
-    double scale = cabs(1.0/dh_gain_at(numerator,len_numerator,denominator,len_denominator,x_evaluate));
+    double scale = cabs(COMPLEX_INV(dh_gain_at(numerator,len_numerator,denominator,len_denominator,x_evaluate)));
     for(size_t i=0; i<len_numerator; ++i) {
         numerator[i] *= scale;
     }
@@ -126,14 +124,19 @@ static size_t append_to_array(COMPLEX* array, size_t skip_entries, COMPLEX value
  * @return Index of the element one past the last written value.  
  */
 static size_t lowpassToBandpass(COMPLEX* lowpass, size_t num_entries, double center, double width, size_t append) {
+    const COMPLEX halfwidth = MAKE_COMPLEX_NUMER(width*0.5 , 0.0);
+    const COMPLEX cnt = MAKE_COMPLEX_NUMER(center , 0.0);
+    const COMPLEX cntSq = COMPLEX_MUL(cnt , cnt);
     for(size_t i= 0; i<num_entries; ++i) {
         // scale to bandwidth
-        COMPLEX current =  width/2.0 * lowpass[i];
+        const COMPLEX current = COMPLEX_MUL(halfwidth , lowpass[i]);
         // duplicate and shift from baseband to +center and -center
-        lowpass[i] = current + csqrt( current*current - center*center);
-        lowpass[i + num_entries] = current - csqrt( current*current - center*center);
+        const COMPLEX currentSq = COMPLEX_MUL(current,current);
+        const COMPLEX shift =  csqrt( COMPLEX_SUB(currentSq,cntSq) );
+        lowpass[i] = COMPLEX_ADD(current, shift);
+        lowpass[i + num_entries] = COMPLEX_SUB(current , shift);
     }
-    return append_to_array(lowpass,2*num_entries,0.0,append);
+    return append_to_array(lowpass,2*num_entries,MAKE_COMPLEX_NUMER(0.0, 0.0),append);
 }
 
 /**
@@ -148,16 +151,21 @@ static size_t lowpassToBandpass(COMPLEX* lowpass, size_t num_entries, double cen
  * @return Index of the element one past the last written value.  
  */
 static size_t lowpassToBandstop(COMPLEX* lowpass, size_t num_entries, double center, double width, size_t append) {
+    const COMPLEX halfwidth = MAKE_COMPLEX_NUMER(width*0.5 , 0.0);
+    const COMPLEX cnt = MAKE_COMPLEX_NUMER(center , 0.0);
+    const COMPLEX cntSq = COMPLEX_MUL(cnt , cnt);
     for(size_t i= 0; i<num_entries; ++i) {
         // invert to highpass
-        COMPLEX current =  (width*0.5) / lowpass[i];
+        COMPLEX current =  COMPLEX_DIV(halfwidth, lowpass[i]);
         // duplicate and shift from baseband to +center and -center
-        lowpass[i] = current + csqrt( current*current - center*center);
-        lowpass[i + num_entries] = current - csqrt( current*current - center*center);
+        const COMPLEX currentSq = COMPLEX_MUL(current,current);
+        const COMPLEX shift =  csqrt( COMPLEX_SUB(currentSq,cntSq) );
+        lowpass[i] = COMPLEX_ADD(current, shift);
+        lowpass[i + num_entries] = COMPLEX_SUB(current , shift);
     }
     // move zeros from infinity to stopband
-    num_entries = append_to_array(lowpass,2*num_entries,center * I,append);
-    return append_to_array(lowpass,num_entries,-center * I,append);
+    num_entries = append_to_array(lowpass,2*num_entries,MAKE_COMPLEX_NUMER(0.0,center),append);
+    return append_to_array(lowpass,num_entries,MAKE_COMPLEX_NUMER(0.0,-center),append);
 }
 
 /**
@@ -169,9 +177,10 @@ static size_t lowpassToBandstop(COMPLEX* lowpass, size_t num_entries, double cen
  * @return Index of the element one past the last written value.  
  */
 static size_t shiftLowpassFrequency(COMPLEX* lowpass, size_t num_entries, double cutoff) {
+    const COMPLEX shift = MAKE_COMPLEX_NUMER(cutoff , 0.0);
     for(size_t i= 0; i<num_entries; ++i) {
         // shift from baseband to cutoff
-        lowpass[i] *= cutoff;
+        lowpass[i] = COMPLEX_MUL(lowpass[i] ,shift);
     }
     return num_entries;
 }
@@ -187,11 +196,12 @@ static size_t shiftLowpassFrequency(COMPLEX* lowpass, size_t num_entries, double
  * @return Index of the element one past the last written value.  
  */
 static size_t lowpassToHighpass(COMPLEX* lowpass, size_t num_entries, double cutoff, size_t append) {
+    const COMPLEX shift = MAKE_COMPLEX_NUMER(cutoff , 0.0);
     for(size_t i= 0; i<num_entries; ++i) {
         // shift from baseband to cutoff
-        lowpass[i] = cutoff/lowpass[i];
+        lowpass[i] = COMPLEX_DIV(shift, lowpass[i]);
     }
-    return append_to_array(lowpass,num_entries,0.0,append);
+    return append_to_array(lowpass,num_entries,MAKE_COMPLEX_NUMER(0.0,0.0),append);
 }
 
 
@@ -206,11 +216,13 @@ static size_t lowpassToHighpass(COMPLEX* lowpass, size_t num_entries, double cut
  * @return The new number of entries in the array.
  */
 static size_t bilinear_z_transform_and_append_ones(COMPLEX* splane, size_t num_entries, double fsample, size_t append_entries) {
-    const double fsample2 = 2 * fsample;
+    const COMPLEX fsample2 = MAKE_COMPLEX_NUMER(2.0 * fsample , 0.0);
     for(size_t i= 0; i<num_entries; ++i) {
-        splane[i] = (fsample2 + splane[i]) / (fsample2 - splane[i]);
+        const COMPLEX num = COMPLEX_ADD(fsample2, splane[i]);
+        const COMPLEX deno = COMPLEX_SUB(fsample2, splane[i]);
+        splane[i] = COMPLEX_DIV(num,deno);
     }
-    return append_to_array(splane,num_entries,-1.0,append_entries);
+    return append_to_array(splane,num_entries,MAKE_COMPLEX_NUMER(-1.0,0.0),append_entries);
 }
 
 /**

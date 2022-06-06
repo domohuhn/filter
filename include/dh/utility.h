@@ -2,6 +2,7 @@
 #define DH_UTILITY_H_INCLUDED
 
 #include "dh/filter-types.h"
+#include "dh/dh_complex.h"
 
 /** @file
  * @brief Utilities for the filter library. 
@@ -12,10 +13,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/** The complex data type for the computations. */
-#define COMPLEX double _Complex
-
 
 /**
  * @brief Computes positions of poles on the complex plane. All poles are equally spaced in quadrants 2 and 3.

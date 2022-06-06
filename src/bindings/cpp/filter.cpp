@@ -1,6 +1,7 @@
 #include "dh/cpp/filter.hpp"
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <algorithm>
 #include "dh/filter.h"
 
 namespace dh {

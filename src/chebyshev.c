@@ -1,7 +1,7 @@
 #include "dh/chebyshev.h"
 #define _USE_MATH_DEFINES
 #include "math.h"
-#include "complex.h"
+#include "dh/dh_complex.h"
 #include "assert.h"
 #include "dh/utility.h"
 
@@ -13,7 +13,7 @@ static void dh_transform_s_poles_to_chebyshev(COMPLEX* ptr, size_t len, double r
 	{ 
         double real = creal(ptr[i]);
         double imag = cimag(ptr[i]);
-        ptr[i] = real*sinh(arg) + imag * cosh(arg) * I;
+        ptr[i] = MAKE_COMPLEX_NUMER(real*sinh(arg) , imag * cosh(arg));
 	}
 }
 
@@ -31,7 +31,7 @@ static size_t chebyshev_splane_zeros(COMPLEX* splane,size_t count,size_t order,v
     if(data->isType2) {
         for(size_t i=0; i<order; ++i) {
             double phi = (2*i+1)*M_PI/(2*order);
-            splane[i] = I/cos(phi);
+            splane[i] = MAKE_COMPLEX_NUMER(0.0,1.0/cos(phi));
         }
         number_zeros = order;
     }
@@ -46,7 +46,7 @@ static size_t chebyshev_splane_poles(COMPLEX* splane,size_t count,size_t order,v
     // convert to chebyshev type 2
     if(data->isType2) {
         for(size_t i=0; i< order; ++i){
-            splane[i] = 1.0/splane[i];
+            splane[i] = COMPLEX_INV(splane[i]);
         }
     }
     return order;

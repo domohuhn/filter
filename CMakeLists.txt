@@ -11,6 +11,7 @@ option(DH_CFILTER_BUILD_TESTS "If the tests should be built." ON)
 option(DH_CFILTER_BUILD_EXAMPLES "If the example application should be built." ON)
 
 add_library(filter 
+  src/dh_complex.c
   src/filter.c
   src/utility.c
   src/create_filter.c

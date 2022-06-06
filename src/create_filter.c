@@ -141,18 +141,15 @@ static DH_FILTER_RETURN_VALUE create_moving_average(dh_filter_data* filter, dh_f
 
 static void fill_array_fir_sinc(double* data, size_t count,double cutoff, bool highpass) {
     assert(data != NULL);
-    int xshift = count/2;
+    int xshift = (int)count/2;
     for (size_t i=0; i<count; ++i) {
-        int idx = i;
+        int idx = (int)i;
         double x = 2*M_PI*cutoff*(idx-xshift);
         data[i] = x!=0.0 ? sin(x)/x : 1.0;
     }
     double gain[1] = {1.0};
     
-    double scale = cabs(1.0/dh_gain_at(data,count,gain,1,0.0));
-    for(size_t i=0; i<count; ++i) {
-        data[i] *= scale;
-    }
+    dh_normalize_gain_at(data,count,gain,1,0.0);
 
     if (highpass) {
         for (size_t i=0; i<count; ++i) {
