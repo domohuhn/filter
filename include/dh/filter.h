@@ -39,6 +39,7 @@ extern "C" {
  * DH_CFILTER_BUILD_JS_BINDINGS   | OFF  |  If the bindings for javascript should be built. This includes the C++ Bindings. Requires emscripten.
  * DH_CFILTER_BUILD_TESTS  | ON  |  If the tests should be built. Will fetch Catch2.
  * DH_CFILTER_BUILD_EXAMPLES  | ON  | If the examples should be built. Will fetch CXXopts.
+ * DH_CFILTER_COVERAGE | OFF | If the binary should be instrumented to collect coverage information. (Only active if you compile with gcc)
  * 
  * @section pak CMake package
  * 

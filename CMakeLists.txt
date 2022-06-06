@@ -9,6 +9,7 @@ option(DH_CFILTER_BUILD_CPP_BINDINGS "If the bindings for cpp should be built." 
 option(DH_CFILTER_BUILD_JS_BINDINGS "If the bindings for javascript should be built. This includes the C++ Bindings." OFF)
 option(DH_CFILTER_BUILD_TESTS "If the tests should be built." ON)
 option(DH_CFILTER_BUILD_EXAMPLES "If the example application should be built." ON)
+option(DH_CFILTER_COVERAGE "If the binary should be instrumented to collect coverage information." OFF)
 
 add_library(filter 
   src/dh_complex.c
@@ -34,6 +35,12 @@ if(MSVC)
   target_compile_options(filter PRIVATE /W4 /WX)
 else()
   target_compile_options(filter PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+
+
+if(DH_CFILTER_COVERAGE AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  target_compile_options(filter PUBLIC -coverage -fprofile-arcs -ftest-coverage)
+  target_link_libraries(filter PUBLIC -coverage)
 endif()
 
 if(DH_CFILTER_BUILD_CPP_BINDINGS OR DH_CFILTER_BUILD_JS_BINDINGS)
@@ -131,3 +138,5 @@ if(TARGET Doxygen::doxygen)
     COMMENT "Generating API documentation"
   )
 endif()
+
+

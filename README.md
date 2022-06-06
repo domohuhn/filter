@@ -1,5 +1,7 @@
 # Filter library for C
 
+[![Build Desktop](https://github.com/domohuhn/filter/actions/workflows/build-desktop.yml/badge.svg)](https://github.com/domohuhn/filter/actions/workflows/build-desktop.yml)
+
 This repostitory contains a C-library that can be used to both design digital filters, as well as use them.
 The library also provides bindings to various other programming languages, like C++ and Javascript via emscripten.
 
