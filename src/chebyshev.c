@@ -27,6 +27,8 @@ typedef struct
 
 static size_t chebyshev_splane_zeros(COMPLEX* splane,size_t count,size_t order,void* user) {
     assert(order <= count);
+    MAYBE_UNUSED(count);
+    MAYBE_UNUSED(user);
     size_t number_zeros = 0;
     dh_chebyshev_data* data = (dh_chebyshev_data*)user;
     if(data->isType2) {
@@ -41,6 +43,7 @@ static size_t chebyshev_splane_zeros(COMPLEX* splane,size_t count,size_t order,v
 
 static size_t chebyshev_splane_poles(COMPLEX* splane,size_t count,size_t order,void* user) {
     assert(order <= count);
+    MAYBE_UNUSED(count);
     dh_chebyshev_data* data = (dh_chebyshev_data*)user;
     dh_compute_poles_on_s_plane(splane,order);
     dh_transform_s_poles_to_chebyshev(splane,order,data->ripple_db);

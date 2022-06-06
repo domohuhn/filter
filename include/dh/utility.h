@@ -120,6 +120,9 @@ typedef struct
  */
 DH_FILTER_RETURN_VALUE dh_compute_transfer_function_polynomials(dh_filter_data* filter, const dh_filter_parameters* options, const dh_transfer_function_callbacks cbs);
 
+/** Used to get rid of compiler warnings */
+#define MAYBE_UNUSED(X) (void)((X))
+
 #ifdef __cplusplus
 }
 #endif

@@ -8,17 +8,21 @@
 #include "dh/utility.h"
 
 
-static size_t butterworth_splane_zeros(COMPLEX* splane,size_t count,size_t order,void* user) {
+static size_t butterworth_splane_zeros(COMPLEX* splane, size_t count,size_t order,void* user) {
     assert(order <= count);
-    (void)splane;
-    (void)user;
+    MAYBE_UNUSED(splane);
+    MAYBE_UNUSED(count);
+    MAYBE_UNUSED(order);
+    MAYBE_UNUSED(user);
+    // Function intentionally left empty
     return 0;
 }
 
 static size_t butterworth_splane_poles(COMPLEX* splane,size_t count,size_t order,void* user) {
     assert(order <= count);
+    MAYBE_UNUSED(count);
+    MAYBE_UNUSED(user);
     dh_compute_poles_on_s_plane(splane,order);
-    (void)user;
     return order;
 }
 

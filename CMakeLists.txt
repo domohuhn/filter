@@ -28,7 +28,7 @@ add_library(dh::filter ALIAS filter)
 
 find_package(Doxygen)
 if(DH_CFILTER_BUILD_TESTS OR DH_CFILTER_BUILD_EXAMPLES OR TARGET Doxygen::doxygen)
-  Include(FetchContent)
+  include(FetchContent)
 endif()
 
 if(MSVC)
@@ -58,12 +58,14 @@ if(DH_CFILTER_BUILD_CPP_BINDINGS OR DH_CFILTER_BUILD_JS_BINDINGS)
 endif()
 
 if(DH_CFILTER_BUILD_EXAMPLES AND DH_CFILTER_BUILD_CPP_BINDINGS)
+  message(STATUS "Fetching cxxopts")
   FetchContent_Declare(
     Cxxopts
     GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
     GIT_TAG        v3.0.0
   )
   FetchContent_MakeAvailable(Cxxopts)
+  message(STATUS "Done")
 
   add_executable(design-filter
     examples/design-filter.cpp
@@ -81,15 +83,14 @@ endif()
 
 
 if(DH_CFILTER_BUILD_TESTS)
-  Include(FetchContent)
-
+  message(STATUS "Fetching Catch2")
   FetchContent_Declare(
     Catch2
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
     GIT_TAG        v3.0.0-preview4
   )
-
   FetchContent_MakeAvailable(Catch2)
+  message(STATUS "Done")
   list(APPEND CMAKE_MODULE_PATH ${Catch2_SOURCE_DIR}/extras)
   include(CTest)
   include(Catch)
@@ -117,12 +118,14 @@ if(DH_CFILTER_BUILD_TESTS)
 endif()
 
 if(TARGET Doxygen::doxygen)
+  message(STATUS "Fetching doxygen awesome")
   FetchContent_Declare(
     doxygen-awesome
     GIT_REPOSITORY https://github.com/jothepro/doxygen-awesome-css.git
     GIT_TAG        v2.0.3
   )
   FetchContent_MakeAvailable(doxygen-awesome)
+  message(STATUS "Done")
 
   set(DOXYGEN_STRIP_FROM_INC_PATH ${PROJECT_SOURCE_DIR}/include)
   set(DOXYGEN_STRIP_FROM_PATH ${PROJECT_SOURCE_DIR}/include)
