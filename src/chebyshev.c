@@ -4,6 +4,7 @@
 #include "dh/dh_complex.h"
 #include "assert.h"
 #include "dh/utility.h"
+#include <complex.h>
 
 static void dh_transform_s_poles_to_chebyshev(COMPLEX* ptr, size_t len, double ripple) {
     double ripple_power = pow(10.0, -ripple / 10.0);

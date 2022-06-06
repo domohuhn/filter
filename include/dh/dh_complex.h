@@ -10,7 +10,6 @@
 extern "C" {
 #endif
 
-#include "complex.h"
 
 #ifndef _WIN32
 /** The complex data type for the computations. */
@@ -22,9 +21,10 @@ extern "C" {
 #define COMPLEX_DIV(x,y) ((x)/(y))
 #define COMPLEX_INV(x) (1.0/(x))
 #define COMPLEX_NEG(x) (-(x))
-#define COMPLEX_CONJ(x) MAKE_COMPLEX_NUMER(creal((x)), -cimag((x)))
 
 #else
+
+#include "complex.h"
 
 /** The complex data type for the computations. */
 #define COMPLEX _Dcomplex
@@ -36,7 +36,6 @@ extern "C" {
 #define COMPLEX_DIV(x,y) dh_complex_division((x),(y))
 #define COMPLEX_INV(x) dh_complex_division(MAKE_COMPLEX_NUMER(1.0,0.0),(x))
 #define COMPLEX_NEG(x) MAKE_COMPLEX_NUMER(-creal((x)), -cimag((x)))
-#define COMPLEX_CONJ(x) MAKE_COMPLEX_NUMER(creal((x)), -cimag((x)))
 
 inline COMPLEX dh_complex_division(COMPLEX num, COMPLEX deno) {
     double a =  creal(num);
