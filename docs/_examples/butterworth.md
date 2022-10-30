@@ -1,7 +1,7 @@
 ---
 layout: example
 title: Butterworth filters
-link: /examples/butterworth.html
+link: butterworth.html
 ---
 
 # Butterworth filters

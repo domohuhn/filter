@@ -1,7 +1,7 @@
 ---
 layout: example
 title: Moving average filters
-link: /examples/moving-average.html
+link: moving-average.html
 ---
 
 # Moving average filters

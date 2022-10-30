@@ -1,7 +1,7 @@
 ---
 layout: example
 title: Chebyshev Type I filters
-link: /examples/chebyshev.html
+link: chebyshev.html
 ---
 
 # Chebyshev Type I filters

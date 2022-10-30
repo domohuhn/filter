@@ -1,7 +1,7 @@
 ---
 layout: example
 title: Exponential filters
-link: /examples/exponential.html
+link: exponential.html
 ---
 
 # Exponential filters

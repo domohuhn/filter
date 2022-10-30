@@ -1,7 +1,7 @@
 ---
 layout: example
 title: Brickwall filters
-link: /examples/brickwall.html
+link: brickwall.html
 ---
 
 # Brickwall filters

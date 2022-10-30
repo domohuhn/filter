@@ -1,7 +1,7 @@
 ---
 layout: example
 title: Chebyshev Type II filters
-link: /examples/chebyshev2.html
+link: chebyshev2.html
 ---
 
 # Chebyshev Type II filters

@@ -9,14 +9,19 @@
 <div class="dropdown">
     {% if page.url contains 'examples' %}
     <button class="dropbtn current">Examples</button>
+    <div class="dropdown-content">
+      {% for example in site.examples %}
+      <a href="{{ example.link }}">{{ example.title }}</a>
+      {% endfor %}
+    </div>
     {% else %}
-    <button class="dropbtn" onclick="window.location.href='filter/examples/butterworth.html';">Examples</button>
+    <button class="dropbtn" onclick="window.location.href='examples/butterworth.html';">Examples</button>
+    <div class="dropdown-content">
+      {% for example in site.examples %}
+      <a href="examples/{{ example.link }}">{{ example.title }}</a>
+      {% endfor %}
+    </div>
     {% endif %}
-  <div class="dropdown-content">
-    {% for example in site.examples %}
-    <a href="{{ example.link }}">{{ example.title }}</a>
-    {% endfor %}
-  </div>
 </div>
 <div><a href="api/index.html">API Documentation</a></div>
 
