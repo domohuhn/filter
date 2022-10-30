@@ -1,4 +1,4 @@
 - name: Home
-  link: /
+  link: /filter/
 - name: Design a filter
-  link: /design_filter.html
+  link: /filter/design_filter.html
