@@ -1,0 +1,8 @@
+<map id="dh/filter&#45;types.h" name="dh/filter&#45;types.h">
+<area shape="rect" id="node1" title="The data types for the filter library." alt="" coords="308,5,433,32"/>
+<area shape="rect" id="node2" href="$butterworth_8h.html" title="The computation of butterworth coefficients for the filter library." alt="" coords="5,80,136,107"/>
+<area shape="rect" id="node3" href="$chebyshev_8h.html" title="The computation of chebyshev coefficients for the filter library." alt="" coords="160,80,283,107"/>
+<area shape="rect" id="node4" href="$filter_8hpp.html" title="The cpp interface for the filter library." alt="" coords="307,80,434,107"/>
+<area shape="rect" id="node5" href="$filter_8h.html" title="The primary include file for the filter library." alt="" coords="459,80,541,107"/>
+<area shape="rect" id="node6" href="$utility_8h.html" title="Utilities for the filter library." alt="" coords="565,80,656,107"/>
+</map>
