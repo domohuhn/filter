@@ -6,7 +6,7 @@
 This repostitory contains a C-library that can be used to both design digital filters, as well as use them.
 The library also provides bindings to various other programming languages, like C++ and Javascript via emscripten.
 
-You can try the library online.
+You can try out the library [online on github pages](https://domohuhn.github.io/filter/design_filter.html).
 
 The following filter types are supported:
 
@@ -48,7 +48,7 @@ ctest
 
 ## Documentation
 
-The API Documentation is generated with doxygen and can read online on the github page (coming soon).
+The API Documentation is generated with doxygen and can read online on [github pages](https://domohuhn.github.io/filter/).
 
 ## License
 All code in this repository is licensed with the MIT license, see file "LICENSE".
