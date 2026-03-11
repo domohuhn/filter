@@ -46,11 +46,11 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_parame
         case DH_FIR_EXPONENTIAL_MOVING_AVERAGE_LOWPASS:
             rv = fir_exponential_lowpass(filter, options);
             break;
-        case DH_FIR_BRICKWALL_LOWPASS: // falltrough
+        case DH_FIR_BRICKWALL_LOWPASS: // fallthrough
         case DH_FIR_BRICKWALL_HIGHPASS:
             rv = fir_create_sinc(filter, options);
             break;
-        case DH_FIR_BRICKWALL_BANDPASS: // falltrough
+        case DH_FIR_BRICKWALL_BANDPASS: // fallthrough
         case DH_FIR_BRICKWALL_BANDSTOP:
             rv = fir_create_sinc_bandfilter(filter, options, options->filter_type == DH_FIR_BRICKWALL_BANDPASS);
             break;
@@ -141,10 +141,10 @@ static DH_FILTER_RETURN_VALUE create_moving_average(dh_filter_data* filter, dh_f
 
 static void fill_array_fir_sinc(double* data, size_t count,double cutoff, bool highpass) {
     assert(data != NULL);
-    int xshift = (int)count/2;
+    const int xShift = (int)count/2;
     for (size_t i=0; i<count; ++i) {
         int idx = (int)i;
-        double x = 2*M_PI*cutoff*(idx-xshift);
+        double x = 2*M_PI*cutoff*(idx-xShift);
         data[i] = x!=0.0 ? sin(x)/x : 1.0;
     }
     double gain[1] = {1.0};
@@ -153,7 +153,7 @@ static void fill_array_fir_sinc(double* data, size_t count,double cutoff, bool h
 
     if (highpass) {
         for (size_t i=0; i<count; ++i) {
-            if(i!=(size_t)xshift) {
+            if(i!=(size_t)xShift) {
                 data[i] = -data[i];
             } else {
                 data[i] = 1.0 - data[i];
@@ -227,7 +227,7 @@ static DH_FILTER_RETURN_VALUE iir_exponential_lowpass(dh_filter_data* filter, dh
     if (dh_filter_allocate_buffers(filter, 1, 2) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    double val = options->cutoff_frequency_low/options->sampling_frequency;
+    const double val = options->cutoff_frequency_low/options->sampling_frequency;
     filter->coefficients_in[0] = val;
     filter->coefficients_out[0] = 1.0;
     filter->coefficients_out[1] = -1.0+val;

@@ -3,7 +3,7 @@
 [![Build Desktop](https://github.com/domohuhn/filter/actions/workflows/build-desktop.yml/badge.svg)](https://github.com/domohuhn/filter/actions/workflows/build-desktop.yml)
 [![codecov](https://codecov.io/gh/domohuhn/filter/branch/main/graph/badge.svg?token=29BG0GTON3)](https://codecov.io/gh/domohuhn/filter)
 
-This repostitory contains a C-library that can be used to both design digital filters, as well as use them.
+This repository contains a C-library that can be used to both design digital filters, as well as use them.
 The library also provides bindings to various other programming languages, like C++ and Javascript via emscripten.
 
 You can try out the library [online on github pages](https://domohuhn.github.io/filter/design_filter.html).

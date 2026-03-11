@@ -43,17 +43,17 @@ void dh_compute_polynomial_coefficients_from_roots(COMPLEX* roots, size_t len, C
 /**
  * @brief Evaluates a polynomial.
  * 
- * @param coeffs Pointer to array with the given coefficients.
+ * @param coefficients Pointer to array with the given coefficients.
  *               The highest index in the array is the coefficient for x**0.
  * @param len Number of coefficients in the array.
  * @param x Position where the polynomial is evaluated.
  * @return computed value 
  */
-static COMPLEX evaluate_polynomial(double* coeffs, size_t len, COMPLEX x) 
+static COMPLEX evaluate_polynomial(double* coefficients, size_t len, COMPLEX x) 
 {
     COMPLEX rv = MAKE_COMPLEX_NUMER(0.0,0.0);
     for(size_t i=0; i<len; ++i) {
-        COMPLEX coeff = MAKE_COMPLEX_NUMER(coeffs[i],0.0);
+        COMPLEX coeff = MAKE_COMPLEX_NUMER(coefficients[i],0.0);
         COMPLEX t1 = COMPLEX_MUL(rv,x);
         rv = COMPLEX_ADD(t1,coeff);
     }
@@ -211,15 +211,15 @@ static size_t lowpassToHighpass(COMPLEX* lowpass, size_t num_entries, double cut
  * Also appends [append_entries] roots at -1.0 (at the Nyquist frequency) to the array.
  * @param splane array of complex numbers.
  * @param num_entries number of array elements.
- * @param fsample sampling frequency.
+ * @param fSample sampling frequency.
  * @param append_entries The number of roots to append. Set this to the number_of_poles - number_of_zeros.
  * @return The new number of entries in the array.
  */
-static size_t bilinear_z_transform_and_append_ones(COMPLEX* splane, size_t num_entries, double fsample, size_t append_entries) {
-    const COMPLEX fsample2 = MAKE_COMPLEX_NUMER(2.0 * fsample , 0.0);
+static size_t bilinear_z_transform_and_append_ones(COMPLEX* splane, size_t num_entries, double fSample, size_t append_entries) {
+    const COMPLEX fSample2 = MAKE_COMPLEX_NUMER(2.0 * fSample , 0.0);
     for(size_t i= 0; i<num_entries; ++i) {
-        const COMPLEX num = COMPLEX_ADD(fsample2, splane[i]);
-        const COMPLEX deno = COMPLEX_SUB(fsample2, splane[i]);
+        const COMPLEX num = COMPLEX_ADD(fSample2, splane[i]);
+        const COMPLEX deno = COMPLEX_SUB(fSample2, splane[i]);
         splane[i] = COMPLEX_DIV(num,deno);
     }
     return append_to_array(splane,num_entries,MAKE_COMPLEX_NUMER(-1.0,0.0),append_entries);
@@ -280,9 +280,9 @@ static size_t compute_transferfunction_polynomial(DH_FILTER_CHARACTERISTIC type,
  */
 static double normalize_at_frequency(DH_FILTER_CHARACTERISTIC type, double cutoff_low_hz, double cutoff_high_hz, double sampling_frequency_hz) {
     switch(type) {
-    case DH_HIGHPASS: return 0.5;
-    case DH_BANDPASS: return (0.5*cutoff_low_hz + 0.5*cutoff_high_hz)/sampling_frequency_hz;
-    default: return 0.0;
+        case DH_HIGHPASS: return 0.5;
+        case DH_BANDPASS: return (0.5*cutoff_low_hz + 0.5*cutoff_high_hz)/sampling_frequency_hz;
+        default: return 0.0;
     }
 }
 
@@ -291,7 +291,7 @@ static double normalize_at_frequency(DH_FILTER_CHARACTERISTIC type, double cutof
  * @return Computed value 
  */
 static double compute_center(DH_FILTER_CHARACTERISTIC type, double warped_low, double warped_high){
-    if(type == DH_BANDPASS || type == DH_BANDSTOP) {
+    if (type == DH_BANDPASS || type == DH_BANDSTOP) {
         return sqrt(warped_low * warped_high);
     }
     return warped_low;
@@ -321,21 +321,21 @@ DH_FILTER_RETURN_VALUE dh_compute_transfer_function_polynomials(dh_filter_data* 
     const double cutoff_frequency_high =  options->cutoff_frequency_high;
     const double sampling_frequency =  options->sampling_frequency;
     
-    double warped_low = 4 * transform_frequency(cutoff_frequency_low/sampling_frequency);
-    double warped_high = 4 * transform_frequency(cutoff_frequency_high/sampling_frequency);
+    const double warped_low = 4 * transform_frequency(cutoff_frequency_low/sampling_frequency);
+    const double warped_high = 4 * transform_frequency(cutoff_frequency_high/sampling_frequency);
     
-    double center = compute_center(type,warped_low,warped_high);
-    double width = compute_width(type,warped_low,warped_high);
+    const double center = compute_center(type,warped_low,warped_high);
+    const double width = compute_width(type,warped_low,warped_high);
 
     // allocate temporary buffers
-    size_t buffer_length = 4*filter_order+1;
+    const size_t buffer_length = 4*filter_order+1;
     COMPLEX* buffer = (COMPLEX*)malloc(sizeof(COMPLEX) * buffer_length);
     if(buffer == NULL) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
     COMPLEX* splane = buffer;
     COMPLEX* polynomial = buffer + 2*filter_order;
-    size_t polylen = 2*(filter_order)+1;
+    const size_t polylen = 2*(filter_order)+1;
 
     // feedforward coefficients
     size_t number_zeros = cbs.zeros(splane,polylen,filter_order,cbs.user_data);

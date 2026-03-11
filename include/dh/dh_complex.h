@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 
-#ifndef _WIN32
+#if !defined(_MSC_VER)
 /** The complex data type for the computations. */
 #define COMPLEX double _Complex
 #define MAKE_COMPLEX_NUMER(re,im) ((re) + (im) * I)

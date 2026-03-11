@@ -37,7 +37,7 @@ void create_graphs(dh_filter_parameters opts) {
     auto freq = filter.compute_frequency_response(impulse.size());
     std::cout << "#cycle    input(impulse)    output(impulse)    input(step)    output(step)    frequency/sampling_frequency    gain    phase(degree)\n";
     for(size_t i=0;i<=impulse.size();++i) {
-        int si = i;
+        int si = static_cast<int>(i);
         std::cout <<std::setw(3)<<si-10<<"    "<<std::setw(5)<<impulse[i].input<<"    "<<std::setw(22)<<impulse[i].output<<"    "
         <<std::setw(5)<<step[i].input<<"    "<<std::setw(22)<<step[i].output<<"    "
         <<std::setw(5)<< freq[i].frequency <<"    "<<std::setw(22)<< freq[i].gain<<"    "<<std::setw(22)<< freq[i].phase_shift <<"\n";

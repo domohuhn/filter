@@ -200,7 +200,7 @@ typedef enum {
     DH_FILTER_ALLOCATION_FAILED
 } DH_FILTER_RETURN_VALUE;
 
-/** The interal data for a filter.
+/** The internal data for a filter.
  * @ingroup C-API
  **/
 typedef struct {
@@ -232,7 +232,7 @@ typedef struct {
     bool buffer_needs_cleanup;
 } dh_filter_data;
 
-/** Return structure for the frequrency response. */
+/** Return structure for the frequency response. */
 typedef struct{
     /** Current position (x value) */
     double frequency;

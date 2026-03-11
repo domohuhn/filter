@@ -14,7 +14,7 @@
  */
 
 static void dh_filter_add_input(dh_filter_data* filter, double input);
-static double dh_filter_run_filter_loop(double* coefficients, size_t num_coeffs, double* data, size_t current_idx , size_t start);
+static double dh_filter_run_filter_loop(double* coefficients, size_t coefficient_count, double* data, size_t current_idx , size_t start);
 static void dh_filter_run_input_loop(dh_filter_data* filter);
 static void dh_filter_run_output_loop(dh_filter_data* filter);
 static void dh_filter_shift_output(dh_filter_data* filter);
@@ -85,15 +85,15 @@ static void dh_filter_add_input(dh_filter_data* filter, double input)
     filter->inputs[filter->current_input_index] = input;
 }
 
-static double dh_filter_run_filter_loop(double* coefficients, size_t num_coeffs, double* data, size_t current_idx , size_t start)
+static double dh_filter_run_filter_loop(double* coefficients, size_t coefficient_count, double* data, size_t current_idx , size_t start)
 {
     double out = 0.0;
-    size_t split_loops = num_coeffs - current_idx;
-    for(size_t i=start; i< split_loops; ++i) {
+    const size_t split_loops = coefficient_count - current_idx;
+    for (size_t i=start; i< split_loops; ++i) {
         size_t idx = current_idx + i;
         out += coefficients[i] * data[idx];
     }
-    for(size_t i=split_loops; i <  num_coeffs; ++i) {
+    for (size_t i=split_loops; i <  coefficient_count; ++i) {
         size_t idx = i-split_loops;
         out += coefficients[i] * data[idx];
     }

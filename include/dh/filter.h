@@ -62,7 +62,7 @@ extern "C" {
  * 
  * @section javascript Javascript bindings
  * 
- * The library can be compiled to Webassembly with emscripten and it provides bindings to javascript via the C++-API.
+ * The library can be compiled to webassembly with emscripten and it provides bindings to javascript via the C++-API.
  * In order to create the webassembly target, set the following options during the cmake call:
  * ```bash
  * cmake -DDH_CFILTER_BUILD_TESTS='OFF' \
@@ -122,7 +122,7 @@ extern "C" {
  * @param[in] input The next input value to the filter.
  * @param[out] output The current output value. Parameter is optional. If it is not NULL, then the output value is written to the given address.
  * @return An enum with the result of the operation.
- * @retval DH_FILTER_OK Operation was successfull
+ * @retval DH_FILTER_OK Operation was successful
  * @retval DH_FILTER_NO_DATA_STRUCTURE You gave NULL as first argument.
  * @retval DH_FILTER_DATA_STRUCTURE_NOT_INITIALIZED The filter data structure was not correctly initialized.
  * @ingroup C-API
@@ -139,7 +139,7 @@ DH_FILTER_RETURN_VALUE dh_filter(dh_filter_data* filter, double input, double* o
  * @param[out] filter pointer to the filter structure that will be initialized.
  * @param[in] options the desired filter type.
  * @return DH_FILTER_RETURN_VALUE 
- * @retval DH_FILTER_OK Operation was successfull
+ * @retval DH_FILTER_OK Operation was successful
  * @retval DH_FILTER_NO_DATA_STRUCTURE You gave NULL as first argument.
  * @retval DH_FILTER_UNKNOWN_FILTER_TYPE An unknown filter was requested in the options.
  * @retval DH_FILTER_ALLOCATION_FAILED Not enough memory for the filter could be allocated.
@@ -156,7 +156,7 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_parame
  * @param[in] filter the filter structure
  * @param[in] value the desired steady state
  * @return An enum with the result of the operation.
- * @retval DH_FILTER_OK Operation was successfull
+ * @retval DH_FILTER_OK Operation was successful
  * @retval DH_FILTER_NO_DATA_STRUCTURE You gave NULL as first argument.
  * @ingroup C-API
  */
@@ -167,7 +167,7 @@ DH_FILTER_RETURN_VALUE dh_initialize_filter(dh_filter_data* filter, double value
  * If the filter is marked as owner of the buffer, free() will be called to clean up the allocated memory.
  * @param[in] filter the filter structure that will be freed.
  * @return An enum with the result of the operation.
- * @retval DH_FILTER_OK Operation was successfull
+ * @retval DH_FILTER_OK Operation was successful
  * @ingroup C-API
  */
 DH_FILTER_RETURN_VALUE dh_free_filter(dh_filter_data* filter);
@@ -177,7 +177,7 @@ DH_FILTER_RETURN_VALUE dh_free_filter(dh_filter_data* filter);
  * @param[in] filter the filter structure
  * @param[in] gain the desired gain
  * @return An enum with the result of the operation.
- * @retval DH_FILTER_OK Operation was successfull
+ * @retval DH_FILTER_OK Operation was successful
  * @retval DH_FILTER_NO_DATA_STRUCTURE You gave NULL as first argument.
  * @retval DH_FILTER_DATA_STRUCTURE_NOT_INITIALIZED The filter data structure was not correctly initialized.
  * @ingroup C-API
@@ -189,7 +189,7 @@ DH_FILTER_RETURN_VALUE dh_filter_set_gain(dh_filter_data* filter, double gain);
  * @param[in] filter the filter structure
  * @param[out] gain pointer to output
  * @return An enum with the result of the operation.
- * @retval DH_FILTER_OK Operation was successfull
+ * @retval DH_FILTER_OK Operation was successful
  * @retval DH_FILTER_NO_DATA_STRUCTURE You gave NULL as first argument.
  * @retval DH_FILTER_DATA_STRUCTURE_NOT_INITIALIZED The filter data structure was not correctly initialized.
  * @ingroup C-API
@@ -202,7 +202,7 @@ DH_FILTER_RETURN_VALUE dh_filter_get_gain(const dh_filter_data* filter, double* 
  * @param[in] frequency frequency/sampling_frequency where the gain is computed. Range: [0,0.5]
  * @param[out] gain pointer to output
  * @return An enum with the result of the operation.
- * @retval DH_FILTER_OK Operation was successfull
+ * @retval DH_FILTER_OK Operation was successful
  * @retval DH_FILTER_NO_DATA_STRUCTURE You gave NULL as first argument.
  * @retval DH_FILTER_DATA_STRUCTURE_NOT_INITIALIZED The filter data structure was not correctly initialized.
  * @ingroup C-API
