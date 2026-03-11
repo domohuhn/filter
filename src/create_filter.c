@@ -139,7 +139,7 @@ static DH_FILTER_RETURN_VALUE create_moving_average(dh_filter_data* filter, dh_f
     return DH_FILTER_OK;
 }
 
-static void fill_array_fir_sinc(double* data, size_t count,double cutoff, bool highpass) {
+static void fill_array_fir_sinc(double* data, size_t count, double cutoff, bool highpass) {
     assert(data != NULL);
     const int xShift = (int)count/2;
     for (size_t i=0; i<count; ++i) {
@@ -162,12 +162,25 @@ static void fill_array_fir_sinc(double* data, size_t count,double cutoff, bool h
     }
 }
 
+static double clamped_cutoff(double cutoff_frequency, double sample_frequency)
+{
+    const double fraction = cutoff_frequency/sample_frequency;
+    if (fraction < 0.0) {
+        return 0.0;
+    }
+    if (fraction < 0.5) {
+        return fraction;
+    }
+    return 0.5;
+}
+
+
 static DH_FILTER_RETURN_VALUE fir_create_sinc(dh_filter_data* filter, dh_filter_parameters* options)
 {
     if (dh_filter_allocate_buffers(filter, options->filter_order+1, 1) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    double cutoff = options->cutoff_frequency_low/options->sampling_frequency;
+    const double cutoff = clamped_cutoff(options->cutoff_frequency_low,options->sampling_frequency);
     bool is_highpass = options->filter_type == DH_FIR_BRICKWALL_HIGHPASS;
     fill_array_fir_sinc(filter->coefficients_in,filter->number_coefficients_in,cutoff , is_highpass);
     filter->coefficients_out[0] = 1.0;
@@ -175,15 +188,14 @@ static DH_FILTER_RETURN_VALUE fir_create_sinc(dh_filter_data* filter, dh_filter_
     return DH_FILTER_OK;
 }
 
-
 static DH_FILTER_RETURN_VALUE fir_create_sinc_bandfilter(dh_filter_data* filter, dh_filter_parameters* options, bool bandpass)
 {
     size_t count_single_filter = options->filter_order+1;
-    if (dh_filter_allocate_buffers(filter, 2*count_single_filter-1, 1) != DH_FILTER_OK) {
+    if (dh_filter_allocate_buffers(filter, 2*count_single_filter - 1, 1) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    double cutoff_low = options->cutoff_frequency_low/options->sampling_frequency;
-    double cutoff_high = options->cutoff_frequency_high/options->sampling_frequency;
+    const double cutoff_low = clamped_cutoff(options->cutoff_frequency_low, options->sampling_frequency);
+    const double cutoff_high = clamped_cutoff(options->cutoff_frequency_high, options->sampling_frequency);
     // in order to save allocations, we will use the input and output buffers for the temporary values
     // inputs has size 2*count_single_filter-1 followed by 2 doubles
     // we need 2*count_single_filter -> ok, there are 8 bytes of buffer left
@@ -193,10 +205,10 @@ static DH_FILTER_RETURN_VALUE fir_create_sinc_bandfilter(dh_filter_data* filter,
 
     fill_array_fir_sinc(coeff_in_temp_low,count_single_filter,cutoff_low, bandpass);
     fill_array_fir_sinc(coeff_in_temp_high,count_single_filter,cutoff_high, !bandpass);
-    if(bandpass) {
-        dh_convolve_parameters(coeff_in_temp_low,coeff_in_temp_high,count_single_filter,filter->coefficients_in);
+    if (bandpass) {
+        dh_convolve_parameters(coeff_in_temp_low,coeff_in_temp_high,count_single_filter, filter->coefficients_in);
     } else {
-        for(size_t i=0; i<count_single_filter;++i) {
+        for (size_t i=0; i < count_single_filter; ++i) {
             filter->coefficients_in[i]= coeff_in_temp_low[i] + coeff_in_temp_high[i];
         }
         filter->number_coefficients_in = count_single_filter;

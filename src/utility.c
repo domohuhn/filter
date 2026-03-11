@@ -82,14 +82,14 @@ void dh_normalize_gain_at(double* numerator, size_t len_numerator,double* denomi
     }
 }
 
-void dh_convolve_parameters(double * param1,double * param2, size_t len,double * out ) {
+void dh_convolve_parameters(double * param1, double * param2, size_t len, double * out ) {
     if(param1 == NULL || param2 == NULL || out==NULL) {
         return;
     }
-    for(size_t i=0;i<2*len-1; ++i) {
+    for (size_t i=0; i<2*len-1; ++i) {
         out[i] = 0.0;
     }
-    for(size_t i=0;i<len; ++i) {
+    for (size_t i=0;i<len; ++i) {
         for(size_t k=0;k<len; ++k) {
             out[i+k] += param1[i] * param2[k];
         }
