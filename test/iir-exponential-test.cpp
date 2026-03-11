@@ -1,4 +1,5 @@
 #include "catch2/catch_test_macros.hpp"
+#include "catch2/catch_approx.hpp"
 #include "dh/filter.h"
 #include <cstring>
 
@@ -30,9 +31,10 @@ SCENARIO( "An IIR exponential lowpass filter can be used", "[filter]" ) {
                 REQUIRE(iir_exp.current_output_index == 0);
                 REQUIRE(iir_exp.buffer_length == 6*sizeof(double));
                 REQUIRE(iir_exp.initialized == false);
-                REQUIRE(iir_exp.coefficients_in[0] == 0.25);
+
+                REQUIRE(iir_exp.coefficients_in[0] == Catch::Approx(0.2078795764));
                 REQUIRE(iir_exp.coefficients_out[0] == 1.0);
-                REQUIRE(iir_exp.coefficients_out[1] == -0.75);
+                REQUIRE(iir_exp.coefficients_out[1] == Catch::Approx(-0.7921204236));
             }
             double output=0.0;
             int status = dh_filter(&iir_exp, 10.0, &output);
@@ -46,14 +48,14 @@ SCENARIO( "An IIR exponential lowpass filter can be used", "[filter]" ) {
             status = dh_filter(&iir_exp, 20.0, &output);
             THEN("a step function can be filtered") {
                 REQUIRE(status == DH_FILTER_OK);
-                REQUIRE(output == 12.5);
+                REQUIRE(output == Catch::Approx(12.0787957635));
                 REQUIRE(iir_exp.current_value == output);
             }
 
             status = dh_filter(&iir_exp, 22.5, &output);
             THEN("a step function can be filtered") {
                 REQUIRE(status == DH_FILTER_OK);
-                REQUIRE(output == 15.0);
+                REQUIRE(output == Catch::Approx(14.2451512853));
                 REQUIRE(iir_exp.current_value == output);
             }
 

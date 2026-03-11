@@ -227,7 +227,7 @@ static DH_FILTER_RETURN_VALUE iir_exponential_lowpass(dh_filter_data* filter, dh
     if (dh_filter_allocate_buffers(filter, 1, 2) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    const double val = options->cutoff_frequency_low/options->sampling_frequency;
+    const double val = exp(-2 * M_PI * options->cutoff_frequency_low/options->sampling_frequency);
     filter->coefficients_in[0] = val;
     filter->coefficients_out[0] = 1.0;
     filter->coefficients_out[1] = -1.0+val;
