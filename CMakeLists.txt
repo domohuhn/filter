@@ -62,7 +62,7 @@ if(DH_CFILTER_BUILD_EXAMPLES AND DH_CFILTER_BUILD_CPP_BINDINGS)
   FetchContent_Declare(
     Cxxopts
     GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
-    GIT_TAG        v3.0.0
+    GIT_TAG        v3.3.1
   )
   FetchContent_MakeAvailable(Cxxopts)
   message(STATUS "Done")
@@ -87,7 +87,7 @@ if(DH_CFILTER_BUILD_TESTS)
   FetchContent_Declare(
     Catch2
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG        v3.0.0-preview4
+    GIT_TAG        v3.7.0
   )
   FetchContent_MakeAvailable(Catch2)
   message(STATUS "Done")

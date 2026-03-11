@@ -4,6 +4,7 @@
 #include <cmath>
 #include "dh/cpp/filter.hpp"
 #include <stdexcept>
+#include <iostream>
 #include <iomanip>
 
 
@@ -71,7 +72,7 @@ int main(int argc, const char * argv[]) {
             create_graphs(opts);
         }
     }
-    catch (const cxxopts::OptionException &e) {
+    catch (const cxxopts::exceptions::parsing &e) {
         std::cout << "error parsing options: " << e.what() << std::endl << std::endl;
         std::cout << options.help({""}) << std::endl;
         exit(1);
