@@ -10,12 +10,13 @@ SCENARIO( "A moving average filter can be created", "[filter]" ) {
 
     GIVEN( "An options structure filled with values for moving average filters" ) {
         dh_filter_data moving_avg;
-        dh_filter_parameters opts;
+        dh_filter_parameters opts{};
         opts.filter_type = DH_FIR_MOVING_AVERAGE_LOWPASS;
         opts.filter_order = 15;
 
         WHEN( "the create function is called" ) {
-            dh_create_filter(&moving_avg, &opts);
+            const auto rv = dh_create_filter(&moving_avg, &opts);
+            REQUIRE(rv == DH_FILTER_OK);
 
             THEN( "the buffers are initialized" ) {
                 REQUIRE(moving_avg.buffer_needs_cleanup);
@@ -140,12 +141,13 @@ SCENARIO( "A moving average highpass filter can be used", "[filter]" ) {
 
     GIVEN( "An options structure filled with values for moving average filters" ) {
         dh_filter_data moving_avg;
-        dh_filter_parameters opts;
+        dh_filter_parameters opts{};
         opts.filter_type = DH_FIR_MOVING_AVERAGE_HIGHPASS;
         opts.filter_order = 15;
 
         WHEN( "the create function is called" ) {
-            dh_create_filter(&moving_avg, &opts);
+            const auto rv = dh_create_filter(&moving_avg, &opts);
+            REQUIRE(rv == DH_FILTER_OK);
 
             THEN( "the buffers are initialized" ) {
                 REQUIRE(moving_avg.buffer_needs_cleanup);

@@ -28,8 +28,11 @@ DH_FILTER_RETURN_VALUE dh_create_filter(dh_filter_data* filter, dh_filter_parame
 {
     assert(filter != NULL);
     assert(options != NULL);
-    if(filter == NULL || options == NULL) {
+    if (filter == NULL || options == NULL) {
         return DH_FILTER_NO_DATA_STRUCTURE;
+    }
+    if (options->cutoff_frequency_low < 0.0 || options->sampling_frequency < 0.0) {
+        return DH_FILTER_PARAMETER_OUT_OF_RANGE;
     }
     DH_FILTER_RETURN_VALUE rv = DH_FILTER_UNKNOWN_FILTER_TYPE;
     switch(options->filter_type){
@@ -251,7 +254,7 @@ static DH_FILTER_RETURN_VALUE fir_exponential_lowpass(dh_filter_data* filter, dh
     if (dh_filter_allocate_buffers(filter, options->filter_order+1, 1) != DH_FILTER_OK) {
         return DH_FILTER_ALLOCATION_FAILED;
     }
-    double val = 1.0-(options->cutoff_frequency_low/options->sampling_frequency);
+    const double val = 1.0 - exp(-2 * M_PI * options->cutoff_frequency_low/options->sampling_frequency);
     double current = val;
     double integrated = 0.0;
     filter->coefficients_out[0] = 1.0;

@@ -45,28 +45,28 @@ SCENARIO( "An FIR exponential lowpass filter can be used", "[filter]" ) {
             status = dh_filter(&filter_data, 20.0, &output);
             THEN("an impulse function can be filtered") {
                 REQUIRE(status == DH_FILTER_OK);
-                REQUIRE(output == Catch::Approx(15.0).margin(0.001));
+                REQUIRE(output == Catch::Approx(10.85270963026451163).margin(0.001));
                 REQUIRE(filter_data.current_value == output);
             }
 
             status = dh_filter(&filter_data, 10.0, &output);
             THEN("an impulse function can be filtered") {
                 REQUIRE(status == DH_FILTER_OK);
-                REQUIRE(output == Catch::Approx(12.5).margin(0.001));
+                REQUIRE(output == Catch::Approx(10.81586070599952976).margin(0.001));
                 REQUIRE(filter_data.current_value == output);
             }
 
             status = dh_filter(&filter_data, 10.0, &output);
             THEN("an impulse function can be filtered") {
                 REQUIRE(status == DH_FILTER_OK);
-                REQUIRE(output == Catch::Approx(11.25).margin(0.001));
+                REQUIRE(output == Catch::Approx(10.78060416813584155).margin(0.001));
                 REQUIRE(filter_data.current_value == output);
             }
 
             status = dh_filter(&filter_data, 10.0, &output);
             THEN("an impulse function can be filtered") {
                 REQUIRE(status == DH_FILTER_OK);
-                REQUIRE(output == Catch::Approx(10.625).margin(0.001));
+                REQUIRE(output == Catch::Approx(10.74687120341766011).margin(0.001));
                 REQUIRE(filter_data.current_value == output);
             }
 

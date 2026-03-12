@@ -197,7 +197,9 @@ typedef enum {
     /** The requested filter type does not exist. */
     DH_FILTER_UNKNOWN_FILTER_TYPE,
     /** Allocation of the buffers failed or there was not enough space in the provided buffer. */
-    DH_FILTER_ALLOCATION_FAILED
+    DH_FILTER_ALLOCATION_FAILED,
+    /** A parameter was not inside the valid range. */
+    DH_FILTER_PARAMETER_OUT_OF_RANGE
 } DH_FILTER_RETURN_VALUE;
 
 /** The internal data for a filter.
